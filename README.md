@@ -1,7 +1,3 @@
-# skripsianyukk
-
-Ini file **skripsi**.
-
 ## Requirement
 
 -   PHP 8.1 (beberapa packages requires php >= 8.2)
