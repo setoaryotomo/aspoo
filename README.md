@@ -22,9 +22,6 @@ $ npm run dev:vite
 $ npm run dev:artisan || php artisan serve
 ```
 
-> Catatan:
->
-> NPM cuma untuk build viewnya doang, soalnya pakai vue. Server tetep pakai php artisan
 
 ## Run Laragon (server)
 
@@ -33,11 +30,3 @@ $ php -S localhost:7000 -t smartaspoo-backend/public
 $ grok http localhost:7000
 ```
 
-## PAYMENT
-
-No. Kartu: `4811 1111 1111 1114` <br>
-CVV: `123`
-
-## Github Actions
-
-Kalau bisa jangan langsung push code ke `master` branch, biar quota 2,000 Actions minutes/month tidak habis.
