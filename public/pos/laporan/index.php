@@ -4,7 +4,19 @@ $title = 'Laporan';
 <?php $active[8] = 'active' ?>
 <?php include('../templates/sidebar.php') ?>
 
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan</title>
+    <!-- Load jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Load DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
 
 <div class="main-panel bgMain fadeIn animated">
     <!-- Navbar -->
@@ -47,13 +59,13 @@ $title = 'Laporan';
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <div class="custom-card uang-keluar">
+                        <div class="custom-card uang-keluar" style="display: none;">
                             <h2>Uang Pembelian</h2>
                             <p class="total-uang-masuk" id="uang_keluar">Rp. 0</p>
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <div class="custom-card uang-piutang">
+                        <div class="custom-card uang-piutang" style="display: none;">
                             <h2>Uang Piutang</h2>
                             <p class="total-uang-masuk" id="uang_piutang">Rp. 0</p>
                         </div>
@@ -74,7 +86,7 @@ $title = 'Laporan';
                 </div>
             </div>
 
-            <div class="card mt-5">
+            <!-- <div class="card mt-5">
                 <div class="card-header card-header-primary card-header-bg">
                     <h4 class="card-title">Laporan Pembelian</h4>
                 </div>
@@ -93,7 +105,7 @@ $title = 'Laporan';
                         </table>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <div class="card mt-5">
                 <div class="card-header card-header-primary card-header-bg">
@@ -104,7 +116,7 @@ $title = 'Laporan';
                         <table class="table" id="penjualan_table">
                             <thead class="text-primary">
                                 <th>No</th>
-                                <th>Nama Obat</th>
+                                <th>Nama Barang</th>
                                 <th>Harga Jual</th>
                                 <th>Jumlah</th>
                                 <th>Total Harga</th>
@@ -133,17 +145,15 @@ $title = 'Laporan';
                 return 0
             }
         }
+
         $(document).ready(() => {
-            run()
-
-
+            run();
 
             $('#tanggal').change(() => {
-                clean()
-                run()
-
-            })
-        })
+                clean();
+                run();
+            });
+        });
 
         function run() {
             var url = "./laporan/api.php";
@@ -152,71 +162,62 @@ $title = 'Laporan';
                 request: 'ambilData',
                 hari: $("#tanggal").val()
             }, (data, status, xhr) => {
-                console.log(data)
+                console.log(data); // Check the data in console
                 if (data.uang_masuk.uang_masuk != null) {
                     var i = 1;
-                    $('#uang_masuk').html("Rp. " +
-                        formatNumber(data.uang_masuk.uang_masuk))
+                    $('#uang_masuk').html("Rp. " + formatNumber(data.uang_masuk.uang_masuk));
                     data.penjualan.forEach(penjualan => {
                         if (typeof penjualan.pelanggan_nama === 'undefined' || penjualan.pelanggan_nama === null)
-                            penjualan['pelanggan_nama'] = "Pelanggan"
+                            penjualan['pelanggan_nama'] = "Pelanggan";
                         $('#laporan_penjualan').append(`
-                                <tr>
+                            <tr>
                                 <td>${i++}</td>
-                                <td>${penjualan.obat_nama}</td>
-                                <td>Rp. ${formatNumber(penjualan.obat_harga_jual)}</td>
+                                <td>${penjualan.nama_barang}</td>
+                                <td>Rp. ${formatNumber(penjualan.harga_umum)}</td>
                                 <td>${formatNumber(penjualan.penjualan_child_jumlah)}</td>
-                                <td>Rp. ${formatNumber(penjualan.obat_harga_jual * penjualan.penjualan_child_jumlah)}</td>
-                              
-                                </tr>
-                        `)
-                        // <a href="./penjualan/edit.php?edit=${penjualan.penjualan_id}" class="btn btn-primary btn-round" rel="tooltip"><i class="material-icons" title="edit data">edit</i></a>
-                        //   <td class="td-actions"><a href="./penjualan/api.php?delete=${penjualan.penjualan_child_id}" class="btn btn-danger btn-danger btn-round" rel="tooltip" onclick="return confirm('Hapus Data?')"><i class="material-icons" title="hapus data">delete</i></a></td>
-                    })
+                                <td>Rp. ${formatNumber(penjualan.harga_umum * penjualan.penjualan_child_jumlah)}</td>
+                            </tr>
+                        `);
+                    });
                 }
 
                 if (data.uang_keluar.uang_keluar != null || data.uang_piutang.uang_keluar != null) {
-                    $('#uang_keluar').html("Rp. " + formatNumber(data.uang_keluar.uang_keluar))
-                    $('#uang_piutang').html("Rp. " + formatNumber(data.uang_piutang.uang_keluar))
+                    $('#uang_keluar').html("Rp. " + formatNumber(data.uang_keluar.uang_keluar));
+                    $('#uang_piutang').html("Rp. " + formatNumber(data.uang_piutang.uang_keluar));
                     var i = 1;
                     data.pembelian.forEach(pembelian => {
                         $('#laporan_pembelian').append(`
-                        <tr>
+                            <tr>
                                 <td>${i++}</td>
                                 <td>${pembelian.supplier_nama}</td>
                                 <td>${pembelian.pembelian_faktur_nomor}</td>
                                 <td>${pembelian.jumlahData}</td>
                                 <td class="td-actions">
-                                     <a href="./pembelian/lihat.php?id=${pembelian.pembelian_faktur_id}" class="btn btn-success btn-round" rel="tooltip">
+                                    <a href="./pembelian/lihat.php?id=${pembelian.pembelian_faktur_id}" class="btn btn-success btn-round" rel="tooltip">
                                         <i class="material-icons"> info </i>
                                     </a>
-                                 </td>
-                                </tr>
-                        `)
-
+                                </td>
+                            </tr>
+                        `);
                     });
                     $('#penjualan_table').DataTable({
                         "ordering": false
-                    })
+                    });
                     $('#pembelian_table').DataTable({
                         "ordering": false
-                    })
+                    });
                 }
-            })
-        }
-
-        function buatModal(id_pembelian) {
-            $('#modall').append(`
-                
-            `)
-            $('#modalBuat').modal('show')
+            }).fail((jqXHR, textStatus, errorThrown) => {
+                console.error("Error: ", textStatus, errorThrown); // Log any errors
+            });
         }
 
         function clean() {
-            $('#uang_masuk').html("Rp. " +
-                formatNumber("0"))
-            $('#uang_keluar').html("Rp. " + formatNumber("0"))
-            $('#laporan_penjualan').html(" ")
-            $('#laporan_pembelian').html(" ")
+            $('#uang_masuk').html("Rp. " + formatNumber("0"));
+            $('#uang_keluar').html("Rp. " + formatNumber("0"));
+            $('#laporan_penjualan').html(" ");
+            $('#laporan_pembelian').html(" ");
         }
     </script>
+</body>
+</html>

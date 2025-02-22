@@ -64,25 +64,27 @@
                 <p>Satuan</p>
               </a>
             </li>
-            <li class="nav-item <?php if (isset($active[3])) echo $active[3] ?>">
+            
+            <li style="display: none;" class="nav-item <?php if (isset($active[3])) echo $active[3] ?>">
               <a href="supplier" class="nav-link">
                 <i class="material-icons">local_shipping</i>
                 <p>Supplier</p>
               </a>
             </li>
-            <li class="nav-item <?php if (isset($active[7])) echo $active[7] ?>">
+            <li style="display: none;" class="nav-item <?php if (isset($active[7])) echo $active[7] ?>">
               <a href="pelanggan" class="nav-link">
                 <i class="material-icons">people</i>
                 <p>Pelanggan</p>
               </a>
             </li>
           <?php endif; ?>
-          <li class="nav-item <?php if (isset($active[4])) echo $active[4] ?>">
+          <li style="display: none;" class="nav-item <?php if (isset($active[4])) echo $active[4] ?>">
             <a href="pembelian" class="nav-link">
               <i class="material-icons">shopping_cart</i>
               <p>Pembelian</p>
             </a>
           </li>
+          
           <li class="nav-item <?php if (isset($active[5])) echo $active[5] ?>">
             <a href="penjualan" class="nav-link">
               <i class="material-icons">attach_money</i>

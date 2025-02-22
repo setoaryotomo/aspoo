@@ -1,10 +1,10 @@
 @extends('portal_layout.templates')
 @section('content')
-<style>
-    .detail-pengirim{
-        align-items: center;
-    }
-</style>
+    <style>
+        .detail-pengirim {
+            align-items: center;
+        }
+    </style>
     @php
         function rupiah($angka)
         {
@@ -22,9 +22,10 @@
                     </div>
                     <div class="col-md-10">
                         <h4><b>Alamat Pengiriman</b></h4>
-                        <p>{{ $user->userMaster->name }}  {{ @$user->telepon}} <br>
+                        <p>{{ $user->userMaster->name }} {{ @$user->telepon }} <br>
                             {{-- {{ @$user->alamat }}  --}}
-                            {{ $user->provinsiModel->name }} | {{ $user->kotaModel->name }} | {{ $user->kecamatanModel->name }} | {{ $user->kelurahanModel->name }}
+                            {{ $user->provinsiModel->name }} | {{ $user->kotaModel->name }} |
+                            {{ $user->kecamatanModel->name }} | {{ $user->kelurahanModel->name }}
                         </p>
                     </div>
                 </div>
@@ -53,13 +54,13 @@
                                 <div class="row">
                                     <div class="col-md-2">
                                         @if (strpos($barang->thumbnail, 'https://') !== false)
-                                        <img src="{{ $barang->thumbnail }}" alt="Product Image"
-                                            class="product-image" height="100">
+                                            <img src="{{ $barang->thumbnail }}" alt="Product Image" class="product-image"
+                                                height="100">
                                         @else
-                                        <img src="{{ $barang->thumbnail_readable }}" alt="Product Image"
-                                            class="product-image" height="100">
+                                            <img src="{{ $barang->thumbnail_readable }}" alt="Product Image"
+                                                class="product-image" height="100">
                                         @endif
-                                        </div>
+                                    </div>
                                     <div class="col-md-10">
                                         <div class="row justify-content-between">
                                             <div class="col-md-6">
@@ -89,8 +90,9 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label>Pilih Pengiriman</label>
-                            <select v-model="transaksi.ongkirData[{{ $iteration }}]" @change="fetchRajaOngkir(transaksi.ongkirData[{{ $iteration }}],{{$iteration}})" name="courier" id="courier"
-                                class="form-control" required>
+                            <select v-model="transaksi.ongkirData[{{ $iteration }}]"
+                                @change="fetchRajaOngkir(transaksi.ongkirData[{{ $iteration }}],{{ $iteration }})"
+                                name="courier" id="courier" class="form-control" required>
                                 <option value="jne">JNE</option>
                                 <option value="pos">POS</option>
                                 <option value="tiki">TIKI</option>
@@ -173,7 +175,7 @@
                     transaksi: {
                         ongkir: [],
                         pesan: [],
-                        ongkirData : [],
+                        ongkirData: [],
                     },
                     rajaongkirData: 0,
                     totalPengiriman: 0,
@@ -182,37 +184,41 @@
                 }
             },
             methods: {
-                async fetchRajaOngkir(value,id) {
-                    try{
+                async fetchRajaOngkir(value, id) {
+                    try {
                         showLoading();
                         var data = {
-                            courier : value
+                            courier: value
+                        };
+                        const response = await httpClient.post("{{ url('p/checkout/rajaongkir') }}", data);
+                        console.log("rajaongkir", response);
+
+                        // Pastikan response memiliki data yang valid
+                        if (response.data.result && response.data.result.results && response.data.result
+                            .results[0].costs) {
+                            this.transaksi.ongkir[id] = response.data.result.results[0].costs[0].cost[0].value;
+                            this.transaksi.ongkirData[id] = value;
+                            this.countTotalPembayaran();
+                        } else {
+                            throw new Error("Pilihan pengiriman tidak tersedia untuk toko ini.");
                         }
-                        console.log("asodoaskd",value,id)
-                        const response = await httpClient.post("{{ url('p/checkout/rajaongkir') }}", data)
-                        console.log("rajaongkir",response);
-                        this.transaksi.ongkir[id] = response.data.result.results[0].costs[0].cost[0].value
-                        this.transaksi.ongkirData[id] = value
-                        console.log(this.transaksi.ongkir)
-                        this.countTotalPembayaran();
                         hideLoading();
-
-                    }catch(e){
+                    } catch (e) {
                         hideLoading();
-                        console.log(e)
+                        console.log(e);
                         Swal.fire({
-                                title: `Plihan Pengiriman Tidak Tersedia Pada Daerah Anda`,
-                                message: e
-                            })
+                            title: `Pilihan Pengiriman Tidak Tersedia Pada Daerah Anda`,
+                            message: e.message
+                        });
                     }
-
                 },
                 countTotalPembayaran() {
                     this.totalPengiriman = 0;
-                    console.log(this.transaksi)
                     this.transaksi.ongkir.forEach(e => {
-                        this.totalPengiriman += parseInt(e)
-                    })
+                        if (e) {
+                            this.totalPengiriman += parseInt(e);
+                        }
+                    });
                 },
                 rupiah(amount) {
                     const rupiahFormat = "Rp " + amount.toLocaleString("id-ID");
@@ -239,7 +245,7 @@
 
                         var data = response.data.result
                         //window.location.href =
-                         //   `{{ url('/') }}/p/checkout/success?kode=${data.kode_transaksi}`
+                        //   `{{ url('/') }}/p/checkout/success?kode=${data.kode_transaksi}`
 
                         //  Redirect to midtrans payment page
                         window.location.href = data.midtrans_link

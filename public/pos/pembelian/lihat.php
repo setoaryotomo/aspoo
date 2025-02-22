@@ -107,10 +107,10 @@ if (isset($_POST['id_pembelian'])) {
 
                                             <?php endif; ?>
                                         </td>
-                                        <!-- <td class=" td-actions">
+                                        <td class=" td-actions">
                                             <a href="./pembelian/edit.php?edit=<?= $row['pembelian_id'] ?>" class="btn btn-primary btn-round" rel="tooltip"><i class="material-icons">edit</i></a>
                                             <a href="./pembelian/edit.php?delete=<?= $row['pembelian_id'] ?>" class="btn btn-danger btn-danger btn-round" rel="tooltip" onclick="return confirm('Hapus Data?')"><i class="material-icons">delete</i></a>
-                                        </td> -->
+                                        </td>
                                     </tr>
                                 <?php endwhile; ?>
                             </tbody>

@@ -16,11 +16,11 @@ middleware();
 if (isset($_POST['nama'])) {
     extract($_POST);
     $userId = $_SESSION['data']['user_id'];
-    query("INSERT INTO barang(nama_barang,satuan_id,created_by_user_id,) VALUES('$nama','$satuan','$userId')");
+    query("INSERT INTO barang(nama_barang,satuan,created_by_user_id,) VALUES('$nama','$satuan','$userId')");
     refresh();
 }
 $i = 1;
-$s = $conn->query("SELECT * FROM obat ORDER BY obat_nama ASC");
+$s = $conn->query("SELECT * FROM barang ORDER BY nama_barang ASC");
 $satuan2 = $conn->query("SELECT * FROM satuan");
 $title = "Barang";
 ?>

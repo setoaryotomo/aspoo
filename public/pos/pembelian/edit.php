@@ -1,21 +1,21 @@
 <?php
 require '../config.php';
 middleware();
-if (isset($_POST['obat'])) {
+if (isset($_POST['barang'])) {
     extract($_POST);
     $id = $_SESSION['data']['user_id'];
     $ed = $_GET['edit'];
-    $edit_query = "UPDATE obat SET ";
+    $edit_query = "UPDATE barang SET ";
     $res = $conn->query("SELECT * FROM pembelian WHERE pembelian_id='$ed'")->fetch_assoc();
     $obast = $res['pembelian_obat_id'];
-    $obatku = $conn->query("SELECT * FROM obat WHERE obat_id='$obast'")->fetch_assoc();
-    $stok = intval($obatku['obat_stok']) + intval($jumlah) - intval($obatku['obat_stok']);
+    $obatku = $conn->query("SELECT * FROM barang WHERE id='$obast'")->fetch_assoc();
+    $stok = intval($obatku['stock_global']) + intval($jumlah) - intval($obatku['stock_global']);
     $last = $conn->query("SELECT * FROM pembelian ORDER BY pembelian_id DESC LIMIT 1")->fetch_assoc();
     if ($last['pembelian_id'] == $res['pembelian_id']) {
         $edit_query .= "obat_harga_beli='" . $harga_beli . "', ";
         $edit_query .= "obat_harga_jual='" . $harga_jual . "',";
     }
-    $edit_query .= "obat_stok = '$stok',obat_user_id='$id' WHERE obat_id ='$obast'";
+    $edit_query .= "stok_global = '$stok',created_by_user_id='$id' WHERE id ='$obast'";
     query($edit_query);
 
     // Logic Nomor Faktur
@@ -44,9 +44,9 @@ if (isset($_GET['delete'])) {
     $del = $_GET['delete'];
     $res = $conn->query("SELECT * FROM pembelian WHERE pembelian_id='$del'")->fetch_assoc();
     $obast = $res['pembelian_obat_id'];
-    $obatku = $conn->query("SELECT * FROM obat WHERE obat_id='$obast'")->fetch_assoc();
-    $stok = intval($obatku['obat_stok']) - intval($res['pembelian_jumlah']);
-    query("UPDATE obat SET obat_stok = '$stok' WHERE obat_id='$obast'");
+    $obatku = $conn->query("SELECT * FROM barang WHERE id='$obast'")->fetch_assoc();
+    $stok = intval($obatku['stock_global']) - intval($res['pembelian_jumlah']);
+    query("UPDATE barang SET stock_global = '$stok' WHERE id='$obast'");
     handleError($conn->query("DELETE FROM pembelian WHERE pembelian_id='$del'"));
     refresh();
 }
@@ -102,7 +102,7 @@ $title = 'Pembelian';
                                 </div>
                                 <div class="col-10">
                                     <select name="supplier" class="form-control selectpicker" data-style="btn btn-link" id="exampleFormControlSelect1">
-                                        <?php $s = $conn->query("SELECT * FROM supplier");
+                                        <?php $s = $conn->query("SELECT * FROM pos_supplier");
                                         $i = 1;
                                         while ($row = $s->fetch_assoc()) : ?>
                                             <option <?php if (isset($show)) if ($show['pembelian_supplier_id'] == $row['supplier_id']) echo "selected" ?> value="<?= $row['supplier_id'] ?>"><?= $row['supplier_nama'] ?></option>
@@ -139,7 +139,7 @@ $title = 'Pembelian';
                                 </div>
                                 <div class="col-10">
                                     <a class="btn btn-primary ml- btn-sm" data-toggle="modal" data-target="#pilihObat">Pilih Obat</a>
-                                    <span id="obat-selected" class="pl-3"><?= queryString("obat", ['obat_id', 'obat_nama'], $show['pembelian_obat_id']) ?></span>
+                                    <span id="obat-selected" class="pl-3"><?= queryString("barang", ['id', 'nama_barang'], $show['pembelian_obat_id']) ?></span>
                                 </div>
                             </div>
                             <!-- modal -->
@@ -164,16 +164,16 @@ $title = 'Pembelian';
                                                     </thead>
                                                     <tbody>
                                                         <?php $i = 1;
-                                                        $s = $conn->query("SELECT * FROM obat");
+                                                        $s = $conn->query("SELECT * FROM barang");
                                                         while ($row = $s->fetch_assoc()) : ?>
                                                             <tr>
                                                                 <td><?= $i++ ?></td>
-                                                                <td><?= $row['obat_kode'] ?></td>
-                                                                <td><?= $row['obat_nama'] ?></td>
+                                                                <td><?= $row['id'] ?></td>
+                                                                <td><?= $row['nama_barang'] ?></td>
                                                                 <td><?= $conn->query("SELECT * FROM satuan WHERE satuan_id='" . $row['obat_satuan_id'] . "'")->fetch_assoc()['satuan_nama'] ?>
                                                                 </td>
                                                                 <td>
-                                                                    <button data-dismiss="modal" aria-label="Close" onclick="editObat('<?= $row['obat_id'] ?>','<?= $row['obat_nama'] ?>')" class="btn btn-primary" type="button">Pilih</button>
+                                                                    <button data-dismiss="modal" aria-label="Close" onclick="editObat('<?= $row['id'] ?>','<?= $row['nama_barang'] ?>')" class="btn btn-primary" type="button">Pilih</button>
                                                                 </td>
                                                             </tr>
                                                         <?php endwhile; ?>

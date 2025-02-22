@@ -747,64 +747,36 @@ class PortalController extends Controller
         return view('Portal::cekongkir', ['cities' => $cities, 'ongkir' => '']);
     }
     public function cekHasil(Request $request)
-    {
-        $userDetail = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
-        $origin = $userDetail->kota_rajaongkir;
+{
+    $userDetail = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
+    $origin = $userDetail->kota_rajaongkir;
 
-        $groupedKeranjang = Keranjang::with(['barang' => function ($query) {
-            $query->with('user');
-        }])->has('barang')->get()->groupBy('barang.created_by_user_id');
-        $destinations = [];
-        foreach ($groupedKeranjang as $userId => $keranjang) {
-            foreach ($keranjang as $item) {
-                // Membaca function 'user' dalam model 'DataBarang' untuk masuk ke model 'TokoUser'
-                $tokoUser = $item->barang->user;
+    $groupedKeranjang = Keranjang::with(['barang' => function ($query) {
+        $query->with('user');
+    }])->has('barang')->get()->groupBy('barang.created_by_user_id');
 
-                // Mengambil function 'detail' dalam model 'TokoUser' untuk masuk ke model 'UserDetail'
-                $userDetail = $tokoUser->detail;
-
-                // Mengambil kolom 'kota_rajaongkir' dari model 'UserDetail'
-                $kota_rajaongkir = $userDetail->kota_rajaongkir;
-
-                $destinations[] = $kota_rajaongkir;
-            }
+    $destinations = [];
+    $weights = [];
+    foreach ($groupedKeranjang as $userId => $keranjang) {
+        foreach ($keranjang as $item) {
+            $tokoUser = $item->barang->user;
+            $userDetail = $tokoUser->detail;
+            $destinations[] = $userDetail->kota_rajaongkir;
+            $weights[] = $item->barang->berat;
         }
-        $groupedKeranjang2 = Keranjang::with(['barang' => function ($query) {
-            $query->with('user');
-        }])->has('barang')->get()->groupBy('barang.created_by_user_id');
-        $weights = [];
-        foreach ($groupedKeranjang2 as $userId => $keranjang) {
-            foreach ($keranjang as $item) {
-                // Membaca function 'user' dalam model 'DataBarang' untuk masuk ke model 'TokoUser'
-                $tokoUser = $item->barang;
-                $userDetail = $tokoUser->berat;
-
-                $weights[] = $userDetail;
-            }
-        }
-
-
-        $destinationsString = implode(',', $destinations);
-        $weightString = implode(',', $weights);
-        $response = Http::withHeaders([
-            'key' => 'f4f21baace88e503f1f1602d7c07a23a'
-        ])->get('https://api.rajaongkir.com/starter/city');
-
-        $responseCost = Http::withHeaders([
-            'key' => 'f4f21baace88e503f1f1602d7c07a23a'
-        ])->post('https://api.rajaongkir.com/starter/cost', [
-            'origin' => $origin,
-            'destination' => $destinationsString,
-            'weight' => $weightString,
-            'courier' => $request->courier,
-        ]);
-
-
-        $cities = $response['rajaongkir']['results'];
-        $ongkir = $responseCost['rajaongkir'];
-
-        return JsonResponseHandler::setResult($ongkir)->send();
     }
+
+    $responseCost = Http::withHeaders([
+        'key' => 'f4f21baace88e503f1f1602d7c07a23a'
+    ])->post('https://api.rajaongkir.com/starter/cost', [
+        'origin' => $origin,
+        'destination' => implode(',', array_unique($destinations)),
+        'weight' => array_sum($weights),
+        'courier' => $request->courier,
+    ]);
+
+    return JsonResponseHandler::setResult($responseCost['rajaongkir'])->send();
+}
 
     // bagian db wilayah
     public function getProvinces()

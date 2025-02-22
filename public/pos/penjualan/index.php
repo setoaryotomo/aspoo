@@ -104,7 +104,7 @@ $title = 'Penjualan';
                                                                         <td><?= $i++ ?></td>
                                                                         <td><?= $row['id'] ?></td>
                                                                         <td><?= $row['nama_barang'] ?></td>
-                                                                        <td><?= $conn->query("SELECT * FROM barang WHERE satuan_id ='" . $row['satuan_id'] . "'")->fetch_assoc()['satuan_id'] ?>
+                                                                        <td><?= $conn->query("SELECT satuan.satuan_nama FROM satuan WHERE id ='" . $row['satuan_id'] . "'")->fetch_assoc()['satuan_nama'] ?></td>
                                                                         </td>
                                                                         <td><?= $row['harga_umum'] ?></td>
                                                                         <td><?= $row['stock_global'] ?></td>
@@ -143,7 +143,7 @@ $title = 'Penjualan';
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <div class="pull-right">
-                                            <button type="button" class="btn btn-primary" id="buat_data">Simpan</button>
+                                            <button type="button" class="btn btn-primary" id="buat_data">Simpann</button>
                                         </div>
                                     </div>
 
@@ -174,7 +174,7 @@ $title = 'Penjualan';
                     <form class="pt-3">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group" style="display: none;">
                                     <select class="form-control selectpicker" data-style="btn btn-link" name="pelanggan" id="pelanggan">
                                         <option selected value="0">Pelanggan Biasa</option>
                                         <?php $sl = $conn->query("SELECT * FROM pos_pelanggan");
@@ -229,13 +229,14 @@ $title = 'Penjualan';
                     request: "dataObat",
                 },
                 (data, status, xhr) => {
+                     console.log("Received data:", data);
                     dataObat = data;
                     $("#obat-selected").html(
-                        data.obat_kode +
+                        data.id +
                         " | " +
-                        data.obat_nama +
+                        data.nama_barang +
                         " | Rp. " +
-                        data.obat_harga_jual
+                        data.harga_umum
                     );
                 }
             );
@@ -279,10 +280,10 @@ $title = 'Penjualan';
                     $("#bodyTable").append(`
                         <tr id="tr_${i++}">
                             <td>${i}</td>
-                            <td>${dataIterate.obat_nama}</td>
+                            <td>${dataIterate.nama_barang}</td>
                             <td>${dataIterate.dc_satuan_nama} | (${dataIterate.satuan_nama})</td>
                             <td>${dataIterate.dc_jumlah} | (${dataIterate.dc_jumlah_asli})</td>
-                            <td>${dataIterate.obat_harga_jual}</td>
+                            <td>${dataIterate.harga_umum}</td>
                             <td>${dataIterate.subtotal}</td>
                             <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
                         </tr>
@@ -291,10 +292,10 @@ $title = 'Penjualan';
                     $("#bodyTable").append(`
                         <tr id="tr_${i++}">
                             <td>${i}</td>
-                            <td>${dataIterate.obat_nama}</td>
+                            <td>${dataIterate.nama_barang}</td>
                             <td>${dataIterate.satuan_nama}</td>
                             <td>${dataIterate.jumlah_data}</td>
-                            <td>${dataIterate.obat_harga_jual}</td>
+                            <td>${dataIterate.harga_umum}</td>
                             <td>${dataIterate.subtotal}</td>
                             <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
                         </tr>
@@ -315,7 +316,7 @@ $title = 'Penjualan';
                     return;
                 }
                 dataObat["jumlah_data"] = parseInt($("#jumlah").val());
-                dataObat["subtotal"] = parseInt(dataObat.jumlah_data) * parseInt(dataObat.obat_harga_jual);
+                dataObat["subtotal"] = parseInt(dataObat.jumlah_data) * parseInt(dataObat.harga_umum);
                 // tambah ke table
                 if (mSwitch) {
                     mSwitch = false;
@@ -327,10 +328,10 @@ $title = 'Penjualan';
                     $("#bodyTable").append(`
                 <tr id="tr_${i++}">
                     <td>${i}</td>
-                    <td>${dataObat.obat_nama}</td>
+                    <td>${dataObat.nama_barang}</td>
                     <td>${dataObat.dc_satuan_nama} | (${dataObat.satuan_nama})</td>
                     <td>${dataObat.dc_jumlah} | (${dataObat.dc_jumlah_asli})</td>
-                    <td>${dataObat.obat_harga_jual}</td>
+                    <td>${dataObat.harga_umum}</td>
                     <td>${dataObat.subtotal}</td>
                     <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
                 </tr>
@@ -339,10 +340,10 @@ $title = 'Penjualan';
                     $("#bodyTable").append(`
                 <tr id="tr_${i++}">
                     <td>${i}</td>
-                    <td>${dataObat.obat_nama}</td>
+                    <td>${dataObat.nama_barang}</td>
                     <td>${dataObat.satuan_nama}</td>
                     <td>${dataObat.jumlah_data}</td>
-                    <td>${dataObat.obat_harga_jual}</td>
+                    <td>${dataObat.harga_umum}</td>
                     <td>${dataObat.subtotal}</td>
                     <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
                 </tr>
@@ -383,7 +384,7 @@ $title = 'Penjualan';
                 // $('#jumlah_awal').html(" Jumlah : " + $('#jumlah').val())
                 // $('#m_satuan_awal').html("Satuan : " + dataObat.satuan_nama)
                 $.post(url, {
-                    id: dataObat.obat_satuan_id,
+                    id: dataObat.satuan_id,
                     request: "getSatuan"
                 }, (data) => {
                     $("#m_satuan_dirubah").empty()

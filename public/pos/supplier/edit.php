@@ -6,7 +6,7 @@ if (is_null($_GET['id'])) header("Location: index.php");
 $id = $_GET['id'];
 
 if (isset($_GET['method']) == 'delete') {
-    $query = $conn->query("DELETE FROM supplier WHERE supplier_id='$id'");
+    $query = $conn->query("DELETE FROM pos_supplier WHERE supplier_id='$id'");
     handleError($query);
 
     header("Location: index.php");
@@ -15,12 +15,12 @@ if (isset($_GET['method']) == 'delete') {
 if (isset($_POST['nama'])) {
     extract($_POST);
     $id_user = $_SESSION['data']['user_id'];
-    $query = $conn->query("UPDATE supplier SET supplier_nama='$nama', supplier_alamat='$alamat', supplier_user_id='$id_user' WHERE supplier_id='$id'");
+    $query = $conn->query("UPDATE pos_supplier SET supplier_nama='$nama', supplier_alamat='$alamat', supplier_user_id='$id_user' WHERE supplier_id='$id'");
     handleError($query);
 
     header("Location: index.php");
 }
-$res = $conn->query("SELECT * FROM supplier WHERE supplier_id='$id'")->fetch_assoc();
+$res = $conn->query("SELECT * FROM pos_supplier WHERE supplier_id='$id'")->fetch_assoc();
 
 
 ?>

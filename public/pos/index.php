@@ -2,8 +2,8 @@
 require 'config.php';
 middleware();
 $obat = getData("SELECT COUNT(id) AS barang FROM barang")[0]["barang"];
-$penjualan = getData("SELECT COUNT(penjualan_id) AS p_id FROM pos_penjualan")[0]["p_id"];
-$pembelian = getData("SELECT COUNT(pembelian_id) AS obat FROM pos_pembelian")[0]["obat"];
+$penjualan = getData("SELECT COUNT(penjualan_id) AS p_id FROM penjualan")[0]["p_id"];
+$pembelian = getData("SELECT COUNT(pembelian_id) AS obat FROM pembelian")[0]["obat"];
 ?>
 
 
@@ -80,7 +80,7 @@ $title = "Dashboard " ?>
                 </div>
             </div>
 
-            <!-- <div class="quick-card mt-5">
+            <div class="quick-card mt-5">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="row card-report m-2 p-3">
@@ -89,7 +89,7 @@ $title = "Dashboard " ?>
                             </div>
                             <div class="col-6">
                                 <span class="title-report">Obat</span>
-                                <h1 class="total"><//?= $obat ?></h1>
+                                <h1 class="total"><?= $obat ?></h1>
                             </div>
                         </div>
                     </div>
@@ -100,7 +100,7 @@ $title = "Dashboard " ?>
                             </div>
                             <div class="col-6">
                                 <span class="title-report">Penjualan</span>
-                                <h1 class="total"><//?= $penjualan ?></h1>
+                                <h1 class="total"><?= $penjualan ?></h1>
                             </div>
                         </div>
                     </div>
@@ -111,12 +111,12 @@ $title = "Dashboard " ?>
                             </div>
                             <div class="col-6">
                                 <span class="title-report">Pembelian</span>
-                                <h1 class="total"><//?= $pembelian ?></h1>
+                                <h1 class="total"><?= $pembelian ?></h1>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
 
             <div class="banner-2">
                 <div class="row h-100">

@@ -13,7 +13,10 @@ $req = $_POST['request'];
 switch ($req) {
     case "dataObat":
         $id = $_POST['id'];
-        $query = $conn->query("SELECT * FROM obat INNER JOIN satuan ON obat.obat_satuan_id=satuan.satuan_id WHERE obat.obat_id='$id'");
+        $query = $conn->query("SELECT barang.id, barang.nama_barang, barang.harga_umum, barang.stock_global, satuan.satuan_nama 
+                               FROM barang 
+                               INNER JOIN satuan ON barang.satuan_id = satuan.id 
+                               WHERE barang.id = '$id'");
         echo json_encode($query->fetch_assoc());
         break;
     case  "kirimData":
@@ -30,11 +33,11 @@ switch ($req) {
             if ($arr['convertSatuan'] == true) {
                 $stmt = $conn->prepare("INSERT INTO penjualan_child(penjualan_parent_id,penjualan_child_obat_id,penjualan_child_jumlah,penjualan_child_subtotal,penjualan_child_satuan_rubah_id,penjualan_child_satuan_rubah_jumlah) VALUES (?,?,?,?,?,?)");
 
-                $stmt->bind_param("ssssss", $id_penjualan, $arr['obat_id'], $arr['jumlah_data'], $arr['subtotal'], $arr['dc_satuan_id'], $arr['dc_jumlah']);
+                $stmt->bind_param("ssssss", $id_penjualan, $arr['id'], $arr['jumlah_data'], $arr['subtotal'], $arr['dc_satuan_id'], $arr['dc_jumlah']);
             } else {
                 $stmt = $conn->prepare("INSERT INTO penjualan_child(penjualan_parent_id,penjualan_child_obat_id,penjualan_child_jumlah,penjualan_child_subtotal) VALUES (?,?,?,?)");
 
-                $stmt->bind_param("ssss", $id_penjualan, $arr['obat_id'], $arr['jumlah_data'], $arr['subtotal']);
+                $stmt->bind_param("ssss", $id_penjualan, $arr['id'], $arr['jumlah_data'], $arr['subtotal']);
             }
             handleError($stmt->execute());
         }
@@ -51,10 +54,10 @@ switch ($req) {
         foreach ($obat as $arr) {
             if (!isset($arr['penjualan_child_id'])) {
                 $stmt = $conn->prepare("INSERT INTO penjualan_child(penjualan_parent_id,penjualan_child_obat_id,penjualan_child_jumlah,penjualan_child_subtotal) VALUES (?,?,?,?)");
-                $stmt->bind_param("ssss", $id_penjualan, $arr['obat_id'], $arr['jumlah_data'], $arr['subtotal']);
+                $stmt->bind_param("ssss", $id_penjualan, $arr['id'], $arr['jumlah_data'], $arr['subtotal']);
             } else {
                 $stmt = $conn->prepare("UPDATE penjualan_child SET penjualan_child_obat_id=?,penjualan_child_jumlah=?,penjualan_child_subtotal=? WHERE penjualan_parent_id=?");
-                $stmt->bind_param("ssss", $arr['obat_id'], $arr['jumlah_data'], $arr['subtotal'], $id_penjualan);
+                $stmt->bind_param("ssss", $arr['id'], $arr['jumlah_data'], $arr['subtotal'], $id_penjualan);
             }
             handleError($stmt->execute());
         }
@@ -69,7 +72,7 @@ switch ($req) {
         break;
     case "getDataEdit":
         $idPenjualan = $_POST['id'];
-        $dataPenjualan = getData("SELECT * FROM penjualan_child a INNER JOIN obat b ON a.`penjualan_child_obat_id`=b.`obat_id` INNER JOIN satuan c  ON b.`obat_satuan_id`=c.`satuan_id` WHERE penjualan_parent_id='$idPenjualan'");
+        $dataPenjualan = getData("SELECT * FROM penjualan_child a INNER JOIN obat b ON a.`penjualan_child_obat_id`=b.`id` INNER JOIN satuan c  ON b.`obat_satuan_id`=c.`satuan_id` WHERE penjualan_parent_id='$idPenjualan'");
 
         echo json_encode($dataPenjualan);
         break;
