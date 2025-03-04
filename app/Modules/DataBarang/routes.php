@@ -25,6 +25,13 @@ Route::prefix('/data-barang')->group(function() {
         Route::post('/create', [DataBarangController::class, 'komposisi_store']);
         Route::delete('/{data_barang_id}', [DataBarangController::class, 'komposisi_destroy']);
     });
+    Route::prefix("/inputstok/{kode_barang}")->group(function(){
+        Route::get('/',[DataBarangController::class,'inputstok_index']);    
+        Route::get('/datatable', [DataBarangController::class, 'inputstok_datatable']);
+        Route::get('/create', [DataBarangController::class, 'inputstok_create']);
+        Route::post('/create', [DataBarangController::class, 'inputstok_store']);
+        Route::delete('/{data_barang_id}', [DataBarangController::class, 'inputstok_destroy']);
+    });
     Route::get('/', [DataBarangController::class, 'index'])->middleware('authorize:read-data_barang');
     Route::get('/view', [DataBarangController::class, 'view'])->middleware('authorize:read-data_barang');
     Route::get('/all', [DataBarangController::class, 'all']);

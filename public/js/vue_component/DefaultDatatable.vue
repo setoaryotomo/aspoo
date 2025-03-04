@@ -30,7 +30,6 @@
                     </div>
                 </div>
             </div>
-            
         </div>
         <div class="card-body px-0 pt-0 pb-2">
             <div class="table-responsive p-0">
@@ -139,6 +138,7 @@
         </div>
     </div>
 </template>
+
 <script>
 import PaginateContent from "./PaginateContent.vue";
 let fetchController = new AbortController();
@@ -179,13 +179,14 @@ export default {
             page: 1,
             per_page: 15,
             isSearchFocused: false,
+            debounceTimeout: null, // Tambahkan debounceTimeout
         };
     },
     watch: {
-        page(newPage, oldPage) {
-            this.fetchData();
-        },
         keyword() {
+            this.debounceFetchData(); // Panggil debounceFetchData saat keyword berubah
+        },
+        page(newPage, oldPage) {
             this.fetchData();
         },
     },
@@ -199,6 +200,12 @@ export default {
         },
         handlePageItemClick(page) {
             this.page = page;
+        },
+        debounceFetchData() {
+            clearTimeout(this.debounceTimeout); // Hapus timeout sebelumnya
+            this.debounceTimeout = setTimeout(() => {
+                this.fetchData(); // Panggil fetchData setelah 300ms
+            }, 300); // Waktu debounce: 300ms
         },
         async fetchData() {
             try {

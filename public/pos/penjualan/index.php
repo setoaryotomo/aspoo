@@ -311,8 +311,8 @@ $title = 'Penjualan';
 
         $(document).ready(() => {
             $("#buat_data").click(() => {
-                if (parseInt(dataObat.obat_stok) < parseInt($('#jumlah').val())) {
-                    alert("Jumlah tidak boleh melebihi dari stok obat! \n" + "Stok Barang : " + dataObat.obat_stok)
+                if (parseInt(dataObat.stock_global) < parseInt($('#jumlah').val())) {
+                    alert("Jumlah tidak boleh melebihi dari stok barang! \n" + "Stok Barang : " + dataObat.stock_global);
                     return;
                 }
                 dataObat["jumlah_data"] = parseInt($("#jumlah").val());
@@ -321,40 +321,38 @@ $title = 'Penjualan';
                 if (mSwitch) {
                     mSwitch = false;
                     isClicked = false;
-                    dataObat['dc_jumlah_asli'] = dataObat.jumlah_data
-                    // Hidupin semisal mengikuti Convert
-                    // dataObat.jumlah_data = dataObat.dc_jumlah_asli
-                    dataObat['convertSatuan'] = true
+                    dataObat['dc_jumlah_asli'] = dataObat.jumlah_data;
+                    dataObat['convertSatuan'] = true;
                     $("#bodyTable").append(`
-                <tr id="tr_${i++}">
-                    <td>${i}</td>
-                    <td>${dataObat.nama_barang}</td>
-                    <td>${dataObat.dc_satuan_nama} | (${dataObat.satuan_nama})</td>
-                    <td>${dataObat.dc_jumlah} | (${dataObat.dc_jumlah_asli})</td>
-                    <td>${dataObat.harga_umum}</td>
-                    <td>${dataObat.subtotal}</td>
-                    <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
-                </tr>
-                `);
+                        <tr id="tr_${i++}">
+                            <td>${i}</td>
+                            <td>${dataObat.nama_barang}</td>
+                            <td>${dataObat.dc_satuan_nama} | (${dataObat.satuan_nama})</td>
+                            <td>${dataObat.dc_jumlah} | (${dataObat.dc_jumlah_asli})</td>
+                            <td>${dataObat.harga_umum}</td>
+                            <td>${dataObat.subtotal}</td>
+                            <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
+                        </tr>
+                    `);
                 } else {
                     $("#bodyTable").append(`
-                <tr id="tr_${i++}">
-                    <td>${i}</td>
-                    <td>${dataObat.nama_barang}</td>
-                    <td>${dataObat.satuan_nama}</td>
-                    <td>${dataObat.jumlah_data}</td>
-                    <td>${dataObat.harga_umum}</td>
-                    <td>${dataObat.subtotal}</td>
-                    <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
-                </tr>
-                `);
+                        <tr id="tr_${i++}">
+                            <td>${i}</td>
+                            <td>${dataObat.nama_barang}</td>
+                            <td>${dataObat.satuan_nama}</td>
+                            <td>${dataObat.jumlah_data}</td>
+                            <td>${dataObat.harga_umum}</td>
+                            <td>${dataObat.subtotal}</td>
+                            <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
+                        </tr>
+                    `);
                     dataObat['convertSatuan'] = false;
                 }
                 arrData.push(dataObat);
                 $("#obat-selected").html("Pilih Barang");
                 $("#jumlah").val("");
-                $("#m_total_obat").val("0")
-                $("#m_jumlah_convert").val("0")
+                $("#m_total_obat").val("0");
+                $("#m_jumlah_convert").val("0");
                 countTotal();
             });
 

@@ -88,7 +88,7 @@ $title = "Dashboard " ?>
                                 <img src="IMG/obat.png" class="img-fluid pt-3">
                             </div>
                             <div class="col-6">
-                                <span class="title-report">Obat</span>
+                                <span class="title-report">Barang</span>
                                 <h1 class="total"><?= $obat ?></h1>
                             </div>
                         </div>
@@ -105,7 +105,7 @@ $title = "Dashboard " ?>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="row card-report m-2 p-3">
+                        <div style="display: none;" class="row card-report m-2 p-3">
                             <div class="col-6">
                                 <img src="IMG/money.png" class="img-fluid pt-3">
                             </div>

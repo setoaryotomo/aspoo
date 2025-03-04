@@ -58,7 +58,7 @@
               </a>
             </li>
             </li>
-            <li class="nav-item <?php if (isset($active[2])) echo $active[2] ?>">
+            <li style="display: none;" class="nav-item <?php if (isset($active[2])) echo $active[2] ?>">
               <a href="satuan" class="nav-link">
                 <i class="material-icons">add_box</i>
                 <p>Satuan</p>

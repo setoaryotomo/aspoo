@@ -19,27 +19,27 @@ switch ($req) {
                                WHERE barang.id = '$id'");
         echo json_encode($query->fetch_assoc());
         break;
-    case  "kirimData":
+    case "kirimData":
         $waw = json_decode($_POST['allData'], true);
         extract($waw);
         extract($penjualan);
         $q = $conn->query("INSERT INTO penjualan(penjualan_total_harga,penjualan_pelanggan_id,penjualan_bayar,penjualan_kembali) VALUES($total,$id_pelanggan,$bayar,$kembali)");
         handleError($q);
-
+    
         $id_penjualan = $conn->insert_id;
-        // $id_penjualan = 5;
-
+    
         foreach ($obat as $arr) {
             if ($arr['convertSatuan'] == true) {
                 $stmt = $conn->prepare("INSERT INTO penjualan_child(penjualan_parent_id,penjualan_child_obat_id,penjualan_child_jumlah,penjualan_child_subtotal,penjualan_child_satuan_rubah_id,penjualan_child_satuan_rubah_jumlah) VALUES (?,?,?,?,?,?)");
-
                 $stmt->bind_param("ssssss", $id_penjualan, $arr['id'], $arr['jumlah_data'], $arr['subtotal'], $arr['dc_satuan_id'], $arr['dc_jumlah']);
             } else {
                 $stmt = $conn->prepare("INSERT INTO penjualan_child(penjualan_parent_id,penjualan_child_obat_id,penjualan_child_jumlah,penjualan_child_subtotal) VALUES (?,?,?,?)");
-
                 $stmt->bind_param("ssss", $id_penjualan, $arr['id'], $arr['jumlah_data'], $arr['subtotal']);
             }
             handleError($stmt->execute());
+    
+            // Kurangi stok barang
+            kurangiStok($conn, $arr['id'], $arr['jumlah_data']);
         }
         return header("Location: " . $url . "/penjualan");
         break;
@@ -82,3 +82,22 @@ switch ($req) {
         echo json_encode($data);
         break;
 }
+
+function kurangiStok($conn, $id_barang, $jumlah) {
+    // Ambil stok saat ini
+    $query = $conn->query("SELECT stock_global FROM barang WHERE id = '$id_barang'");
+    $stok_sekarang = $query->fetch_assoc()['stock_global'];
+
+    // Kurangi stok
+    $stok_baru = $stok_sekarang - $jumlah;
+
+    // Pastikan stok tidak kurang dari 0
+    if ($stok_baru < 0) {
+        throw new Exception("Stok barang tidak mencukupi.");
+    }
+
+    // Update stok di database
+    $conn->query("UPDATE barang SET stock_global = $stok_baru WHERE id = '$id_barang'");
+}
+
+

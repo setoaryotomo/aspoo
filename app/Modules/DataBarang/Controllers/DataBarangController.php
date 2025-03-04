@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Modules\DataBarang\Models\DataBarang;
 use App\Modules\DataBarang\Models\DataBarangKomposisi;
+use App\Modules\DataBarang\Models\InputStok;
 use App\Modules\DataBarang\Repositories\DataBarangRepository;
 use App\Modules\DataBarang\Requests\DataBarangCreateRequest;
 use App\Modules\Permission\Repositories\PermissionRepository;
@@ -64,6 +65,52 @@ class DataBarangController extends Controller
 
 
 
+        return JsonResponseHandler::setResult($data)->send();
+    }
+
+
+    public function inputstok_index(Request $request,$id){
+
+        return view('DataBarang::inputstok.index',['id' => $id]);
+
+    }
+    public function inputstok_datatable(Request $request,$id)
+    {
+        $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
+
+        $data = InputStok::where("id_barang_master",$id)->paginate($per_page);
+        return JsonResponseHandler::setResult($data)->send();
+    }
+
+    public function inputstok_destroy(Request $request, $id, $id2){
+        $data = InputStok::destroy($id2);
+        return JsonResponseHandler::setResult($data)->send();
+
+    }
+
+    public function inputstok_create(Request $request,$id){
+
+        return view('DataBarang::inputstok.create');
+
+    }
+
+    public function inputstok_store(Request $request, $id){
+        $payload = $request->all();
+    
+        // Simpan data input stok
+        $data = InputStok::create([
+            'jumlah' => $payload['jumlah'],
+            'tanggal' => $payload['tanggal'],
+            'id_barang_master' => $id,
+        ]);
+    
+        // Ambil data barang yang terkait
+        $barang = DataBarang::find($id);
+    
+        // Update stock_global
+        $barang->stock_global += $payload['jumlah'];
+        $barang->save();
+    
         return JsonResponseHandler::setResult($data)->send();
     }
 
