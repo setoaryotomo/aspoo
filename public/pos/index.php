@@ -1,8 +1,9 @@
 <?php
 require 'config.php';
 middleware();
-$obat = getData("SELECT COUNT(id) AS barang FROM barang")[0]["barang"];
-$penjualan = getData("SELECT COUNT(penjualan_id) AS p_id FROM penjualan")[0]["p_id"];
+$userId = $_SESSION['data']['id'];
+$obat = getData("SELECT COUNT(id) AS barang FROM barang WHERE created_by_user_id = '$userId'")[0]["barang"];
+$penjualan = getData("SELECT COUNT(penjualan_id) AS p_id FROM penjualan WHERE user_id = '$userId'")[0]["p_id"];
 $pembelian = getData("SELECT COUNT(pembelian_id) AS obat FROM pembelian")[0]["obat"];
 ?>
 
@@ -50,8 +51,8 @@ $title = "Dashboard " ?>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
                             <div class="px-2 pt-2">
-                                <div class="nama"><?= $_SESSION['data']['user_username'] ?></div>
-                                <div class="posisi"><?= $_SESSION['role'] ?></div>
+                                <div class="nama"><?= $_SESSION['data']['username'] ?></div>
+                                <!-- <div class="posisi"><?= $_SESSION['role'] ?></div> -->
                                 <hr>
                             </div>
                             <a class="dropdown-item" href="logout.php"><i class="material-icons pr-3">power_settings_new</i> Log out</a>
@@ -69,7 +70,7 @@ $title = "Dashboard " ?>
             <div class="banner">
                     <div class="row h-100">
                     <div class="col-md-12 text pt-4 pb-5 px-5 text-center align-self-center isi-banner">
-                        <h2 class="title-banner">Selamat Datang <?= ucfirst($_SESSION['data']['user_name']) ?></h2>
+                        <h2 class="title-banner">Selamat Datang <?= ucfirst($_SESSION['data']['username']) ?></h2>
                         <div class="text-banner">
                             <p><i class="material-icons fa-2x">today</i> &nbsp<span id="days"></span></span></p>
                         </div>
@@ -82,10 +83,10 @@ $title = "Dashboard " ?>
 
             <div class="quick-card mt-5">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="row card-report m-2 p-3">
                             <div class="col-6">
-                                <img src="IMG/obat.png" class="img-fluid pt-3">
+                                <img src="https://cdn2.iconfinder.com/data/icons/e-commerce-line-4-1/1024/product4-512.png" class="img-fluid pt-3">
                             </div>
                             <div class="col-6">
                                 <span class="title-report">Barang</span>
@@ -93,10 +94,10 @@ $title = "Dashboard " ?>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="row card-report m-2 p-3">
                             <div class="col-6">
-                                <img src="IMG/sell.png" class="img-fluid pt-3">
+                                <img src="https://cdn2.iconfinder.com/data/icons/sales-line/48/bill-512.png" class="img-fluid pt-3">
                             </div>
                             <div class="col-6">
                                 <span class="title-report">Penjualan</span>
@@ -104,7 +105,7 @@ $title = "Dashboard " ?>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <!-- <div class="col-md-4">
                         <div style="display: none;" class="row card-report m-2 p-3">
                             <div class="col-6">
                                 <img src="IMG/money.png" class="img-fluid pt-3">
@@ -114,7 +115,7 @@ $title = "Dashboard " ?>
                                 <h1 class="total"><?= $pembelian ?></h1>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
 

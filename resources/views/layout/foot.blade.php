@@ -35,6 +35,8 @@
 <!-- Atlantis JS -->
 <script src="{!! asset('js/atlantis.min.js') !!}"></script>
 
+
+
 <script>
     Vue.createApp({
         data() {
@@ -68,8 +70,6 @@
 
         }
 
-    }).mount("#navbar")
+    }).mount("#header")
 </script>
-</body>
 
-</html>

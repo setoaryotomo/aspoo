@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  {{-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> --}}
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link rel="icon" type="image/png" href="{!! asset('img/favicon.png') !!}">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css">
@@ -76,5 +77,34 @@
         }
     });
   </script> --}}
+
+  
+
+<!-- font -->
+<link rel="stylesheet" href="{!! asset('css/fonts.css') !!}">
+<!-- Icons -->
+<link rel="stylesheet" href="{!! asset('css/font-icons.css') !!}">
+<link rel="stylesheet" href="{!! asset('css/bootstrap.min.css') !!}">
+<link rel="stylesheet" href="{!! asset('css/image-compare-viewer.min.css') !!}">
+<link rel="stylesheet" href="{!! asset('css/swiper-bundle.min.css') !!}">
+<link rel="stylesheet" href="{!! asset('css/animate.css') !!}">
+<link rel="stylesheet" type="text/css" href="{!! asset('css/styles.css') !!}">
+
+<!-- Favicon and Touch Icons  -->
+<link rel="shortcut icon" href="{!! asset('images/favicon.png') !!}">
+<link rel="apple-touch-icon-precomposed" href="{!! asset('images/favicon.png') !!}">
+<script src="{!! asset('js/bootstrap.min.js') !!}"></script>
+<script src="{!! asset('js/jquery.min.js') !!}"></script>
+<script src="{!! asset('js/swiper-bundle.min.js') !!}"></script>
+<script src="{!! asset('js/carousel.js') !!}"></script>
+<script src="{!! asset('js/bootstrap-select.min.js') !!}"></script>
+<script src="{!! asset('js/lazysize.min.js') !!}"></script>
+<script src="{!! asset('js/bootstrap-select.min.js') !!}"></script>
+<script src="{!! asset('js/count-down.js') !!}"></script>
+<script src="{!! asset('js/wow.min.js') !!}"></script>
+<script src="{!! asset('js/multiple-modal.js') !!}"></script>
+<script src="{!! asset('js/shop.js') !!}"></script>
+<script src="{!! asset('js/nouislider.min.js') !!}"></script>
+<script src="{!! asset('js/main.js') !!}"></script>
 </head>
   

@@ -162,6 +162,7 @@ class PortalController extends Controller
             'rekomendasi' => $barang,
         ];
         return JsonResponseHandler::setResult($data)->send();
+       
     }
     public function fetchLogin(Request $request)
     {
@@ -175,7 +176,9 @@ class PortalController extends Controller
     }
     public function index(Request $request)
     {
-        return view('Portal::dashboard.dashboard');
+        $slider = Slider::all();
+        $barang = DataBarang::limit(8)->inRandomOrder()->get();
+        return view('Portal::dashboard.dashboard', compact('barang','slider'));
     }
     public function login(Request $request)
     {
@@ -187,30 +190,84 @@ class PortalController extends Controller
     }
 
     public function statuspengiriman(Request $request, $kode)
-    {
+{
+    try {
         $user = Auth::user()->id;
-        $transaksi_barang = TransaksiBarang::where('user_id', $user)->where('kode_transaksi', $kode)->first();
-        $transaksiChildren = TransaksiBarangChildren::where('transaksi_id', $transaksi_barang->id)->first();
-        $pengiriman = Pengiriman::where('transaksi_id', $transaksi_barang->id)->orderBy('created_at', 'desc')->get();
-        $barang = DataBarang::find($transaksiChildren->barang_id);
+        
+        // Get the master transaction first
+        $transaksi_master = TransaksiMaster::where('kode_transaksi', $kode)->first();
+        
+        if (!$transaksi_master) {
+            abort(404, 'Transaksi tidak ditemukan');
+        }
 
-        $keterangan_pengiriman = $pengiriman->first()->keterangan;
-        $kurir = $transaksi_barang->kurir_pengiriman;
-        $image_product = $barang->thumbnail_readable;
+        // Get all transactions with this master code for the user
+        $transaksi_barang = TransaksiBarang::where('user_id', $user)
+            ->where('kode_transaksi_master', $transaksi_master->kode_transaksi)
+            ->get();
+
+        if ($transaksi_barang->isEmpty()) {
+            abort(404, 'Transaksi tidak ditemukan');
+        }
+
+        // Collect all items from all transactions
+        $allItems = [];
+        $allPengiriman = [];
+        
+        foreach ($transaksi_barang as $transaksi) {
+            $transaksiChildren = TransaksiBarangChildren::where('transaksi_id', $transaksi->id)->get();
+            
+            foreach ($transaksiChildren as $child) {
+                $barang = DataBarang::find($child->barang_id);
+                if ($barang) {
+                    $allItems[] = [
+                        'namaBarang' => $barang->nama_barang,
+                        'thumbnail' => $barang->thumbnail_readable,
+                        'jumlah' => $child->jumlah,
+                        'harga' => $child->harga,
+                        'subtotal' => $child->harga * $child->jumlah,
+                        'transaksi_kode' => $transaksi->kode_transaksi,
+                        'status' => $transaksi->status,
+                        'status_readable' => $transaksi->status_readable,
+                        'biaya_pengiriman' => $transaksi->biaya_pengiriman,
+                        'kurir_pengiriman' => $transaksi->kurir_pengiriman
+                    ];
+                }
+            }
+            
+            // Get shipping history for each transaction
+            $pengiriman = Pengiriman::where('transaksi_id', $transaksi->id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+                
+            $allPengiriman = array_merge($allPengiriman, $pengiriman->toArray());
+        }
+
+        // Sort shipping history by date
+        usort($allPengiriman, function($a, $b) {
+            return strtotime($b['created_at']) - strtotime($a['created_at']);
+        });
+
+        // Get the first product image for the header
+        $firstProductImage = count($allItems) > 0 ? $allItems[0]['thumbnail'] : asset('img/default-product.jpg');
 
         $status_pengiriman = [
-            'transaksi' => $transaksi_barang,
-            'transaksi_child' => $transaksiChildren,
-            'pengiriman' => $pengiriman,
-            'keterangan' => $keterangan_pengiriman,
-            'kurir' => $kurir,
-            'resi' => $kode,
-            'image_product' => $image_product
+            'transaksi_master' => $transaksi_master,
+            'transaksi_list' => $transaksi_barang,
+            'items' => $allItems,
+            'pengiriman' => $allPengiriman,
+            'keterangan' => $allPengiriman[0]['keterangan'] ?? 'Menunggu pengiriman',
+            'image_product' => $firstProductImage,
+            'kode_unik' => $transaksi_master->kode_unik
         ];
 
-
         return view('Portal::statuspengiriman', ['data' => $status_pengiriman]);
+        
+    } catch (\Exception $e) {
+        Log::error('Error in statuspengiriman: ' . $e->getMessage());
+        abort(500, 'Terjadi kesalahan saat memuat data pengiriman');
     }
+}
     public function toko(Request $request, $id)
     {
 
@@ -288,63 +345,96 @@ class PortalController extends Controller
     }
 
     public function daftartransaksi(Request $request)
-    {
-        $user = Auth::user()->id;
-        if ($request->has('cari')) {
-            $transaksi_barang = TransaksiBarang::where('user_id', $user)->where('kode_transaksi', $request->cari)->get();
-        } else {
-            $transaksi_barang = TransaksiBarang::where('user_id', $user)->get();
-        }
-        $data_transaksi = [];
-        foreach ($transaksi_barang as $transaksi) {
-            $transaksiChildren = TransaksiBarangChildren::where('transaksi_id', $transaksi->id)->first();
-            if ($transaksiChildren) {
-                $barang = DataBarang::find($transaksiChildren->barang_id);
-                if (!$barang) {
-                    continue;
-                }
-                $jumlah = $transaksiChildren->jumlah;
-                $totalHarga = $transaksi->biaya_pengiriman + $transaksi->total_biaya;
-                $totalHargaFormatted = number_format($totalHarga, 0, ',', '.');
-                $createdDate = Carbon::parse($transaksi->created_at)->format('d-m-Y');
+{
+    $user = Auth::user()->id;
+    
+    if ($request->has('cari')) {
+        $transaksi_masters = TransaksiMaster::whereHas('transaksi', function($query) use ($user) {
+            $query->where('user_id', $user);
+        })->where('kode_transaksi', 'LIKE', '%'.$request->cari.'%')->get();
+    } else {
+        $transaksi_masters = TransaksiMaster::whereHas('transaksi', function($query) use ($user) {
+            $query->where('user_id', $user);
+        })->orderBy('created_at', 'desc')->get();
+    }
 
-                $transaksiId = $transaksi->id;
-                $kodeTransaksi = $transaksi->kode_transaksi;
-                $alamat = $transaksi->alamat;
-                $biayaPengiriman = $transaksi->biaya_pengiriman;
-                $kurirPengiriman = $transaksi->kurir_pengiriman;
-                $pesan = $transaksi->pesan;
-                $totalBiaya = $transaksi->total_biaya;
-                $userId = $transaksi->user_id;
-                $tokoId = $transaksi->toko_id;
-                $namaBarang = $barang->nama_barang;
-                $thumbnail = $barang->thumbnail_readable;
-                $status = $transaksi->status;
-
-
-                $data_transaksi[] = [
-                    'transaksiId' => $transaksiId,
-                    'kodeTransaksi' => $kodeTransaksi,
-                    'createdDate' => $createdDate,
-                    'alamat' => $alamat,
-                    'biayaPengiriman' => $biayaPengiriman,
-                    'kurirPengiriman' => $kurirPengiriman,
-                    'pesan' => $pesan,
-                    'totalBiaya' => $totalBiaya,
-                    'userId' => $userId,
-                    'tokoId' => $tokoId,
-                    'namaBarang' => $namaBarang,
-                    'thumbnail' => $thumbnail,
-                    'jumlah' => $jumlah,
-                    'totalHarga' => $totalHarga,
-                    'totalHargaFormatted' => 'Rp. ' . $totalHargaFormatted,
+    $data_transaksi = [];
+    
+    foreach ($transaksi_masters as $master) {
+        $master_total = 0;
+        $master_items = [];
+        $createdDate = Carbon::parse($master->created_at)->format('d-m-Y');
+        
+        foreach ($master->transaksi as $transaksi) {
+            $transaksiChildren = TransaksiBarangChildren::where('transaksi_id', $transaksi->id)->get();
+            
+            foreach ($transaksiChildren as $child) {
+                $barang = DataBarang::find($child->barang_id);
+                if (!$barang) continue;
+                
+                $subtotal = $child->harga * $child->jumlah;
+                $master_total += $subtotal + $transaksi->biaya_pengiriman;
+                
+                $master_items[] = [
+                    'transaksiId' => $transaksi->id,
+                    'kodeTransaksi' => $transaksi->kode_transaksi,
+                    'namaBarang' => $barang->nama_barang,
+                    'thumbnail' => $barang->thumbnail_readable,
+                    'jumlah' => $child->jumlah,
+                    'harga' => $child->harga,
+                    'subtotal' => $subtotal,
+                    'biayaPengiriman' => $transaksi->biaya_pengiriman,
+                    'kurirPengiriman' => $transaksi->kurir_pengiriman,
+                    'status' => $transaksi->status,
                     'statusReadable' => $transaksi->status_readable,
-                    'status' => $status,
+                    'tokoId' => $transaksi->toko_id,
                 ];
             }
         }
-        return view('Portal::transaksi.daftartransaksi', ['data' => $data_transaksi]);
+        
+        $master_total += $master->kode_unik;
+        $totalHargaFormatted = number_format($master_total, 0, ',', '.');
+        
+        $data_transaksi[] = [
+            'masterKode' => $master->kode_transaksi,
+            'createdDate' => $createdDate,
+            'items' => $master_items,
+            'totalHarga' => $master_total,
+            'totalHargaFormatted' => 'Rp. ' . $totalHargaFormatted,
+            'kodeUnik' => $master->kode_unik,
+            'status' => $this->getMasterStatus($master->transaksi),
+            'statusReadable' => $this->getMasterStatusReadable($master->transaksi),
+        ];
     }
+    
+    return view('Portal::transaksi.daftartransaksi', ['data' => $data_transaksi]);
+}
+
+private function getMasterStatus($transactions)
+{
+    // If any transaction is still in process (status < 4), consider it in process
+    foreach ($transactions as $trans) {
+        if ($trans->status < 4) {
+            return $trans->status;
+        }
+    }
+    // If all are completed (status 4), return completed
+    return 4;
+}
+
+private function getMasterStatusReadable($transactions)
+{
+    $statuses = [
+        1 => 'Menunggu Pembayaran',
+        2 => 'Pembayaran Diterima',
+        3 => 'Barang Dikirim',
+        4 => 'Barang Diterima',
+        44 => 'Barang Tidak Diterima'
+    ];
+    
+    $status = $this->getMasterStatus($transactions);
+    return $statuses[$status] ?? 'Unknown Status';
+}
 
     public function updateStatus(Request $request)
     {
@@ -505,9 +595,14 @@ class PortalController extends Controller
         return view('Portal::detailproduk');
     }
     public function keranjang(Request $request)
-    {
-        return view('Portal::transaksi.keranjang');
-    }
+{
+    $user = Auth::user();
+    $keranjang = Keranjang::with(['barang', 'parcel'])
+        ->where('user_id', $user->id)
+        ->get();
+    
+    return view('Portal::transaksi.keranjang', compact('keranjang'));
+}
     public function infotoko(Request $request)
     {
         return view('Portal::infotoko');
@@ -534,7 +629,7 @@ class PortalController extends Controller
 
 
         $data = Keranjang::with(['barang' => function ($query) {
-        }, 'barang.user'])->has('barang')->get()->groupBy('barang.created_by_user_id');
+        }, 'barang.user','parcel'])->has('barang')->get()->groupBy('barang.created_by_user_id');
 
         $userdata = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
         $kodeUnik = rand(10, 99);
@@ -548,13 +643,17 @@ class PortalController extends Controller
     {
         $user = User::find(Auth::id())->with('detail')->first();
         $userid = $user->id;
-        $datas = Keranjang::with(['barang', 'barang.user'])->where('user_id', Auth::user()->id)->get()->groupBy('barang.created_by_user_id');
+        $datas = Keranjang::with(['barang', 'barang.user', 'parcel'])
+            ->where('user_id', Auth::user()->id)
+            ->get()
+            ->groupBy('barang.created_by_user_id');
+        
         $input = $request->all();
         $kode_master = "TR-" . Str::random(8);
         $total_biaya = $request->totalPembayaran;
         $kode_unik = $request->kodeUnik;
         $total_pengiriman = $request->totalPengiriman;
-
+    
         $barangs_midtrans = [
             [
                 'id' => 1398274,
@@ -569,7 +668,7 @@ class PortalController extends Controller
                 'name' => 'Kode Unik'
             ]
         ];
-
+    
         DB::beginTransaction();
         try {
             $i = 0;
@@ -581,14 +680,14 @@ class PortalController extends Controller
                     'biaya_pengiriman' => intval($request->transaksi['ongkir'][$i]),
                     'kurir_pengiriman' => $request->transaksi['ongkirData'][$i],
                     'total_biaya' => $total_biaya + $total_pengiriman + $kode_unik,
-
                     'user_id' => Auth::id(),
                     'toko_id' => 0, // temp
                     'kode_transaksi_master' => $kode_master,
                     'pesan' => $request->transaksi['pesan'][$i],
+                    'parcel_id' => $barangs->first()->parcel_id ?? null, // Tambahkan parcel_id jika ada
                 ]);
                 $toko_id = 0;
-
+    
                 foreach ($barangs as $keranjang) {
                     $barang = $keranjang->barang;
                     $barangs_midtrans[] = [
@@ -597,7 +696,7 @@ class PortalController extends Controller
                         'quantity' => $keranjang->jumlah,
                         'name' => $barang->nama_barang,
                     ];
-
+    
                     $tr_child = TransaksiBarangChildren::create([
                         'transaksi_id' => $transaksi->id,
                         'barang_id' => $keranjang->barang_id,
@@ -614,30 +713,24 @@ class PortalController extends Controller
                 $i++;
                 $total_biaya += $transaksi->biaya_pengiriman;
             }
-
+    
             $return = TransaksiMaster::create([
                 'kode_transaksi' => $kode_master,
                 'kode_unik' => $kode_unik,
                 'total_biaya' => $total_biaya,
             ]);
-
-
-            // Midtrans
-            // Konfigurasi midtrans
+    
+            // Midtrans configuration and payment URL generation
             Config::$serverKey = config('services.midtrans.serverKey');
             Config::$isProduction = config('services.midtrans.isProduction');
             Config::$isSanitized = config('services.midtrans.isSanitized');
             Config::$is3ds = config('services.midtrans.is3ds');
-
+    
             $midtrans = [
-                'transaction_details' => array(
-                    'order_id' =>  $kode_master,
+                'transaction_details' => [
+                    'order_id' => $kode_master,
                     'gross_amount' => (int) $return->total_biaya + $kode_unik,
-                ),
-                // 'customer_details' => array(
-                //     'first_name'    => $transaction->patient->name,
-                //     'email'         => $transaction->patient->email,
-                // ),
+                ],
                 'item_details' => $barangs_midtrans,
                 'enabled_payments' => [
                     'qris',
@@ -645,22 +738,18 @@ class PortalController extends Controller
                     'alfamart',
                     'alfamidi',
                 ],
-                'vtweb' => array()
+                'vtweb' => []
             ];
-
-
+    
             $paymentUrl = Snap::createTransaction($midtrans)->redirect_url;
-            // $return->midtrans_link = $paymentUrl;
-            // $return->save();
             TransaksiMaster::where('kode_transaksi', $kode_master)->update(['midtrans_link' => $paymentUrl]);
-
+    
             $link = [
                 'midtrans_link' => $paymentUrl,
             ];
             $dataResponse = array_merge($return->toArray(), $link);
             DB::commit();
-
-
+    
             return JsonResponseHandler::setResult($dataResponse)->send();
         } catch (Exception $e) {
             DB::rollBack();
@@ -687,7 +776,8 @@ class PortalController extends Controller
     public function listBarang(Request $request)
     {
         // Mengambil semua data barang dari database
-        $produk = DataBarang::paginate(24);
+        // $produk = DataBarang::paginate(24);
+        $produk = DataBarang::paginate(12);
 
         // Mengambil data dari jsonplaceholder
         $response = Http::get('https://jsonplaceholder.typicode.com/posts');
@@ -882,7 +972,31 @@ class PortalController extends Controller
         return view('Portal::pesanparcel', compact('auth', 'card', 'data', 'asal'));
     }
 
-
+    public function saveToCart(Request $request)
+    {
+        $user = Auth::user();
+        $items = $request->input('items');
+        $parcelId = $request->input('parcel_id');
+    
+        DB::beginTransaction();
+        try {
+            foreach ($items as $item) {
+                Keranjang::create([
+                    'user_id' => $user->id,
+                    'barang_id' => $item['id'],
+                    'jumlah' => 1, // Anda bisa menyesuaikan jumlahnya
+                    'parcel_id' => $parcelId,
+                    // 'harga' => $item['price'],
+                ]);
+            }
+    
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
 
     public function kirimpesanparcel(Request $request)
     {

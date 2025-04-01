@@ -46,14 +46,14 @@
         }
     </style>
     <div class="title">
-        <h4 class="text-center">Pesan Parcel Sesuai Keinginanmu Disini !!!</h4>
+        <h5 class="text-center">Pesan Parcel Sesuai Keinginanmu Disini !!!</h5>
     </div>
 
     <div class="content text-center">
         <form id="parcel-form" action="{{ route('parcel.store') }}" method="POST">
             @csrf
 
-            <h4 class="text-center">Alamat Pengiriman</h4>
+            <h6 class="text-center">Alamat Pengiriman</h6>
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="provinsi" class="form-label">Provinsi</label>
@@ -525,7 +525,7 @@
                                                 <div class="mb-2">
                                                     <strong>Item: ${keyword}</strong><br>
                                                     ${items.map(item => `
-                                                        <div class="d-flex align-items-center mb-2">
+                                                        <div class="">
                                                             <img src="${item.thumbnail}" alt="${item.name}" style="width: 200px; height: 200px; object-fit: cover; margin-right: 10px;display: none;">
                                                             <div>
                                                                 <b>${item.name}</b> <br>
@@ -549,25 +549,28 @@
             // Add event listeners for parcel selection
             // Modify the event listeners for parcel selection
             document.querySelectorAll('.select-parcel').forEach(button => {
-                button.addEventListener('click', function() {
-                    // Reset all buttons to original state
-                    document.querySelectorAll('.select-parcel').forEach(btn => {
-                        btn.innerHTML = 'Pilih Parcel Ini';
-                        btn.classList.remove('btn-success', 'selected');
-                        btn.classList.add('btn-primary');
-                    });
+    button.addEventListener('click', function() {
+        // Reset all buttons to original state
+        document.querySelectorAll('.select-parcel').forEach(btn => {
+            btn.innerHTML = 'Pilih Parcel Ini';
+            btn.classList.remove('btn-success', 'selected');
+            btn.classList.add('btn-primary');
+        });
 
-                    // Change the clicked button's style
-                    this.innerHTML = 'Selected';
-                    this.classList.remove('btn-primary');
-                    this.classList.add('btn-success', 'selected');
+        // Change the clicked button's style
+        this.innerHTML = 'Selected';
+        this.classList.remove('btn-primary');
+        this.classList.add('btn-success', 'selected');
 
-                    // Get the recommendation index
-                    const index = this.getAttribute('data-index');
-                    selectedItems = [...recommendations[index].items];
-                    updateSelectedItems();
-                });
-            });
+        // Get the recommendation index
+        const index = this.getAttribute('data-index');
+        selectedItems = [...recommendations[index].items];
+        updateSelectedItems();
+
+        // Simpan barang-barang yang dipilih ke dalam keranjang
+        //saveToCart(selectedItems);
+    });
+});
 
             // Display JSON of recommendations
             console.log('Rekomendasi Parcel:', JSON.stringify(recommendations, null, 2));
@@ -710,6 +713,33 @@
             }, 100);
         });
 
+        function saveToCart(items) {
+    const _token = document.querySelector('input[name="_token"]').value;
+
+    fetch('save-to-cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': _token
+        },
+        body: JSON.stringify({
+            items: items
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // alert('Barang berhasil ditambahkan ke keranjang!');
+        } else {
+            alert('Gagal menambahkan barang ke keranjang: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat menyimpan ke keranjang.');
+    });
+}
+
         // Keep the existing functions for chips
         function createChip(name) {
             const chipContainer = document.querySelector(".chips-container");
@@ -818,43 +848,69 @@
         });
 
         document.getElementById('save-recommendations').addEventListener('click', function() {
-            if (selectedItems.length === 0) {
-                alert('Pilih setidaknya satu barang untuk disimpan.');
-                return;
+    if (selectedItems.length === 0) {
+        alert('Pilih setidaknya satu barang untuk disimpan.');
+        return;
+    }
+
+    // Simpan ke keranjang dengan parcel_id
+    saveToCart(selectedItems, parcelId);
+
+    // Mengonversi selectedItems ke JSON
+    const selectedItemsJson = JSON.stringify(selectedItems);
+
+    // Mengirim data ke server
+    fetch(`/permintaan-parcel/save-selected-items/${parcelId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                items: selectedItems
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = 'keranjang';
+            } else {
+                alert('Terjadi kesalahan saat menyimpan rekomendasi: ' + (data.error || 'Unknown error'));
             }
-
-            // Mengonversi selectedItems ke JSON
-            const selectedItemsJson = JSON.stringify(selectedItems);
-
-            // Mengirim data ke server
-            fetch(`/permintaan-parcel/save-selected-items/${parcelId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Pastikan CSRF token ada
-                    },
-                    body: JSON.stringify({
-                        items: selectedItems
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // window.location.href = data.redirect;
-                        // window.location.href = '{{ route('paymentparcel') }}';
-
-                        // alert('Rekomendasi parcel berhasil disimpan!');
-                        alert('Success');
-                    } else {
-                        alert('Terjadi kesalahan saat menyimpan rekomendasi: ' + (data.error ||
-                            'Unknown error'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat menyimpan rekomendasi.');
-                });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat menyimpan rekomendasi.');
         });
+});
+
+function saveToCart(items, parcelId) {
+    const _token = document.querySelector('input[name="_token"]').value;
+
+    fetch('save-to-cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': _token
+        },
+        body: JSON.stringify({
+            items: items,
+            parcel_id: parcelId // Kirim parcel_id ke backend
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // alert('Barang berhasil ditambahkan ke keranjang!');
+        } else {
+            alert('Gagal menambahkan barang ke keranjang: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat menyimpan ke keranjang.');
+    });
+}
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>

@@ -13,13 +13,19 @@ class ApproveTransaksi extends Model
     protected $guarded = [];
     protected $appends = ['total_biaya_readable'];
 
-    public function getTotalBiayaReadableAttribute(){
+    public function getTotalBiayaReadableAttribute()
+    {
         $rupiah = "Rp. " . number_format(($this->total_biaya + $this->biaya_pengiriman), 0, ',', '.');
         return $rupiah;
     }
 
 
-    public function pembeli(){
-        return $this->hasOne(User::class,"id","user_id");
+    public function pembeli()
+    {
+        return $this->hasOne(User::class, "id", "user_id");
+    }
+    public function penjual()
+    {
+        return $this->hasOne(User::class, "id", "toko_id");
     }
 }

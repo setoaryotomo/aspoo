@@ -4,7 +4,7 @@
     <default-datatable title="permintaanparcel" url="{!! url('permintaan-parcel') !!}" :headers="headers" :can-add="true" :can-edit="false" :can-delete="true" />
     <template #left-action="{ content }">
         <a :href="`{!! url('permintaan-parcel') !!}/preview/${content.id}`" class="btn btn-xs btn-info mr-1">
-            Lihat Detail
+            Detail
         </a>
     </template>
 </div>

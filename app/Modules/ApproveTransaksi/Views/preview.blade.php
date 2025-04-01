@@ -19,6 +19,17 @@
                             <div class="col-md-6">
                                 <p><b>Kode Transaksi : </b> {{ $data->kode_transaksi }}</p>
                             </div>
+                            @if ($data->parcel_id)
+                                <div class="col-md-6">
+                                    <p><b>Parcel : </b>
+                                        <a href="{{ url('permintaan-parcel/preview/' . $data->parcel_id) }}"
+                                            class="text-primary">
+                                            {{-- class="text-primary" target="_blank"> --}}
+                                            {{ $data->parcel_id }} <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                    </p>
+                                </div>
+                            @endif
                             <div class="col-md-6">
                                 <p><b>Alamat : </b> {{ $data->alamat }}</p>
                             </div>
@@ -87,8 +98,8 @@
                             </div>
                             <div class="col-md-6"></div>
                             <div class="col-md-6">
-                                <h3 class="text-danger"><b>Grand Total : </b>
-                                    {{ rupiah($total + $data->biaya_pengiriman) }}</h3>
+                                <h5 class="text-danger"><b>Grand Total : </b>
+                                    {{ rupiah($total + $data->biaya_pengiriman) }}</h5>
                             </div>
                         </div>
                     </section>
@@ -138,7 +149,7 @@
                             Swal.fire({
                                 title: `Data berhasil ditolak!`,
                             })
-                            window.location.href = `{{url('approve-transaksi')}}`
+                            window.location.href = `{{ url('approve-transaksi') }}`
                         }
                     })
                 },

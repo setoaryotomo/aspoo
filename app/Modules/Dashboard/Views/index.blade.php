@@ -19,7 +19,7 @@
         <div class="page-inner py-5">
             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
                 <div>
-                    <h2 class="text-white pb-2 fw-bold">Dashboard</h2>
+                    <h5 class="text-white pb-2 fw-bold">Dashboard</h5>
                     <h5 class="text-white op-7 mb-2">SmartAspoo Admin Panel</h5>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                         <div class="card" style="background-color: #E1EFFA; color: #3621c2;">
                             <div class="card-body">
                                 <h5 class="card-text">Total Stok Barang</h5>
-                                <h1 class="card-text fw-bold" id="total-stok">{{ $data['total_stock'] }}</h1>
+                                <h5 class="card-text fw-bold" id="total-stok">{{ $data['total_stock'] }}</h5>
                             </div>
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                         <div class="card" style="background-color: #E1EFFA; color: #3621c2;">
                             <div class="card-body">
                                 <h5 class="card-text">Total Barang</h5>
-                                <h1 class="card-text fw-bold" id="total-stok">{{ $data['total_barang'] }}</h1>
+                                <h5 class="card-text fw-bold" id="total-stok">{{ $data['total_barang'] }}</h5>
                             </div>
                         </div>
                     </div>

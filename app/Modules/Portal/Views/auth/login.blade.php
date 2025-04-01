@@ -11,7 +11,7 @@
         font-family: 'Poppins';
     }
     main#login-page {
-        background: #FBD9C0;
+        /* background: #FBD9C0; */
         height: 100vh;
         position: relative;
         display: flex;
@@ -36,7 +36,7 @@
     }
 </style>
 
-<main id="login-page" class="main-content mt-0" style="background: #FBD9C0;">
+<main id="login-page" class="main-content mt-0">
     <section>
         <div class="page-header min-vh-100">
             <div class="container">
@@ -55,7 +55,7 @@
                                 <div class="col-md-6">
                                     <div style="padding-right: 24px;">
                                         <br>
-                                        <h1 style="text-align: center; font-weight: bold; color: #rgba(0, 0, 0, 0.90);">User Login</h1>
+                                        <h4 style="text-align: center; font-weight: bold; color: #rgba(0, 0, 0, 0.90);">User Login</h4>
                                         <br>
                                         <form role="form">
                                             <div class="mb-3">

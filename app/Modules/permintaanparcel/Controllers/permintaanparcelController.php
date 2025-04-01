@@ -79,17 +79,21 @@ class permintaanparcelController extends Controller
     }
 
     public function preview(Request $request, $id){
-        $data = permintaanparcel::where('id',$id)->with(['user'])->first();
+        $data = permintaanparcel::where('id',$id)
+                ->with(['user', 'transaksi']) // Tambahkan relasi transaksi
+                ->first();
+        
         $barang = DataBarang::select('*')->with(['user'])->get();
-
-        $selectedItems = ParcelChildren::where('parcel_id', $id)->with(['parcel','barang'])->get();
-        // dd($selectedItems);
+    
+        $selectedItems = ParcelChildren::where('parcel_id', $id)
+                        ->with(['parcel','barang'])
+                        ->get();
         
         $card = [
             'barang' => $barang,
             'selectedItems' => $selectedItems
         ];
-        // dd($card);
+        
         return view('permintaanparcel::preview',compact('data', 'card'));
     }
     

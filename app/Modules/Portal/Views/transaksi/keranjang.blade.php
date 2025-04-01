@@ -11,15 +11,16 @@
     <div class="container mt-5" id="container">
         <div class="frame">
             <div class="title">
-                <h2>Keranjang Belanja</h2>
+                <h5>Keranjang Belanja</h5>
             </div>
-
+            <br>
             <div class="content">
                 <div class="cart-box table-responsive">
                     <table id="table" class="table">
                         <thead>
                             <tr>
                                 <th scope="col">Foto Produk</th>
+                                <th scope="col">Id Parcel</th>
                                 <th scope="col">Nama Produk</th>
                                 <th scope="col">Harga</th>
                                 <th scope="col">Jumlah</th>
@@ -33,6 +34,7 @@
                                     alt="Product" 
                                     style="width: 100px;">                               
                                 </td>
+                                <td>@{{ keranjang.parcel_id }}</td>
                                 <td>@{{ keranjang.barang.nama_barang }}</td>
                                 <td class="product-price">@{{ rupiah(keranjang.barang.harga_user) }}</td>
                                 <td>

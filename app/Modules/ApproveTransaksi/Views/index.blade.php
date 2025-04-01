@@ -8,7 +8,7 @@
                     Approve
                 </button>
                 <a :href="`{!! url('approve-transaksi') !!}/preview/${content.kode_transaksi}`" class="btn btn-xs btn-info mr-1">
-                    Lihat Data
+                    Detail
                 </a>
             </template>
         </default-datatable>
@@ -38,6 +38,10 @@
                         {
                             text: 'Pembeli',
                             value: 'pembeli.name',
+                        },
+                        {
+                            text: 'Penjual',
+                            value: 'penjual.name',
                         },
 
                     ],

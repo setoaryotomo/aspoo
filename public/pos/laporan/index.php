@@ -1,4 +1,5 @@
 <?php require '../config.php';
+middleware();
 $title = 'Laporan';
 ?>
 <?php $active[8] = 'active' ?>
@@ -160,7 +161,8 @@ $title = 'Laporan';
             clean();
             $.post(url, {
                 request: 'ambilData',
-                hari: $("#tanggal").val()
+                hari: $("#tanggal").val(),
+                user_id: <?php echo $_SESSION['data']['id']; ?>     
             }, (data, status, xhr) => {
                 console.log(data); // Check the data in console
                 if (data.uang_masuk.uang_masuk != null) {

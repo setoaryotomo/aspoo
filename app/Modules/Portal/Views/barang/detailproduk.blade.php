@@ -303,10 +303,17 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <div class="product-image">
-                                                @if (strpos($data->thumbnail, 'https://') !== false)
-                                                <img src="{{ $data->thumbnail }}" alt="Product Image">
+                                                @if (strpos($data->thumbnail, 'https://drive.google.com/file/d/') !== false)
+                                                    @php
+                                                        // Ekstrak ID file dari URL Google Drive
+                                                        $urlParts = explode('/', $data->thumbnail);
+                                                        $fileId = $urlParts[5];
+                                                    @endphp
+                                                    <img src="https://drive.google.com/thumbnail?id={{ $fileId }}&sz=w1000" alt="{{ $data->nama_barang }}" class="img-fluid" style="height: 187px;">
+                                                @elseif (strpos($data->thumbnail, 'https://') !== false)
+                                                    <img src="{{ URL::asset($data->thumbnail) }}" alt="{{ $data->nama_barang }}" class="img-fluid" style="height: 187px">
                                                 @else
-                                                <img src="{{ $data->thumbnail_readable }}" alt="Product Image">
+                                                    <img src="{{ URL::asset($data->thumbnail_readable) }}" alt="{{ $data->nama_barang }}" class="img-fluid" style="height: 187px">
                                                 @endif
                                             </div>
 
@@ -337,14 +344,14 @@
                                 <div class="col-md-8">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <h1 style="margin-bottom: 0px"><strong>{{ $data->nama_barang }}</strong></h1>
+                                            <h5 style="margin-bottom: 0px"><strong>{{ $data->nama_barang }}</strong></h5>
                                             <small>
                                                 Terjual <span class="text-secondary">{{ $data->terjual }}</span>
                                             </small>
                                         </div>
 
                                         <div class="col-md-12 mt-3">
-                                            <h1><strong>{{ rupiah($data->harga_user) }}</strong></h1>
+                                            <h6><strong>{{ rupiah($data->harga_user) }}</strong></h6>
                                         </div>
                                         <div class="col-md-12">
                                             <span class="badge badge-danger">{{ $data->diskon }}%</span> <span
@@ -395,7 +402,7 @@
                                     <p><b>Stok Sisa :</b> {{ $data->stock_global }}</p>
                                 </div>
                                 <div class="col-md-12">
-                                    <h3><b>Total Harga :</b> @{{ rupiah(Math.round(parseFloat(this.barang.harga)) * parseInt(this.barang.jumlah)) }}</h3>
+                                    <h6><b>Total Harga :</b> @{{ rupiah(Math.round(parseFloat(this.barang.harga)) * parseInt(this.barang.jumlah)) }}</h6>
                                 </div>
                             </div>
                             <div class="card-footer">

@@ -1,10 +1,10 @@
 @extends('dashboard_layout.index')
 @section('content')
-<style>
-    .border-primary {
-    border: 2px solid #17a2b8 !important;
-}
-</style>
+    <style>
+        .border-primary {
+            border: 2px solid #17a2b8 !important;
+        }
+    </style>
     <div class="container mt-4 mb-0" id="container">
         <section class="card mb-0">
             <div class="card-header">
@@ -68,6 +68,26 @@
                         </table>
                     </section>
 
+                    @if ($data->transaksi)
+                        <section class="col-md-12 mt-4">
+                            <div class="alert alert-info">
+                                <p><b>Kode Transaksi :</b>
+                                    @if ($data->transaksi->status == "")
+                                    <a href="{{ url('approve-transaksi/preview/' . $data->transaksi->kode_transaksi) }}"
+                                        class="text-primary font-weight-bold">
+                                        {{-- class="text-primary font-weight-bold" target="_blank"> --}}
+                                        {{ $data->transaksi->kode_transaksi }}
+                                        <i class="fas fa-external-link-alt ml-1"></i>
+                                    </a>
+                                    @elseif ($data->transaksi->status == 4)
+                                        {{-- class="text-primary font-weight-bold" target="_blank"> --}}
+                                        {{ $data->transaksi->kode_transaksi }}
+                                    @endif
+                                </p>
+                            </div>
+                        </section>
+                    @endif
+
                     <!-- Rekomendasi Parcel Section -->
                     <section class="col-md-12 mt-4">
                         <h4 class="text-center mb-4">Rekomendasi Parcel</h4>
@@ -95,7 +115,7 @@
                                             : ($index == 1
                                                 ? 'bg-warning'
                                                 : 'bg-warning'));
-                                    
+
                                     $borderClass = $isFullySelected ? 'border-primary' : '';
                                 @endphp
 
@@ -128,14 +148,16 @@
                                                     @foreach ($recommendation['items'] as $item)
                                                         @php
                                                             // Check if the seller's city matches the delivery city
-                                                            $isCityMatch = $item['sellerCity'] === $deliveryCity;
+$isCityMatch = $item['sellerCity'] === $deliveryCity;
                                                         @endphp
-                                                        <img src="{{ $item['thumbnail'] }}" alt="" style="width: 200px; height: 200px; object-fit: cover; margin-right: 10px;display: none;">
-                                                            <b>{{ $item['name'] }}</b> <br>Berat : {{ $item['berat'] }}g
-                                                            <br>Harga : Rp {{ number_format($item['price'], 0, ',', '.') }}
-                                                            <br> Toko: {{ $item['seller'] }} <br>
-                                                            <span style="color: {{ $isCityMatch ? 'blue' : 'red' }}">({{ $item['sellerCity'] }})</span>
-                                                            <br><br><br>
+                                                        <img src="{{ $item['thumbnail'] }}" alt=""
+                                                            style="width: 200px; height: 200px; object-fit: cover; margin-right: 10px;display: none;">
+                                                        <b>{{ $item['name'] }}</b> <br>Berat : {{ $item['berat'] }}g
+                                                        <br>Harga : Rp {{ number_format($item['price'], 0, ',', '.') }}
+                                                        <br> Toko: {{ $item['seller'] }} <br>
+                                                        <span
+                                                            style="color: {{ $isCityMatch ? 'blue' : 'red' }}">({{ $item['sellerCity'] }})</span>
+                                                        <br><br><br>
                                                     @endforeach
                                                 </ul>
                                             </div>

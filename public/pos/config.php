@@ -64,19 +64,21 @@ function middleware()
     global $cookie_name;
     if (isset($_COOKIE[$cookie_name])) {
         $id = encrypt_decrypt('decrypt', $_COOKIE[$cookie_name]);
-        $query = $conn->query("SELECT * FROM user WHERE user_id = '$id'")->fetch_assoc();
+        $query = $conn->query("SELECT * FROM users WHERE id = '$id'")->fetch_assoc();
         handleError($query);
-        $_SESSION['role'] = $query['user_role'];
-        $id = $query['user_id'];
-        $conn->query("UPDATE user SET user_status=1 WHERE user_id='$id'");
-        unset($query['user_password']);
-        unset($query['user_role']);
-        unset($query['user_status']);
+        // $_SESSION['role'] = $query['user_role'];
+        $_SESSION['user_name'] = $query['username'];
+        $id = $query['id'];
+        // $conn->query("UPDATE user SET user_status=1 WHERE user_id='$id'");
+        unset($query['password']);
+        unset($query['user_name']);
+        // unset($query['user_role']);
+        // unset($query['user_status']);
         $_SESSION['data'] = $query;
         $cookie = encrypt_decrypt('encrypt', $id);
         setcookie($cookie_name, $cookie, time() + (86400 * 30), "/");
     }
-    if (is_null($_SESSION['role'])) header("Location: " . $url . "login.php");
+    if (is_null($_SESSION['user_name'])) header("Location: " . $url . "login.php");
 }
 
 function encrypt_decrypt($action, $string)

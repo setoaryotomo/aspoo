@@ -4,6 +4,7 @@ namespace App\Modules\permintaanparcel\Models;
 
 use App\Models\ParcelChildren;
 use App\Models\User;
+use App\Modules\TransaksiBarang\Models\TransaksiBarang;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -21,4 +22,8 @@ class permintaanparcel extends Model
     public function parcel_children(){
         return $this->hasMany(ParcelChildren::class,"parcel_id");
     }
+    public function transaksi()
+{
+    return $this->hasOne(TransaksiBarang::class, 'parcel_id');
+}
 }

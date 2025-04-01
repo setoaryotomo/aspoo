@@ -9,9 +9,24 @@ class ValidasiTransaksiRepository
 {
     public static function datatable($per_page = 15)
     {
-        $data = TransaksiMaster::with(['transaksi'])->whereHas('transaksi',function($query){
-            $query->where('status',1);  
-        })->paginate($per_page);
+        // Ambil semua TransaksiMaster yang memiliki transaksi
+        $data = TransaksiMaster::with(['transaksi'])
+            // Pastikan minimal ada 1 transaksi dengan status = 1
+            ->whereHas('transaksi', function ($query) {
+                $query->where('status', 1);
+            })
+            // Pastikan tidak ada transaksi dengan status != 1
+            ->whereDoesntHave('transaksi', function ($query) {
+                $query->where('status', '!=', 1);
+            })
+            // Pastikan semua transaksi (count) sama dengan transaksi yang status = 1
+            ->has('transaksi', '=', function ($subQuery) {
+                $subQuery->selectRaw('COUNT(*)')
+                    ->from('transaksi')
+                    ->whereColumn('transaksi.kode_transaksi_master', 'transaksi_master.kode_transaksi')
+                    ->where('transaksi.status', 1);
+            })
+            ->paginate($per_page);
 
         return $data;
     }

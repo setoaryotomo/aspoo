@@ -17,6 +17,7 @@
     <script src="{!! asset('js/navigator.js') !!}"></script>
     <script src="{!! asset('js/vue_initial.js') !!}"></script>
     <script src="{!! asset('js/ckeditor_initial.js') !!}"></script>
+    
     <?php 
     if(!isset($hideHeaderFooter)){
         $style = "min-height: 100vh; padding-top:50px; margin-bottom:100px";
@@ -31,7 +32,7 @@
             @yield('content')
         </div>
         @if (!isset($hideHeaderFooter))
-            @include('portal_layout.footer')
+            {{-- @include('portal_layout.footer') --}}
         @endif
 
     </body>

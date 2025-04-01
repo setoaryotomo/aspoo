@@ -2,16 +2,18 @@
 require 'config.php';
 if (isset($_POST['username'])) {
     extract($_POST);
-    $query = $conn->query("SELECT * FROM pos_user WHERE user_username = '$username'")->fetch_assoc();
+    $query = $conn->query("SELECT * FROM users WHERE username = '$username'")->fetch_assoc();
     if ($query) {
-        if (password_verify($password, $query['user_password'])) {
+        if (password_verify($password, $query['password'])) {
 
-            $_SESSION['role'] = $query['user_role'];
-            $id = $query['user_id'];
-            $conn->query("UPDATE pos_user SET user_status=1 WHERE user_id='$id'");
-            unset($query['user_password']);
-            unset($query['user_role']);
-            unset($query['user_status']);
+            // $_SESSION['role'] = $query['user_role'];
+            $_SESSION['user_name'] = $query['username'];
+            $id = $query['id'];
+            // $conn->query("UPDATE pos_user SET user_status=1 WHERE user_id='$id'");
+            unset($query['password']);
+            unset($query['user_name']);
+            // unset($query['user_role']);
+            // unset($query['user_status']);
             $_SESSION['data'] = $query;
             if (isset($_POST['ingat']) && $_POST['ingat'] == 'yes') {
                 $cookie = encrypt_decrypt('encrypt', $id);
@@ -19,7 +21,7 @@ if (isset($_POST['username'])) {
             }
             header("Location: index.php");
         } else {
-            echo "<script>alert('Password anda salah!')</script>";
+            echo "<script>alert('Password anda salahh!')</script>";
         }
     } else {
         echo "wew";
@@ -103,16 +105,7 @@ if (isset($_POST['username'])) {
                             </div>
                         </div>
                     </form>
-                    <?php if (isset($_GET['mesg'])) : ?>
-                        <div class="col s12 m5">
-                            <div class="card-panel red">
-                                <span class="white-text">
-                                    <?= (isset($_GET['msg']) && $_GET['msg'] == 'success') ? "Sukses!" : '' ?>
-                                    <?= (isset($_GET['msg']) && $_GET['msg'] == 'active') ? "User sedang aktif!" : '' ?>
-                                </span>
-                            </div>
-                        </div>
-                    <?php endif; ?>
+                    
                 </div>
             </div>
         </div>

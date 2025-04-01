@@ -1,26 +1,15 @@
-<style type="text/css">
-    .font-blue {
-        color: #1971C4;
-    }
-
-    .pyy-3 {
-        padding-top: 19px;
-        padding-bottom: 19px;
-    }
-
-</style>
-
 <?php
 require '../config.php';
 middleware();
-if (isset($_POST['nama'])) {
-    extract($_POST);
-    $userId = $_SESSION['data']['user_id'];
-    query("INSERT INTO barang(nama_barang,satuan,created_by_user_id,) VALUES('$nama','$satuan','$userId')");
-    refresh();
-}
+// if (isset($_POST['nama'])) {
+//     extract($_POST);
+//     $userId = $_SESSION['data']['id'];
+//     query("INSERT INTO barang(nama_barang, satuan, created_by_user_id) VALUES('$nama', '$satuan', '$userId')");
+//     refresh();
+// }
 $i = 1;
-$s = $conn->query("SELECT * FROM barang ORDER BY nama_barang ASC");
+$userId = $_SESSION['data']['id']; // Ambil ID user yang login
+$s = $conn->query("SELECT * FROM barang WHERE created_by_user_id = '$userId' ORDER BY nama_barang ASC");
 $satuan2 = $conn->query("SELECT * FROM satuan");
 $title = "Barang";
 ?>
@@ -117,9 +106,5 @@ $title = "Barang";
 
         </div>
     </div>
-
-
-
-
 
     <?php include('../templates/footer.php') ?>

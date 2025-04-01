@@ -35,10 +35,10 @@
                         text: 'Berat (gram)',
                         value: 'berat',
                     }, 
-                    {
-                        text: 'Satuan',
-                        value: 'satuan.satuan_nama',
-                    },  
+                    // {
+                    //     text: 'Satuan',
+                    //     value: 'satuan.satuan_nama',
+                    // },  
                     {
                         text: 'UMKM',
                         value: 'user.nama',

@@ -1,4 +1,5 @@
 <?php require '../config.php';
+middleware();
 $title = 'Penjualan';
 ?>
 <?php $active[5] = 'active' ?>
@@ -98,7 +99,8 @@ $title = 'Penjualan';
                                                             </thead>
                                                             <tbody>
                                                                 <?php $i = 1;
-                                                                $s = $conn->query("SELECT * FROM barang");
+                                                                $userId = $_SESSION['data']['id']; // Ambil ID user yang login
+                                                                $s = $conn->query("SELECT * FROM barang WHERE created_by_user_id = '$userId'"); // Filter barang berdasarkan user_id
                                                                 while ($row = $s->fetch_assoc()) : ?>
                                                                     <tr>
                                                                         <td><?= $i++ ?></td>

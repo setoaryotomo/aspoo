@@ -49,7 +49,7 @@
               <p>Dashboard</p>
             </a>
           </li>
-          <?php if ($_SESSION['role'] == 'admin') : ?>
+          <?php if ($_SESSION['user_name'] !== ' ') : ?>
 
             <li class="nav-item <?php if (isset($active[1])) echo $active[1] ?>">
               <a href="obat" class="nav-link">

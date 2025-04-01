@@ -18,7 +18,10 @@ class TransaksiBarang extends Model
         $rupiah = "Rp. " . number_format(($this->total_biaya + $this->biaya_pengiriman), 0, ',', '.');
         return $rupiah;
     }
-    
+    public function parcel()
+{
+    return $this->belongsTo(PermintaanParcel::class, 'parcel_id');
+}
     public function dataChildren(){
         return $this->hasMany(TransaksiBarangChildren::class,"transaksi_id");
     }

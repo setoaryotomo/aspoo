@@ -47,6 +47,12 @@
                 $totalHargaPerSeller = 0;
                 ?>
                 @foreach ($data_group_seller_id as $keranjang)
+                    {{-- <p>{{ $keranjang->parcel_id }}</p> --}}
+                    @if ($keranjang->parcel_id)
+                        <div class="alert alert-info">
+                            Pesanan ini berasal dari Parcel #{{ $keranjang->parcel_id }}
+                        </div>
+                    @endif
                     <?php $barang = $keranjang->barang; ?>
                     <div class="col-md-12">
                         <div class="card bg-light">
@@ -110,7 +116,7 @@
                 @endif
             @endforeach
             <div class="col-md-12">
-                <h2>Rincian Pembayaran</h2>
+                <h5>Rincian Pembayaran</h5>
                 <br>
                 <div class="row">
                     <div class="col-md-12">
