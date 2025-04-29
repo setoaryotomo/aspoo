@@ -21,30 +21,57 @@ class DataBarang extends Model
     use SoftDeletes;
     protected $table = 'barang';
     protected $guarded = [];
-    protected $fillable = ['nama_barang','harga_supplier','harga_umum','diskon','berat','keterangan','info_penting','stock_global','created_by_user_id','satuan_id','thumbnail','expired','dimensi','panjang','lebar','tinggi'];
+    protected $fillable = ['nama_barang','kategori_umum','kategori_nama','kategori_produk','bahan_dasar','kekhasan','basah_kering','rasa','jenis_kemasan','komposisi','harga_supplier','harga_umum','diskon','berat','keterangan','info_penting','stock_global','created_by_user_id','satuan_id','thumbnail','expired','dimensi','panjang','lebar','tinggi'];
     protected $appends = ['harga_user','harga_user_asli','thumbnail_readable'];
 
-    public function getThumbnailReadableAttribute(){
-        // if(Storage::exists($this->thumbnail)){
-            return url("storage/".$this->thumbnail);
-        // }else{
-        //     return url("/img/portal/produk.png");
+    // public function getThumbnailReadableAttribute(){
+    //     // if(Storage::exists($this->thumbnail)){
+    //         return url($this->thumbnail);
+    //     // }else{
+    //     //     return url("/img/portal/produk.png");
 
-        // }
-        // if($this->thumbnail == null){
-        //     return url("/img/portal/produk.png");
-        // }else{
-        //     return url("storage/".$this->thumbnail);
-        // }
+    //     // }
+    //     // if($this->thumbnail == null){
+    //     //     return url("/img/portal/produk.png");
+    //     // }else{
+    //     //     return url("storage/".$this->thumbnail);
+    //     // }
+    // }
+
+    public function getThumbnailReadableAttribute(){
+        // Jika thumbnail sudah dalam format URL lengkap
+       
+        
+        // Jika thumbnail adalah link Google Drive
+        if (strpos($this->thumbnail, 'https://drive.google.com/') === 0) {
+            // Ekstrak ID dari URL Google Drive
+            $pattern = '/\/d\/([^\/]+)/';
+            preg_match($pattern, $this->thumbnail, $matches);
+            
+            if (isset($matches[1])) {
+                $fileId = $matches[1];
+                // return "https://drive.google.com/thumbnail?id=" . $fileId . "&sz=w1000";
+                // w500 (lebar 500px) dengan aspek ratio 1:1 (persegi)
+            return "https://drive.google.com/thumbnail?id=" . $fileId . "&sz=w500&v=1";
+            }
+            
+            return $this->thumbnail;
+        }
+        
+        // Default: ambil dari storage lokal
+        return url("storage/" . $this->thumbnail);
     }
+    
+
     public function getHargaUserAsliAttribute(){
         $user = Auth::user();
         if($user){
             $role = UserRoleModel::where('user_id',$user->id)->first();
-            if($role == "2"){
+            // if($role == "2"){
+            if($role == "3"){
                 return $this->harga_umum;
             } else{
-                return $this->harga_supplier;
+                return $this->harga_umum;
             }
         }else{
             return $this->harga_umum;

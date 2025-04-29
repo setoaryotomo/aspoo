@@ -15,6 +15,10 @@
             return {
                 headers: [
                     {
+                        text: 'Parcel Id',
+                        value: 'id',
+                    },
+                    {
                         text: 'Username',
                         value: 'user.name',
                     },
@@ -29,6 +33,14 @@
                     {
                         text: 'Tanggal Dibutuhkan',
                         value: 'tanggal',
+                    },    
+                    {
+                        text: 'Review Komposisi',
+                        value: 'review_komposisi',
+                    },    
+                    {
+                        text: 'Review Pelayanan',
+                        value: 'review_pelayanan',
                     },    
 					],
             }

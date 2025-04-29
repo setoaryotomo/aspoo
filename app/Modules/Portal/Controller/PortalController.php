@@ -177,8 +177,10 @@ class PortalController extends Controller
     public function index(Request $request)
     {
         $slider = Slider::all();
+        // $category = DataBarang::all();
+        $category = DataBarang::limit(8)->inRandomOrder()->get();
         $barang = DataBarang::limit(8)->inRandomOrder()->get();
-        return view('Portal::dashboard.dashboard', compact('barang','slider'));
+        return view('Portal::dashboard.dashboard', compact('barang','slider','category'));
     }
     public function login(Request $request)
     {
@@ -379,7 +381,8 @@ class PortalController extends Controller
                     'transaksiId' => $transaksi->id,
                     'kodeTransaksi' => $transaksi->kode_transaksi,
                     'namaBarang' => $barang->nama_barang,
-                    'thumbnail' => $barang->thumbnail_readable,
+                    'thumbnail' => $barang->thumbnail,
+                    'thumbnail_readable' => $barang->thumbnail_readable,
                     'jumlah' => $child->jumlah,
                     'harga' => $child->harga,
                     'subtotal' => $subtotal,
@@ -397,6 +400,7 @@ class PortalController extends Controller
         
         $data_transaksi[] = [
             'masterKode' => $master->kode_transaksi,
+            'parcelId' => $master->transaksi->pluck('parcel_id')->unique()->first(),
             'createdDate' => $createdDate,
             'items' => $master_items,
             'totalHarga' => $master_total,
@@ -433,7 +437,7 @@ private function getMasterStatusReadable($transactions)
     ];
     
     $status = $this->getMasterStatus($transactions);
-    return $statuses[$status] ?? 'Unknown Status';
+    return $statuses[$status] ?? 'Diproses';
 }
 
     public function updateStatus(Request $request)
@@ -778,6 +782,7 @@ private function getMasterStatusReadable($transactions)
         // Mengambil semua data barang dari database
         // $produk = DataBarang::paginate(24);
         $produk = DataBarang::paginate(12);
+        $category = DataBarang::all();
 
         // Mengambil data dari jsonplaceholder
         $response = Http::get('https://jsonplaceholder.typicode.com/posts');
@@ -785,7 +790,7 @@ private function getMasterStatusReadable($transactions)
         // Mengkonversi respons JSON menjadi array
         $placeholder = $response->json(); // atau $response->json() jika ingin mendapatkan array
 
-        return view('Portal::listbarang', compact('produk', 'placeholder'));
+        return view('Portal::listbarang', compact('produk','category', 'placeholder'));
     }
 
 
@@ -949,6 +954,9 @@ private function getMasterStatusReadable($transactions)
         $auth = Auth::user();
         // $data = permintaanparcel::where('id',$id)->with(['user'])->first();
         $barang = DataBarang::select('*')->with(['user'])->get();
+        $parcel = permintaanparcel::with(['parcel_children.barang'])->where('review_komposisi', '!=', '')
+                          ->get();
+
 
         $data = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
         // dd($data);
@@ -969,34 +977,38 @@ private function getMasterStatusReadable($transactions)
         ];
         // dd($card);
         //return view('Portal::auth.profile', ['data' => $data, 'user' => $userMaster, 'asal' => $asal_daerah]);
-        return view('Portal::pesanparcel', compact('auth', 'card', 'data', 'asal'));
+        return view('Portal::pesanparcel', compact('auth', 'card', 'data', 'asal','parcel'));
     }
 
     public function saveToCart(Request $request)
-    {
-        $user = Auth::user();
-        $items = $request->input('items');
-        $parcelId = $request->input('parcel_id');
+{
+    $user = Auth::user();
+    $items = $request->input('items');
+    $parcelId = $request->input('parcel_id');
+    $parcelQuantity = $request->input('parcel_quantity', 1); // Default to 1 if not provided
     
-        DB::beginTransaction();
-        try {
-            foreach ($items as $item) {
-                Keranjang::create([
-                    'user_id' => $user->id,
-                    'barang_id' => $item['id'],
-                    'jumlah' => 1, // Anda bisa menyesuaikan jumlahnya
-                    'parcel_id' => $parcelId,
-                    // 'harga' => $item['price'],
-                ]);
-            }
+    // Make sure quantity is at least 1
+    $parcelQuantity = max(1, intval($parcelQuantity));
     
-            DB::commit();
-            return response()->json(['success' => true]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    DB::beginTransaction();
+    try {
+        foreach ($items as $item) {
+            Keranjang::create([
+                'user_id' => $user->id,
+                'barang_id' => $item['id'],
+                'jumlah' => $parcelQuantity, // Use the parcel quantity
+                'parcel_id' => $parcelId,
+                // 'harga' => $item['price'],
+            ]);
         }
+        
+        DB::commit();
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
+}
 
     public function kirimpesanparcel(Request $request)
     {

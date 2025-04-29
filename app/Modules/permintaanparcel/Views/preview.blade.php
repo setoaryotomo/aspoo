@@ -82,6 +82,8 @@
                                     @elseif ($data->transaksi->status == 4)
                                         {{-- class="text-primary font-weight-bold" target="_blank"> --}}
                                         {{ $data->transaksi->kode_transaksi }}
+                                    @else
+                                        {{ $data->transaksi->kode_transaksi }}
                                     @endif
                                 </p>
                             </div>

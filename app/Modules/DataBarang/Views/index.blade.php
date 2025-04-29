@@ -19,6 +19,10 @@
                         text: 'Nama Barang',
                         value: 'nama_barang',
                     },    
+                    // {
+                    //     text: 'Kategori',
+                    //     value: 'kategori_umum',
+                    // },    
                     {
                         text: 'Harga Umum',
                         value: 'harga_umum',

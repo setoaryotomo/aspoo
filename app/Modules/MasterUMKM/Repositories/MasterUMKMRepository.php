@@ -2,6 +2,7 @@
 
 namespace App\Modules\MasterUMKM\Repositories;
 
+use App\Modules\DataBarang\Models\DataBarang;
 use App\Modules\MasterUMKM\Models\MasterUMKM;
 
 class MasterUMKMRepository
@@ -11,6 +12,13 @@ class MasterUMKMRepository
         $data = MasterUMKM::paginate($per_page);
         return $data;
     }
+
+    public static function barang_datatable($per_page = 15)
+    {
+        $data = DataBarang::with(['user','satuan'])->paginate($per_page);
+        return $data;
+    }
+
     public static function get($masterumkm_id)
     {
         $masterumkm = MasterUMKM::where('id', $masterumkm_id)->first();

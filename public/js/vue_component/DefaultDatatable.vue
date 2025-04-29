@@ -4,7 +4,7 @@
             <div class="card-head-row justify-content-between">
                 <h4 class="card-title"><strong>{{ title }}</strong></h4>
                 <div class="d-flex align-items-center">
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <div class="input-icon">
                             <input
                                 type="text"
@@ -16,7 +16,7 @@
                                 <i class="fa fa-search"></i>
                             </span>
                         </div>
-                    </div>
+                    </div> -->
                     <div>
                         <a
                             v-if="canAdd"
@@ -232,10 +232,10 @@ export default {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     await httpClient.delete(`${this.url}/${id}`);
-                    Swal.fire("Data berhasil dihapus!", "", "success");
+                    Swal.fire("Data berhasil dihapus!", "", "");
                     this.fetchData();
                 } else if (result.isDenied) {
-                    Swal.fire("Proses hapus dibatalkan", "", "info");
+                    Swal.fire("Proses hapus dibatalkan", "", "");
                     this.fetchData();
                 }
             });

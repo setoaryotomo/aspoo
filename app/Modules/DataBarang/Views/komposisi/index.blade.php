@@ -3,10 +3,10 @@
     <div class="page-inner" id="data-barang">
         <default-datatable title="Komposisi Barang" url="{!! url('data-barang/komposisi') . '/' . $id !!}" :headers="headers"
             :can-add="true" :can-edit="false" :can-delete="true">
-            <template #left-action="{ content }">
+            {{-- <template #left-action="{ content }">
                 <a :href="`{!! url()->current() !!}/supplier/${content.id_komposisi}`" class="btn btn-xs btn-info mr-1">Data Supplier</a>
     
-            </template>
+            </template> --}}
         </default-datatable>
     </div>
     <script>

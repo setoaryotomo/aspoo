@@ -55,7 +55,7 @@ $title = 'Laporan';
                 <div class="row justify-content-center align-items-center">
                     <div class="col-md-4 mb-3">
                         <div class="custom-card uang-masuk">
-                            <h2>Uang Penjualan</h2>
+                            <h3 style="color: white;">Uang Penjualan</h3>
                             <p class="total-uang-masuk" id="uang_masuk">Rp. 0</p>
                         </div>
                     </div>

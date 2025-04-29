@@ -126,7 +126,9 @@
             @foreach($results as $users_toko)
             <div class="col col-md-4">
                 <div class="card mx-auto">
-                    <img src="{{ asset('storage/' . $users_toko->detail->foto) }}" alt="{{ $users_toko->nama}}" class="card-img">
+                    <img src="{{ $users_toko->detail->foto ? Storage::url($users_toko->detail->foto) : 'https://www.canbind.ca/wp-content/uploads/2025/01/placeholder-image-person-jpg.jpg' }}" 
+     alt="{{ $users_toko->nama }}" 
+     class="card-img">
                     <div class="card-body">
                         <h5 class="card-title">{{ $users_toko->nama }}</h5>
                         {{-- <p class="card-text">Tautan: {{ $users_toko->tautan }}</p> --}}

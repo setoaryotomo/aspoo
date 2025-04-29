@@ -38,25 +38,28 @@
         <!-- /slider -->
         <!-- Categories -->
         <section class="flat-spacing-30 flat-control-sw">
-            <div class="container">
+            {{-- <div class="container">
                 <div class="flat-title flex-row justify-content-between px-0">
-                    <span class="title fw-6 wow fadeInUp" data-wow-delay="0s">Featured Categories</span>
+                    <span class="title fw-6 wow fadeInUp" data-wow-delay="0s" style="font-size: 30px">Featured Categories</span>
                     <div class="box-sw-navigation">
                         <div class="sw-dots style-2 medium sw-pagination-recent justify-content-center"></div>
                     </div>
                 </div>
                 <div dir="ltr" class="swiper tf-sw-recent wow fadeInUp" data-preview="6" data-tablet="3" data-mobile="2" data-space-lg="30" data-space-md="30" data-space="15" data-pagination="2" data-pagination-md="3" data-pagination-lg="3">
                     <div class="swiper-wrapper">
+                        @foreach($category->unique('kategori_nama') as $items)
                         <div class="swiper-slide">
                             <div class="collection-item-circle has-bg has-bg-2 hover-img">
                                 <a href="shop-default.html" class="collection-image img-style">
-                                    <img class="lazyload" data-src="https://www.themesflat.co/html/ecomus/images/collections/vegetable.png" alt="collection-img" src="https://www.themesflat.co/html/ecomus/images/collections/vegetable.png">
+                                    <img class="lazyload" data-src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrEQSrRvWngQBdX7MBdzKYjG9BL3HP1ovhxA&s" alt="collection-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrEQSrRvWngQBdX7MBdzKYjG9BL3HP1ovhxA&s">
                                 </a>
                                 <div class="collection-content text-center">
-                                    <a href="shop-default.html" class="link title fw-5">Vegetables</a>
+                                    <a href="shop-default.html" class="link title fw-5">{{ $items->kategori_nama }}</a>
                                 </div>
                             </div>
                         </div>
+                        @endforeach
+                        
                         <div class="swiper-slide">
                             <div class="collection-item-circle has-bg has-bg-2 hover-img">
                                 <a href="shop-default.html" class="collection-image img-style">
@@ -119,7 +122,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </section>
         <!-- /Categories -->
         <!-- Banner Collection -->
@@ -177,10 +180,10 @@
         <section class="flat-spacing-5 pt_0">
             <div class="container">
                 <div class="flat-animate-tab">
-                    <div class="flat-title flat-title-tab flex-row justify-content-between px-0">
-                        <span class="title text-nowrap fw-6 wow fadeInUp" data-wow-delay="0s">List products</span>
-                       
-                    </div>
+                    {{-- <div class="flat-title flat-title-tab flex-row justify-content-between"> --}}
+                        <span class="title text-nowrap fw-6 wow fadeInUp" style="font-size: 30px" data-wow-delay="0s">List products</span>
+                    {{-- </div> --}}
+                    <br><br>
                     <div class="tab-content">
                         <div class="tab-pane active show" id="meat" role="tabpanel">
                             <div class="tf-grid-layout tf-col-2 xl-col-4">
@@ -189,11 +192,9 @@
                                 <div class="card-product style-9">
                                     <div class="card-product-wrapper">
                                         <a data-href="{{ url('/p/barang/' . $barangs->id) }}" class="product-img">
-                                            @if (strpos($barangs->thumbnail, 'https://') !== false)
-                                            <img src="{{ URL::asset($barangs->thumbnail) }}" alt="{{ $barangs->nama_barang }}" class="img-fluid" style="height: 187px">
-                                        @else
+                                            
                                             <img src="{{ URL::asset($barangs->thumbnail_readable) }}" alt="{{ $barangs->nama_barang }}" class="img-fluid" style="height: 187px">
-                                        @endif
+                                      
                                         </a>
                                         <div class="list-product-btn absolute-2">
                                             <a href="javascript:void(0);" class="box-icon bg_white wishlist btn-icon-action">
@@ -215,8 +216,7 @@
                                     <div class="card-product-info">
                                         <div class="inner-info">
                                             <a href="product-detail.html" class="title link fw-6">{{ $barangs->nama_barang }}</a>
-                                            <span class="price fw-6">Rp.
-                                                {{ number_format($barangs->harga_user, 2) }}</span>
+                                            <span class="">Rp.{{ number_format($barangs->harga_user, 2) }}</span>
                                         </div>
                                         <div class="list-product-btn">
                                             <a href="#quick_add" data-bs-toggle="modal" class="box-icon quick-add tf-btn-loading">

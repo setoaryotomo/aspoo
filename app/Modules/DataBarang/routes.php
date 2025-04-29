@@ -32,6 +32,12 @@ Route::prefix('/data-barang')->group(function() {
         Route::post('/create', [DataBarangController::class, 'inputstok_store']);
         Route::delete('/{data_barang_id}', [DataBarangController::class, 'inputstok_destroy']);
     });
+
+    Route::prefix('/{user_id}')->where(['user_id' => '[0-9]+'])->group(function() {
+        Route::get('/create', [DataBarangController::class, 'createWithUserId'])->middleware('authorize:create-data_barang');
+        Route::post('/create', [DataBarangController::class, 'storeWithUserId'])->middleware('authorize:create-data_barang');
+    });
+
     Route::get('/', [DataBarangController::class, 'index'])->middleware('authorize:read-data_barang');
     Route::get('/view', [DataBarangController::class, 'view'])->middleware('authorize:read-data_barang');
     Route::get('/all', [DataBarangController::class, 'all']);

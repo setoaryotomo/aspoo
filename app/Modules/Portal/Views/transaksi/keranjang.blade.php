@@ -30,7 +30,11 @@
                         </thead>
                         <tbody>
                             <tr v-for="keranjang in keranjangList ">
-                                <td><img :src="keranjang.barang.thumbnail.includes('https://') ? keranjang.barang.thumbnail : keranjang.barang.thumbnail_readable" 
+                                <td>
+                                    {{-- <img :src="keranjang.barang.thumbnail.includes('https://') ? keranjang.barang.thumbnail : keranjang.barang.thumbnail_readable" 
+                                    alt="Product" 
+                                    style="width: 100px;">                                --}}
+                                    <img :src="keranjang.barang.thumbnail_readable" 
                                     alt="Product" 
                                     style="width: 100px;">                               
                                 </td>

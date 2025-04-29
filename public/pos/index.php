@@ -86,7 +86,7 @@ $title = "Dashboard " ?>
                     <div class="col-md-6">
                         <div class="row card-report m-2 p-3">
                             <div class="col-6">
-                                <img src="https://cdn2.iconfinder.com/data/icons/e-commerce-line-4-1/1024/product4-512.png" class="img-fluid pt-3">
+                                <img src="https://cdn2.iconfinder.com/data/icons/e-commerce-line-4-1/1024/product4-512.png" class="img-fluid pt-3" style="width: 100px;">
                             </div>
                             <div class="col-6">
                                 <span class="title-report">Barang</span>
@@ -97,7 +97,7 @@ $title = "Dashboard " ?>
                     <div class="col-md-6">
                         <div class="row card-report m-2 p-3">
                             <div class="col-6">
-                                <img src="https://cdn2.iconfinder.com/data/icons/sales-line/48/bill-512.png" class="img-fluid pt-3">
+                                <img src="https://cdn2.iconfinder.com/data/icons/sales-line/48/bill-512.png" class="img-fluid pt-3" style="width: 100px;">
                             </div>
                             <div class="col-6">
                                 <span class="title-report">Penjualan</span>

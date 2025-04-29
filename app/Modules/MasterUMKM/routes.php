@@ -18,4 +18,7 @@ Route::prefix('/masterumkm')->group(function() {
     Route::get('/{masterumkm_id}/edit', [MasterUMKMController::class, 'edit'])->middleware('authorize:update-master_umkm');
     Route::put('/{masterumkm_id}', [MasterUMKMController::class, 'update'])->middleware('authorize:update-master_umkm');
     Route::delete('/{masterumkm_id}', [MasterUMKMController::class, 'destroy'])->middleware('authorize:delete-master_umkm');
+
+    Route::get('/{masterumkm_id}/barang', [MasterUMKMController::class, 'barang_index'])->middleware('authorize:read-master_umkm');
+Route::get('/{masterumkm_id}/barang/datatable', [MasterUMKMController::class, 'barang_datatable'])->middleware('authorize:read-master_umkm');
 });

@@ -19,10 +19,10 @@
                             text: 'Kode Master',
                             value: 'kode_transaksi',
                         },
-                        {
-                            text: 'Tipe Rekening',
-                            value: 'tipe_rekening',
-                        },
+                        // {
+                        //     text: 'Tipe Rekening',
+                        //     value: 'tipe_rekening',
+                        // },
                         {
                             text: 'Total Biaya',
                             value: 'total_biaya',

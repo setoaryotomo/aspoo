@@ -2,6 +2,7 @@
 
 @section('content')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
     .search-container {
@@ -125,10 +126,54 @@
         background-color: #FBD9C0;
         color: #333;
     }
+    .review-section {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+    }
+    .review-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .star-rating {
+        display: flex;
+        margin-bottom: 10px;
+    }
+    .star-rating i {
+        color: #ddd;
+        cursor: pointer;
+        font-size: 20px;
+        margin-right: 5px;
+    }
+    .star-rating i.active {
+        color: #FFD700;
+    }
+    .review-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    .submit-review {
+        background-color: #FBD9C0;
+        color: #333;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .review-display {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+    }
 </style>
 
 <div class="container">
-    <div class="container custom-margin">
+    <div class="container custom-margin" style="display: none">
         <ul class="nav">
             <li class="nav-item">
                 <a href="{{ url('/p/daftartransaksi') }}" class="nav-link active" aria-disabled="true"
@@ -147,16 +192,23 @@
 
     @if(count($data) == 0)
         <div class="master-transaction">
-            <h4>Anda belum memiliki transaksi</h4>
+            <h7>Anda belum memiliki transaksi</h7>
         </div>
-    @endif
+    @else
+        <br>
+        <div class="master-transaction">
+            <h5><b>Daftar Transaksi</b></h5>
+        </div>
+    @endif 
 
     @foreach($data as $master)
         <div class="master-transaction">
             <div class="master-header">
                 <div>
-                    <h5>Order #{{ $master['masterKode'] }}</h5>
+                    <h6>Order #{{ $master['masterKode'] }}</h6>
                     <p class="transaction-meta">Tanggal: {{ $master['createdDate'] }}</p>
+                    <p class="transaction-meta">ID: {{ $master['parcelId'] }}</p>
+                    
                 </div>
                 <div>
                     @php
@@ -173,7 +225,8 @@
 
             @foreach($master['items'] as $item)
                 <div class="transaction-item">
-                    <img src="{{ url($item['thumbnail']) }}" alt="Product Image" class="product-image">
+                    <img src="{{ url($item['thumbnail_readable']) }}" alt="Product Image" class="product-image">
+                    
                     <div class="product-details">
                         <div class="product-name">{{ $item['namaBarang'] }}</div>
                         <p class="transaction-meta">Kode: {{ $item['kodeTransaksi'] }}</p>
@@ -197,17 +250,71 @@
                 </div>
             @endforeach
 
+            @if($master['parcelId'])
+            
+                <div class="review-section">
+                    {{-- <div class="review-title">Review Parcel</div> --}}
+                    
+                    @if($master['status'] == 4) {{-- Only show review form if transaction is completed --}}
+                        @php
+                            $parcel = \App\Modules\permintaanparcel\Models\permintaanparcel::find($master['parcelId']);
+                        @endphp
+                        
+                        @if($parcel && !$parcel->review_komposisi && !$parcel->review_pelayanan)
+                        <div class="review-title">Review Parcel</div>
+                            <form id="reviewForm-{{ $master['parcelId'] }}" class="review-form" data-parcel-id="{{ $master['parcelId'] }}">
+                                @csrf
+                                <div>
+                                    <label>Rating Komposisi:</label>
+                                    <div class="star-rating komposisi-rating">
+                                        <i class="fas fa-star" data-rating="1"></i>
+                                        <i class="fas fa-star" data-rating="2"></i>
+                                        <i class="fas fa-star" data-rating="3"></i>
+                                        <i class="fas fa-star" data-rating="4"></i>
+                                        <i class="fas fa-star" data-rating="5"></i>
+                                        <input type="hidden" name="review_komposisi" id="komposisi-rating-input" value="0">
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 15px;">
+                                    <label>Rating Pelayanan:</label>
+                                    <div class="star-rating pelayanan-rating">
+                                        <i class="fas fa-star" data-rating="1"></i>
+                                        <i class="fas fa-star" data-rating="2"></i>
+                                        <i class="fas fa-star" data-rating="3"></i>
+                                        <i class="fas fa-star" data-rating="4"></i>
+                                        <i class="fas fa-star" data-rating="5"></i>
+                                        <input type="hidden" name="review_pelayanan" id="pelayanan-rating-input" value="0">
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="submit-review">Kirim Review</button>
+                            </form>
+                        @elseif($parcel)
+                            <div class="review-display">
+                                <p><strong>Komposisi:</strong> 
+                                    @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star" style="@if($i <= $parcel->review_komposisi) color: #FFD700; @else color: #ddd; @endif"></i>
+                                    @endfor
+                                </p>
+                                <p><strong>Pelayanan:</strong> 
+                                    @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star" style="@if($i <= $parcel->review_pelayanan) color: #FFD700; @else color: #ddd; @endif"></i>
+                                    @endfor
+                                </p>
+                            </div>
+                        @endif
+                    @endif
+                </div>
+            @endif
+
             <div class="master-footer">
                 <div>
-                    <a href="{{ url('p/status/').'/'.$master['masterKode'] }}" class="btn btn-primary" style="color: white" target="_blank">
-                        Lihat Detail Transaksi
-                    </a>
+                    {{-- <a href="{{ url('p/status/').'/'.$master['masterKode'] }}" class="btn btn-primary" style="color: white" target="_blank">Detail</a> --}}
+                    <a href="{{ url('p/status/').'/'.$master['masterKode'] }}" class="btn btn-primary" style="color: white" target="_blank" onclick="window.open(this.href, '_blank'); return false;"> Detail </a>
                 </div>
                 <div class="total-price">
                     Total: {{ $master['totalHargaFormatted'] }}
-                    @if($master['kodeUnik'] > 0)
-                        <small>(termasuk kode unik Rp {{ number_format($master['kodeUnik'], 0, ',', '.') }})</small>
-                    @endif
                 </div>
             </div>
         </div>
@@ -216,6 +323,7 @@
 
 <script>
 $(document).ready(function() {
+    // Status update functions
     $(".ubah-status").click(function() {
         var transaksiId = $(this).data("transaksi-id");
         
@@ -269,6 +377,40 @@ $(document).ready(function() {
             },
             error: function() {
                 alert("Terjadi kesalahan saat mengupdate status.");
+            }
+        });
+    });
+
+    // Star rating functionality
+    $('.star-rating i').click(function() {
+        const rating = $(this).data('rating');
+        const ratingType = $(this).parent().hasClass('komposisi-rating') ? 'komposisi' : 'pelayanan';
+        
+        $(this).parent().find('i').removeClass('active');
+        $(this).prevAll('i').addBack().addClass('active');
+        $(`#${ratingType}-rating-input`).val(rating);
+    });
+
+    // Review submission
+    $('.review-form').submit(function(e) {
+        e.preventDefault();
+        const parcelId = $(this).data('parcel-id');
+        const formData = $(this).serialize();
+        
+        $.ajax({
+            type: "POST",
+            url: `/p/parcel/${parcelId}/review`,
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    alert("Review berhasil dikirim.");
+                    location.reload();
+                } else {
+                    alert("Gagal mengirim review.");
+                }
+            },
+            error: function() {
+                alert("Terjadi kesalahan saat mengirim review.");
             }
         });
     });

@@ -296,11 +296,9 @@
             @foreach ($barang as $item)
             <div class="col-md-2">
                 <div class="card" data-href="{{ url('/p/') }}/barang/{{ $item->id }}">
-                    @if (strpos($item->thumbnail, 'https://') !== false)
-                    <img class="card-img-top foto-produk" src="{{ URL::asset($item->thumbnail) }}" alt="{{ $item->thumbnail }}">
-                    @else
+                    
                     <img class="card-img-top foto-produk" src="{{ URL::asset($item->thumbnail_readable) }}" alt="{{ $item->thumbnail_readable }}">
-                    @endif
+                    
                     <div class="card-body">
                         <h5 class="card-title">{{ $item->nama_barang }}</h5>
                         {{-- <p class="card-text">Kategori: {{ $item->kategori }}</p> --}}
@@ -308,7 +306,7 @@
                         <p class="card-text harga">Rp.
                             {{ number_format($item->harga_umum - ($item->harga_umum * ($item->diskon / 100)), 0, ',', '.') }}
                         </p>
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-md-12">
                                 <p class="card-text diskon text-muted"><span
                                         class="badge badge-danger">-{{ $item->diskon }}%</span>&nbsp;&nbsp;<s>Rp.
@@ -317,11 +315,11 @@
                             <div class="col-md-12">
                                 <p class="lokasi">{{ $toko->detail->kotaModel->name }}</p>
                             </div>
-                            {{-- <div class="col-md-12 keranjang">
+                            <div class="col-md-12 keranjang">
                                 <a href="{{ url('/p/') }}/barang/{{ $item->id }}" class="btn btn-primary"><i
                                         class="fas fa-shopping-cart cart-icon"></i></a>
-                            </div> --}}
-                        </div>
+                            </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>

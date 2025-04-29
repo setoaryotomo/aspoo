@@ -40,10 +40,10 @@ $title = 'Penjualan';
                     <div class="alert alert-danger pt-4" role="alert">
                         <div class="row">
                             <div class="col-md-3">
-                                <h2>Total Harga :</h2>
+                                <h3>Total Harga :</h3>
                             </div>
                             <div class="col-md-9">
-                                <h2 class="mb-0" id="totalAtas">Rp. 0</h2>
+                                <h3 class="mb-0" id="totalAtas">Rp. 0</h3>
                             </div>
                         </div>
                     </div>

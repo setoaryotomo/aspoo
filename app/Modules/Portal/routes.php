@@ -43,6 +43,7 @@ Route::prefix('/p')->group(function () {
     Route::get('/parcel/search', [ParcelController::class, 'searchbarangparcel'])->name('parcel.search');
     // Route::post('/save-selected-items/{id}', [permintaanparcelController::class, 'saveSelectedItems'])->name('save-selected-items');
     Route::post('/permintaan-parcel/save-selected-items/{id}', [permintaanparcelController::class, 'saveSelectedItems']);
+    Route::post('/parcel/{id}/review', [PortalController::class, 'submitParcelReview'])->name('parcel.review');
 
     Route::prefix("toko")->group(function(){
         Route::get("/", [PortalController::class, "toko"]);

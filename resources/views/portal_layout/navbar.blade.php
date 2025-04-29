@@ -97,7 +97,7 @@
         <!-- /Top bar -->
         <!-- header -->
         <header id="header" class="header-default header-style-2 header-style-4">
-            <div class="main-header line">
+            <div class="main-header line" style="background-color: rgb(245, 245, 245)">
                 <div class="container">
                     <div class="row wrapper-header align-items-center">
                         <div class="col-md-4 col-3 tf-lg-hidden">
@@ -113,17 +113,16 @@
                             </a>
                         </div>
                         <div class="col-md-4 col-6 tf-md-hidden">
-                            <div class="tf-form-search">
+                            {{-- <div class="tf-form-search">
                                 <form action="home-search.html" class="search-box">
                                     <input type="text" placeholder="Search product">
                                     <button class="tf-btn"><i class="icon icon-search"></i></button>
                                 </form>
-                               
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="col-md-4 col-3">
                             <ul class="nav-icon d-flex justify-content-end align-items-center gap-20">
-                                <li class="nav-search"><a href="#canvasSearch" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="nav-icon-item"><i class="icon icon-search"></i></a></li>
+                                {{-- <li class="nav-search"><a href="#canvasSearch" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="nav-icon-item"><i class="icon icon-search"></i></a></li> --}}
                                 
                                 <li class="nav-compare"><a href="{{ url('/p/listbarang') }}" class="nav-icon-item align-items-center gap-10"><i class="icon icon-shopping"></i><span class="text">Product</span></a></li>
                                 

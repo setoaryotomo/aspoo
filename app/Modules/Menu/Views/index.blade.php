@@ -30,6 +30,10 @@
                         text: 'Parent',
                         value: 'parent.name',
                     },
+                    {
+                        text: 'Icon',
+                        value: 'icon',
+                    },
                 ],
             }
         },

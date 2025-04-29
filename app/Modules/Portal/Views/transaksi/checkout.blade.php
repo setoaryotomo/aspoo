@@ -48,24 +48,21 @@
                 ?>
                 @foreach ($data_group_seller_id as $keranjang)
                     {{-- <p>{{ $keranjang->parcel_id }}</p> --}}
-                    @if ($keranjang->parcel_id)
+
+                    {{-- @if ($keranjang->parcel_id)
                         <div class="alert alert-info">
                             Pesanan ini berasal dari Parcel #{{ $keranjang->parcel_id }}
                         </div>
-                    @endif
+                    @endif --}}
+
                     <?php $barang = $keranjang->barang; ?>
                     <div class="col-md-12">
                         <div class="card bg-light">
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-2">
-                                        @if (strpos($barang->thumbnail, 'https://') !== false)
-                                            <img src="{{ $barang->thumbnail }}" alt="Product Image" class="product-image"
-                                                height="100">
-                                        @else
                                             <img src="{{ $barang->thumbnail_readable }}" alt="Product Image"
-                                                class="product-image" height="100">
-                                        @endif
+                                                class="product-image" width="100">
                                     </div>
                                     <div class="col-md-10">
                                         <div class="row justify-content-between">

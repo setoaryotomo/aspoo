@@ -12,7 +12,7 @@ class permintaanparcel extends Model
 {
     use SoftDeletes;
     protected $table = 'parcel';
-    protected $fillable = ['user_id','harga','berat','alamat','barang', 'tanggal'];
+    protected $fillable = ['user_id','harga','berat','alamat','barang','tanggal','review_komposisi','review_pelayanan']; //review_komposisi isinya 1-5
     protected $guarded = [];
 
     public function user()

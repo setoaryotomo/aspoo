@@ -11,6 +11,7 @@ use App\Modules\DataBarang\Models\DataBarangKomposisi;
 use App\Modules\DataBarang\Models\InputStok;
 use App\Modules\DataBarang\Repositories\DataBarangRepository;
 use App\Modules\DataBarang\Requests\DataBarangCreateRequest;
+use App\Modules\MasterUMKM\Models\MasterUMKM;
 use App\Modules\Permission\Repositories\PermissionRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -135,6 +136,41 @@ class DataBarangController extends Controller
     {
         return view('DataBarang::create');
     }
+
+    public function createWithUserId($user_id)
+{
+    // Check if user exists
+    $user = User::find($user_id);
+    if (!$user) {
+        return abort(404, 'User not found');
+    }
+    $umkm = MasterUMKM::where('user_id',$user_id)->first();
+    return view('DataBarang::create', ['specified_user_id' => $user_id,'umkm' => $umkm]);
+}
+
+public function storeWithUserId(DataBarangCreateRequest $request, $user_id)
+{
+    // Check if user exists
+    $user = User::find($user_id);
+    if (!$user) {
+        return abort(404, 'User not found');
+    }
+    
+    $payload = $request->all();
+    unset($payload['foto']);
+
+    // Store file in the specific user's directory
+    $foto = FileHandler::store(
+        file: $request->file('foto'), 
+        targetDir: "uploads/{$user_id}/barang"
+    );
+    
+    $payload['created_by_user_id'] = $user_id;
+    $payload['thumbnail'] = $foto;
+    
+    $data_barang = DataBarangRepository::create($payload);
+    return JsonResponseHandler::setResult($data_barang)->send();
+}
 
     public function view()
     {
