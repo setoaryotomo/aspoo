@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -64,12 +65,21 @@ class PortalController extends Controller
     public function postKeranjangToCheckout(Request $request)
     {
         $datas = json_decode($request->data);
+        $userId = Auth::user()->id;
+
+        // Update quantities for selected items
         foreach ($datas->data_keranjang as $data) {
-            $keranjang = Keranjang::where('id', $data->id)->first();
-            $keranjang->jumlah = $data->jumlah;
-            $keranjang->save();
+            $keranjang = Keranjang::where('id', $data->id)->where('user_id', $userId)->first();
+            if ($keranjang) {
+                $keranjang->jumlah = $data->jumlah;
+                $keranjang->save();
+            }
         }
-        return JsonResponseHandler::setResult($keranjang)->send();
+
+        // Store selected items in session for checkout
+        Session::put('checkout_keranjang', $datas->data_keranjang);
+
+        return JsonResponseHandler::setResult(true)->send();
     }
     public function getKeranjangData()
     {
@@ -429,7 +439,7 @@ private function getMasterStatus($transactions)
 private function getMasterStatusReadable($transactions)
 {
     $statuses = [
-        1 => 'Menunggu Pembayaran',
+        1 => 'Diproses',
         2 => 'Pembayaran Diterima',
         3 => 'Barang Dikirim',
         4 => 'Barang Diterima',
@@ -626,19 +636,29 @@ private function getMasterStatusReadable($transactions)
     }
     public function checkout(Request $request)
     {
-        // $user = User::find(Auth::id())->with(['detail'])->first();
         $user = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
-        $userid = $user->id;
+        $userId = Auth::id();
 
+        // Get selected items from session
+        $selectedKeranjang = Session::get('checkout_keranjang', []);
 
-
-        $data = Keranjang::with(['barang' => function ($query) {
-        }, 'barang.user','parcel'])->has('barang')->get()->groupBy('barang.created_by_user_id');
+        // Fetch full cart item details for selected items
+        $data = collect($selectedKeranjang)->groupBy(function ($item) {
+            // Fetch the barang to get created_by_user_id
+            $barang = DataBarang::find($item->barang_id);
+            return $barang ? $barang->created_by_user_id : 0;
+        })->map(function ($group) {
+            return collect($group)->map(function ($item) {
+                $keranjang = Keranjang::with(['barang', 'barang.user', 'parcel'])
+                    ->where('id', $item->id)
+                    ->first();
+                return $keranjang;
+            })->filter(); // Remove null items
+        });
 
         $userdata = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
         $kodeUnik = rand(10, 99);
 
-        // $rajaongkir = $this->countRajaOngkir($origin, $destination, $weight, $courier);
         $ret = ['data' => $data, 'userdetail' => $userdata, 'user' => $user, 'kodeUnik' => $kodeUnik];
 
         return view('Portal::transaksi.checkout', $ret);
@@ -794,6 +814,8 @@ private function getMasterStatusReadable($transactions)
     }
 
 
+
+
     public function listParcel(Request $request)
     {
         // Mengambil semua data dari database
@@ -844,7 +866,13 @@ private function getMasterStatusReadable($transactions)
     public function cekHasil(Request $request)
 {
     $userDetail = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
-    $origin = $userDetail->kota_rajaongkir;
+    
+    // Jika ini parcel, gunakan alamat dari parcel
+    if ($request->is_parcel && $request->parcel_address) {
+        $origin = $request->parcel_address['kota']['kota_rajaongkir'];
+    } else {
+        $origin = $userDetail->kota_rajaongkir;
+    }
 
     $groupedKeranjang = Keranjang::with(['barang' => function ($query) {
         $query->with('user');
@@ -852,6 +880,7 @@ private function getMasterStatusReadable($transactions)
 
     $destinations = [];
     $weights = [];
+    
     foreach ($groupedKeranjang as $userId => $keranjang) {
         foreach ($keranjang as $item) {
             $tokoUser = $item->barang->user;
@@ -949,11 +978,36 @@ private function getMasterStatusReadable($transactions)
 
         return response()->json($output);
     }
+
+    public function submitParcelReview(Request $request, $id)
+    {
+        try {
+            $parcel = permintaanparcel::findOrFail($id);
+            
+            $request->validate([
+                'review_komposisi' => 'required|integer|min:1|max:5',
+                'review_pelayanan' => 'required|integer|min:1|max:5',
+            ]);
+            
+            $parcel->update([
+                'review_komposisi' => $request->review_komposisi,
+                'review_pelayanan' => $request->review_pelayanan,
+            ]);
+            
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
     public function pesanparcel(Request $request)
     {
         $auth = Auth::user();
         // $data = permintaanparcel::where('id',$id)->with(['user'])->first();
+        
+        // $barang = DataBarang::select('*')->with(['user'])->get();
         $barang = DataBarang::select('*')->with(['user'])->get();
+
         $parcel = permintaanparcel::with(['parcel_children.barang'])->where('review_komposisi', '!=', '')
                           ->get();
 
@@ -968,6 +1022,57 @@ private function getMasterStatusReadable($transactions)
             'kota' => $kota,
         ];
 
+        // Query dasar dengan eager loading
+        $barangUnique = DataBarang::with(['user'])
+        ->where('berat', '>', 0)
+        ->where('stock_global', '>', 0)
+            ->where('kategori_umum', '!=', 'Null')
+            ->where('produsen', '!=', 'null')
+            ->where('produsen', '!=', '-')
+            // ->where('kategori_umum', '!=', '')
+            // ->where('bahan_dasar', '!=', '')
+            // ->where('basah_kering', '!=', '')
+            // ->where('rasa', '!=', '')
+            // ->where('produsen', '!=', '')
+        ->get();
+
+        $namaBarangUnique = DataBarang::with(['user'])
+        ->where('berat', '>', 0)
+        ->where('stock_global', '>', 0)
+            // ->where('kategori_umum', '!=', '')
+            // ->where('bahan_dasar', '!=', '')
+            // ->where('basah_kering', '!=', '')
+            // ->where('rasa', '!=', '')
+            // ->where('produsen', '!=', '')
+        ->get();
+
+        $stokProduk = $barangUnique->groupBy('nama_barang')->map(function ($items) {
+            return $items->sum(function ($item) {
+                return isset($item->stock_global) ? $item->stock_global : 0;
+            });
+        });
+
+        // Hitung semua kategori unik sekaligus
+        $uniqueData = [
+            // 'categories' => $barangUnique->pluck('kategori_umum')->unique()->sort()->values(),
+            'categories' => $barangUnique->pluck('kategori_umum')->filter()->unique()->sort()->values(),
+            'bahan' => $barangUnique->pluck('bahan_dasar')->filter()->unique()->sort()->values(),
+            'basah_kering' => $barangUnique->pluck('basah_kering')->filter()->unique()->sort()->values(),
+            'rasa' => $barangUnique->pluck('rasa')->filter()->unique()->sort()->values(),
+            'produsen' => $barangUnique->pluck('produsen')->filter()->unique()->sort()->values(),
+            // 'nama_produk' => $barangUnique->pluck('nama_barang')->filter()->unique()->sort()->values(),
+            'nama_produk' => $namaBarangUnique->pluck('nama_barang')->filter()->unique()->sort()->values(),
+        ];
+
+        // Hitung jumlah per kategori (sekali saja)
+        $counts = [
+            'categories' => $barangUnique->countBy('kategori_umum'),
+            'bahan' => $barangUnique->countBy('bahan_dasar'),
+            'basah_kering' => $barangUnique->countBy('basah_kering'),
+            'rasa' => $barangUnique->countBy('rasa'),
+            'produsen' => $barangUnique->countBy('produsen'),
+        ];
+
         // $selectedItems = ParcelChildren::where('parcel_id', $id)->with(['parcel','barang'])->get();
         // dd($selectedItems);
 
@@ -977,12 +1082,53 @@ private function getMasterStatusReadable($transactions)
         ];
         // dd($card);
         //return view('Portal::auth.profile', ['data' => $data, 'user' => $userMaster, 'asal' => $asal_daerah]);
-        return view('Portal::pesanparcel', compact('auth', 'card', 'data', 'asal','parcel'));
+        return view('Portal::pesanparcel', compact('auth', 'card', 'data', 'asal','parcel','barangUnique','uniqueData','counts','stokProduk'));
+    }
+
+    public function apibarang(Request $request){
+        $barang = DataBarang::with(['user', 'user.detail', 'user.detail.kotaModel'])
+            ->where('berat', '>', 0)
+            ->where('stock_global', '>', 0)
+            // ->where('kategori_umum', '!=', '')
+            // ->where('bahan_dasar', '!=', '')
+            // ->where('basah_kering', '!=', '')
+            // ->where('rasa', '!=', '')
+            // ->where('produsen', '!=', '')
+            ->groupBy('nama_barang')
+            ->get();
+            
+        return response()->json([
+            'success' => true,
+            'data' => $barang->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'nama_barang' => $item->nama_barang,
+                    'harga_user' => $item->harga_user,
+                    'berat' => $item->berat,
+                    'kategori_umum' => $item->kategori_umum,
+                    'bahan_dasar' => $item->bahan_dasar,
+                    'basah_kering' => $item->basah_kering,
+                    'rasa' => $item->rasa,
+                    'produsen' => $item->produsen,
+                    'stock_global' => $item->stock_global,
+                    'thumbnail_readable' => $item->thumbnail_readable ? URL::asset($item->thumbnail_readable) : null,
+                    'user' => [
+                        'nama' => $item->user->nama,
+                        'detail' => [
+                            'kotaModel' => [
+                                'name' => $item->user->detail->kotaModel->name ?? 'Unknown'
+                            ]
+                        ]
+                    ]
+                ];
+            })
+        ]);
     }
 
     public function saveToCart(Request $request)
 {
     $user = Auth::user();
+    $datauser = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
     $items = $request->input('items');
     $parcelId = $request->input('parcel_id');
     $parcelQuantity = $request->input('parcel_quantity', 1); // Default to 1 if not provided
@@ -992,6 +1138,18 @@ private function getMasterStatusReadable($transactions)
     
     DB::beginTransaction();
     try {
+        // Get parcel information
+        $parcel = permintaanparcel::with(['parcel_children.barang'])
+                        ->where('id', $parcelId)
+                        ->first();
+        
+        // Prepare items list for WhatsApp message
+        $itemsList = "";
+        foreach ($items as $index => $item) {
+            $barang = DataBarang::find($item['id']);
+            $itemsList .= ($index + 1) . ". " . $barang->nama_barang . "\n";
+        }
+        
         foreach ($items as $item) {
             Keranjang::create([
                 'user_id' => $user->id,
@@ -1003,6 +1161,24 @@ private function getMasterStatusReadable($transactions)
         }
         
         DB::commit();
+        
+        // Send WhatsApp notification
+        $whatsappMessage = "Halo " . $user->username . ", Pesanan Parcel ASPOO #" . $parcelId . "\n";
+        // $whatsappMessage .= "Nama Parcel: " . ($parcel->nama_parcel ?? 'N/A') . "\n";
+        // $whatsappMessage .= "ID Parcel: " . $parcelId . "\n";
+        $whatsappMessage .= "Jumlah: " . $parcelQuantity . "\n";
+        $whatsappMessage .= "Items:\n" . $itemsList;
+        // $whatsappMessage .= "Pelanggan: " . $user->username . "\n";
+        
+        $response = Http::withHeaders([
+            'Authorization' => 'RNnk34zGgGPPxF7KLn8L',
+        ])->post('https://api.fonnte.com/send', [
+            'target' => $datauser->telepon,
+            'message' => $whatsappMessage,
+        ]);
+
+        // dd(json_decode($response, true));
+        
         return response()->json(['success' => true]);
     } catch (\Exception $e) {
         DB::rollBack();
@@ -1010,39 +1186,42 @@ private function getMasterStatusReadable($transactions)
     }
 }
 
-    public function kirimpesanparcel(Request $request)
-    {
+public function kirimpesanparcel(Request $request)
+{
+    $request->validate([
+        'user_id' => 'required|string',
+        'harga' => 'required|numeric',
+        'berat' => 'required|numeric',
+        'alamat' => 'required|string',
+        'barang' => 'required|string',
+        'tanggal' => 'required|date',
+    ]);
 
-        $request->validate([
-            'user_id' => 'required|string',
-            'harga' => 'required|numeric',
-            'berat' => 'required|numeric',
-            'alamat' => 'required|string',
-            'barang' => 'required|string',
-            'tanggal' => 'required|date',
-        ]);
+    // Decode alamat JSON untuk menambahkan data RajaOngkir
+    $alamat = json_decode($request->alamat, true);
+    
+    // Ambil data kota dari database
+    $kota = Kota::find($alamat['kota']['id']);
+    
+    // Tambahkan data RajaOngkir ke alamat
+    $alamat['kota']['kota_rajaongkir'] = $kota->rajaongkir_city;
+    $alamat['kota']['postal_rajaongkir'] = $kota->rajaongkir_postal;
 
-        $parcel = permintaanparcel::create([
-            'user_id' => $request->user_id,
-            'harga' => $request->harga,
-            'berat' => $request->berat,
-            'alamat' => $request->alamat,
-            'barang' => $request->barang,
-            'tanggal' => $request->tanggal,
-        ]);
-        // return response()->json([
-        //     'success' => true,
-        //     'parcel_id' => $parcel->id  // Assuming $parcel is the newly created parcel model
-        // ]);
-        // return redirect()->route('paymentparcel', ['harga' => $parcel->harga]);
-        
-            return response()->json([
-                'success' => true,
-                'parcel_id' => $parcel->id,
-                'harga' => $parcel->harga
-            ]);
-        
-    }
+    $parcel = permintaanparcel::create([
+        'user_id' => $request->user_id,
+        'harga' => $request->harga,
+        'berat' => $request->berat,
+        'alamat' => json_encode($alamat), // Simpan kembali sebagai JSON
+        'barang' => $request->barang,
+        'tanggal' => $request->tanggal,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'parcel_id' => $parcel->id,
+        'harga' => $parcel->harga
+    ]);
+}
     public function paymentparcel(Request $request)
     {
         $harga = $request->harga;

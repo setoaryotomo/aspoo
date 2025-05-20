@@ -49,14 +49,34 @@ class MasterUMKMController extends Controller
         return view('MasterUMKM::edit', ['masterumkm_id' => $id]);
     }
 
-    public function update(Request $request, $id)
+    public function detail(Request $request, $id)
     {
-        $payload = $request->all();
-        unset($payload['created_at']);
-        unset($payload['updated_at']);
-        $masterumkm = MasterUMKMRepository::update($id, $payload);
-        return JsonResponseHandler::setResult($masterumkm)->send();
+        $Umkm = MasterUMKM::where('id', $id)->with(['user','detail'])->first();
+        return JsonResponseHandler::setResult($Umkm)->send();
     }
+
+    public function update(Request $request, $id)
+{
+    $payload = $request->all();
+    
+    // Separate the main UMKM data from user and detail data
+    $umkmData = array_diff_key($payload, ['user' => '', 'detail' => '']);
+    
+    // Update the main UMKM record
+    $masterumkm = MasterUMKMRepository::update($id, $umkmData);
+    
+    // Update user data if present
+    if (isset($payload['user'])) {
+        $masterumkm->user()->update($payload['user']);
+    }
+    
+    // Update detail data if present
+    if (isset($payload['detail'])) {
+        $masterumkm->detail()->update($payload['detail']);
+    }
+    
+    return JsonResponseHandler::setResult($masterumkm)->send();
+}
 
     public function destroy(Request $request, $id)
     {

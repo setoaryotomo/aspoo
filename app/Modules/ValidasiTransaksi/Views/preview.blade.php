@@ -13,6 +13,7 @@
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Detail Transaksi</div>
+                {{ $datas[0]->pembeli->username }}
             </div>
             <div class="card-body">
                 <table class="table">
@@ -55,7 +56,7 @@
             </div>
             <div class="card-footer ">
                 <div class="float-right">
-                    <button class="btn btn-primary" @click="klikApprove('{{ $data->kode_transaksi }}')">
+                    <button class="btn btn-primary" style="margin-right: 5px;" @click="klikApprove('{{ $data->kode_transaksi }}')">
                         Approve
                     </button>
                     <button class="btn btn-danger" @click="klikTolak('{{ $data->kode_transaksi }}')">

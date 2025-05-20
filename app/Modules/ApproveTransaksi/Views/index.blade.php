@@ -22,14 +22,15 @@
                         {
                             text: 'Kode Master',
                             value: 'kode_transaksi_master',
-                        },{
+                        },
+                        {
                             text: 'Kode Transaksi',
                             value: 'kode_transaksi',
                         },
-                        {
-                            text: 'Kurir Pengiriman',
-                            value: 'kurir_pengiriman',
-                        },
+                        // {
+                        //     text: 'Kurir Pengiriman',
+                        //     value: 'kurir_pengiriman',
+                        // },
 
                         {
                             text: 'Total Transaksi',

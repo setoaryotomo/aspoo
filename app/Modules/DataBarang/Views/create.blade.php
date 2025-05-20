@@ -18,6 +18,16 @@
                     <div class="row">
                         <!-- Left Column -->
                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">Pilih Barang</label>
+                                <vue-multiselect 
+                                    v-model="barang.scm_barang_id" 
+                                    :options="barang_list"
+                                    placeholder="Pilih Barang"
+                                    :allow-empty="true"
+                                    :searchable="true">
+                                </vue-multiselect>
+                            </div>
                             <div class="form-group" style="margin-bottom: 0.5px">
                                 <label class="form-control-label">Foto Produk</label>
                                 <div class="custom-file">
@@ -60,20 +70,8 @@
                                     required>
                                 </vue-multiselect>
                             </div>
-
                             
-                            <div class="form-group">
-                                <label class="form-control-label">Rasa *</label>
-                                <vue-multiselect 
-                                    v-model="barang.rasa" 
-                                    :options="rasaOptions"
-                                    placeholder="Pilih Rasa"
-                                    :allow-empty="false"
-                                    :searchable="true"
-                                    required>
-                                </vue-multiselect>
-                            </div>
-                            <div class="form-group" style="margin-top: 34px">
+                            <div class="form-group" style="">
                                 <label class="form-control-label">Jenis Kemasan *</label>
                                 <vue-multiselect 
                                     v-model="barang.jenis_kemasan" 
@@ -136,6 +134,10 @@
                                         <input v-model="barang.stock_global" class="form-control" type="number" required>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label class="form-control-label">Expired</label>
+                                    <input v-model="barang.expired" class="form-control" type="date">
+                                </div>
                             </div>
 
                             
@@ -182,9 +184,17 @@
                                 </vue-multiselect>
                             </div>
                             <div class="form-group">
-                                <label class="form-control-label">Expired</label>
-                                <input v-model="barang.expired" class="form-control" type="date">
+                                <label class="form-control-label">Rasa *</label>
+                                <vue-multiselect 
+                                    v-model="barang.rasa" 
+                                    :options="rasaOptions"
+                                    placeholder="Pilih Rasa"
+                                    :allow-empty="false"
+                                    :searchable="true"
+                                    required>
+                                </vue-multiselect>
                             </div>
+                            
                             {{-- <div class="form-group">
                                 <label class="form-control-label">Bahan Kemasan *</label>
                                 <input v-model="barang.bahan_kemasan" class="form-control" type="text" required>
@@ -294,6 +304,7 @@
                         created_by_user_id: {{ $specified_user_id }},
                         @endif
                     },
+                    barang_list: [],
                     satuan_list: [],
                     
                     // Options for dropdowns
@@ -335,9 +346,22 @@
                 }
             },
             created() {
+                this.fetchBarangList(),
                 this.fetchSatuanList()
             },
             watch: {
+                "barang.scm_barang_id": {
+                    handler: function(value) {
+                        let barang_data = this.barang_list.find(barang_item => barang_item.value == value)
+                        this.path = `${barang_data.label.toLowerCase().split(" ").join("-")}`
+                        if (this.name != null && this.name != "") {
+                            this.path += `/${this.name.toLowerCase().split(" ").join("-")}`
+                        }
+                        this.barang.scm_barang_id = value
+                        console.log(this.barang)
+                    },
+                    deep: true,
+                },
                 "barang.satuan_id": {
                     handler: function(value) {
                         let satuan_data = this.satuan_list.find(satuan_item => satuan_item.value == value)
@@ -358,6 +382,18 @@
                         const label = event.target.nextElementSibling;
                         label.textContent = this.barang.foto.name;
                     }
+                },
+                async fetchBarangList() {
+                    const response = await httpClient.get("{!! url('data-barang/all') !!}")
+                    this.barang_list = [
+                        ...this.barang_list,
+                        ...response.data.result.map(el => {
+                            return {
+                                value: el.id,
+                                label: el.nama_barang
+                            }
+                        })
+                    ]
                 },
                 async fetchSatuanList() {
                     const response = await httpClient.get("{!! url('satuan/all') !!}")

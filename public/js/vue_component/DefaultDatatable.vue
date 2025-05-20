@@ -58,11 +58,9 @@
                             </td>
                         </tr>
                         <template v-if="!isContentLoading">
-                            <tr
-                                v-for="(content, index) in contents"
-                                :key="index"
-                            >
-                                <td class="text-center">{{ index+1 }}</td>
+                            <tr v-for="(content, index) in contents" :key="index">
+                                <!-- Perubahan ada di sini -->
+                                <td class="text-center">{{ (page - 1) * per_page + index + 1 }}</td>
                                 <td
                                     v-for="(header, _index) in headers"
                                     :key="_index"

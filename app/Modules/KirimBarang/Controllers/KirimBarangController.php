@@ -15,6 +15,7 @@ use App\Modules\TransaksiBarang\Models\TransaksiBarangChildren;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class KirimBarangController extends Controller
 {
@@ -47,27 +48,72 @@ class KirimBarangController extends Controller
         try{
             $kode = $request->kode;
             $data = TransaksiBarang::where("kode_transaksi",$kode)->first();
-            $pesan = WatZapRepository::formatMessage($data);
-            $pesan .="Barang Telah di kirim oleh Seller";
-            WatZapRepository::sendTextMessage($data->pembeli->nomor_telepon,$pesan);
+            
+            // Update status transaksi
             $data->status = 3;
             $data->save();
+            
+            // Buat record pengiriman
             $approve_transaksi = Pengiriman::create([
                 'transaksi_id' => $data->id,
                 'status' => 3,
                 'keterangan' => 'Seller telah mengirim barang'
             ]);
-
+    
+            // Update stok barang
             $transaksi_childrens = TransaksiBarangChildren::where('transaksi_id',$data->id)->get();
             foreach($transaksi_childrens as $transaksi_children){
                 $barang = DataBarang::where('id',$transaksi_children->barang_id)->first();
                 $barang->stock_global = intval($barang->stock_global) - intval($transaksi_children->jumlah);
                 $barang->save();
             }
+    
+            // Kirim notifikasi WhatsApp jika ada biaya pengiriman atau kurir
+            if($data->biaya_pengiriman || $data->kurir_pengiriman) {
+                // Format pesan WhatsApp
+                $whatsappMessage = "Halo " . $data->pembeli->name . ",\n";
+                $whatsappMessage .= "📦 *Informasi Pengiriman* #" . $data->kode_transaksi_master . "\n\n";
+                
+                // Daftar produk
+                $itemsList = "";
+                $i = 1;
+                $totalBiaya = 0;
+                
+                foreach($data->dataChildren as $child) {
+                    $itemsList .= $i++ . ". " . $child->barang->nama_barang 
+                               . " x" . $child->jumlah 
+                               . " (" . number_format($child->harga, 0, ',', '.') . ")\n";
+                    $totalBiaya += $child->harga * $child->jumlah;
+                }
+                
+                // $whatsappMessage .= "📋 *Daftar Produk*:\n" . $itemsList . "\n";
+                // $whatsappMessage .= "💵 *Total Produk*: Rp " . number_format($totalBiaya, 0, ',', '.') . "\n";
+                
+                // Info pengiriman jika ada
+                if($data->kurir_pengiriman) {
+                    $whatsappMessage .= "🚚 *Kurir*: " . $data->kurir_pengiriman . "\n";
+                }
+                // if($data->biaya_pengiriman) {
+                //     $whatsappMessage .= "💰 *Biaya Pengiriman*: Rp " . number_format($data->biaya_pengiriman, 0, ',', '.') . "\n";
+                // }
+                
+                // $whatsappMessage .= "💳 *Total Pembayaran*: Rp " . number_format($totalBiaya + $data->biaya_pengiriman, 0, ',', '.') . "\n\n";
+                $whatsappMessage .= "📢 *Status*: Barang telah dikirim oleh penjual\n";
+                $whatsappMessage .= "Terima kasih telah berbelanja dengan kami!";
+                
+                // Kirim WhatsApp
+                $response = Http::withHeaders([
+                    'Authorization' => 'RNnk34zGgGPPxF7KLn8L',
+                ])->post('https://api.fonnte.com/send', [
+                    'target' => $data->pembeli->nomor_telepon,
+                    'message' => $whatsappMessage,
+                ]);
+            }
+    
             DB::commit();
             return JsonResponseHandler::setResult($approve_transaksi)->send();
-
-        }catch(Exception $e){
+    
+        } catch(Exception $e){
             DB::rollBack();
             return JsonResponseHandler::setResult($e->getMessage())->send();
         }

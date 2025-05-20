@@ -14,10 +14,10 @@
         data() {
             return {
                 headers: [
-                    {
-                        text: 'Parcel Id',
-                        value: 'id',
-                    },
+                    // {
+                    //     text: 'Parcel Id',
+                    //     value: 'id',
+                    // },
                     {
                         text: 'Username',
                         value: 'user.name',

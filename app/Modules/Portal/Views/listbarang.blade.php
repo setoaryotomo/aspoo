@@ -1,202 +1,14 @@
 @extends('portal_layout.templates')
 @section('content')
-<style>
-    /* Base responsive styles */
-@media (max-width: 1200px) {
-  .tf-col-4 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .container {
-    max-width: 95%;
-  }
-}
-
-@media (max-width: 992px) {
-  .tf-row-flex {
-    flex-direction: column;
-  }
-  
-  aside.tf-shop-sidebar {
-    width: 100%;
-    margin-bottom: 30px;
-  }
-  
-  .tf-shop-content {
-    width: 100%;
-  }
-  
-  .tf-col-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  /* Make sidebar categories horizontal scrollable on medium screens */
-  .list-categoris {
-    display: flex;
-    overflow-x: auto;
-    padding-bottom: 15px;
-  }
-  
-  .list-categoris .cate-item {
-    min-width: max-content;
-    margin-right: 15px;
-  }
-  
-  /* Adjust iconbox widgets to be more compact */
-  .widget-iconbox-list {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-}
-
-@media (max-width: 768px) {
-  .tf-col-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  /* Adjust iconbox to stack on smaller screens */
-  .widget-iconbox-list {
-    grid-template-columns: repeat(1, 1fr);
-  }
-  
-  /* Make card product smaller on mobile */
-  .card-product {
-    margin-bottom: 15px;
-  }
-  
-  /* Adjust product image height to be consistent */
-  .card-product .product-img img {
-    height: 180px;
-    object-fit: contain;
-  }
-  
-  /* Better padding for product info */
-  .card-product-info {
-    padding: 10px 5px !important;
-  }
-  
-  /* Adjust text sizes */
-  .card-product-info .title {
-    font-size: 14px;
-    line-height: 1.3;
-  }
-  
-  .card-product-info .price {
-    font-size: 14px;
-  }
-  
-  /* Social icons should be more compact */
-  .tf-social-icon {
-    justify-content: center;
-  }
-  
-  /* Widget facets better mobile display */
-  .widget-facet {
-    margin-bottom: 15px;
-  }
-  
-  .facet-title {
-    padding: 10px 0;
-  }
-}
-
-@media (max-width: 576px) {
-  .tf-col-4 {
-    grid-template-columns: repeat(1, 1fr);
-  }
-  
-  /* Center product cards on mobile */
-  .card-product {
-    max-width: 280px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  /* Full width images on smallest screens */
-  .card-product .product-img img {
-    width: 100%;
-    height: auto;
-    max-height: 250px;
-  }
-  
-  /* Better pagination for mobile */
-  .pagination {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  
-  .pagination .page-item {
-    margin: 2px;
-  }
-  
-  /* Fix preloader for mobile */
-  .preload-container {
-    width: 100%;
-  }
-}
-
-/* Improve the sidebar as offcanvas on mobile */
-@media (max-width: 768px) {
-  .tf-shop-sidebar:not(.wrap-sidebar-mobile) {
-    display: none;
-  }
-  
-  .tf-control-filter {
-    display: block !important;
-  }
-  
-  .canvas-filter {
-    width: 300px;
-  }
-  
-  /* Adjust filter button to show on mobile */
-  .tf-btn-filter {
-    display: inline-flex !important;
-    align-items: center;
-    padding: 8px 15px;
-    background: #f5f5f5;
-    border-radius: 4px;
-    margin-bottom: 15px;
-  }
-  
-  .tf-btn-filter .icon {
-    margin-right: 5px;
-  }
-}
-
-/* Ensure images don't break layout */
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-/* Fix for pagination responsiveness */
-.pagination .pagination-link {
-  padding: 8px 12px;
-}
-
-/* Better hover states for mobile */
-@media (hover: none) {
-  .card-product-wrapper:hover .list-product-btn {
-    opacity: 0;
-  }
-  
-  .card-product-wrapper .product-img:active + .list-product-btn {
-    opacity: 1;
-  }
-}
-</style>
 <body class="preload-wrapper">
-<div class="preload preload-container">
+{{-- <div class="preload preload-container">
     <div class="preload-logo">
         <div class="spinner"></div>
     </div>
-</div>
+</div> --}}
 <section class="flat-spacing-1">
     <div class="container">
-        {{-- <div class="tf-shop-control grid-3 align-items-center">
+        <div class="tf-shop-control grid-3 align-items-center">
             <div class="tf-control-filter">
                 <a href="#filterShop" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="tf-btn-filter"><span class="icon icon-filter"></span><span class="text">Filter</span></a>
             </div>
@@ -248,7 +60,7 @@ img {
                     </div>
                 </div>
             </div>
-        </div> --}}
+        </div>
         <div class="tf-row-flex">
             <aside class="tf-shop-sidebar wrap-sidebar-mobile">
                 <div class="widget-facet wd-categories">
@@ -338,16 +150,20 @@ img {
                 </div>
                
                 <div class="tf-grid-layout wrapper-shop tf-col-4" id="gridLayout">
+                    <div class="preload preload-container">
+                        <div class="preload-logo">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
                     @foreach($produk as $barang)
                     <!-- card product 1 -->
                     <div class="card-product grid" data-availability="In stock" data-brand="Ecomus">
                         <div class="card-product-wrapper">
                             <a href="{{ url('/p/barang/' . $barang->id) }}" class="product-img">
-                               
-                                <img class="lazyload img-product" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" class="img-fluid" style="height: 187px">
-                                <img class="lazyload img-hover" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" class="img-fluid" style="height: 187px">
-                                {{-- <img class="lazyload img-product" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" style="max-height: 200px">
-                                <img class="lazyload img-hover" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" style="max-height: 200px"> --}}
+                                
+                                <img class="lazyload img-product" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" style="height: 187px;width: 100%;">
+                                <img class="lazyload img-hover" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" style="height: 187px;width: 100%; object-fit: contain;">
+                                
                             </a>
                             {{-- <div class="list-product-btn absolute-2">
                                 <a href="#quick_add" data-bs-toggle="modal" class="box-icon bg_white quick-add tf-btn-loading">
@@ -371,8 +187,7 @@ img {
                             </div> --}}
                         </div>
                         <div class="card-product-info" style="padding: 7px">
-                            <a class="title link">{{ $barang->nama_barang }}</a>
-                            <a>{{ $barang->kategori }}</a>
+                            <a href="product-detail.html" class="title link">{{ $barang->nama_barang }}</a>
                             <span class="price current-price">Rp.
                                 {{ number_format($barang->harga_user, 2) }}</span>
                            
@@ -400,10 +215,11 @@ img {
                             </a>
                         </li>
                     </ul> --}}
-                </div>
-                <div class="pagination">
-                    {{ $produk->links() }}
+                    <div class="wg-pagination tf-pagination-list">
+                        {{ $produk->links() }}
                     </div>
+                </div>
+                
             </div>
             
         </div>
@@ -423,46 +239,26 @@ img {
             <div class="widget-facet wd-categories">
                 <div class="facet-title" data-bs-target="#categories" data-bs-toggle="collapse" aria-expanded="true" aria-controls="categories">
                     <span>Product categories</span>
-                    <span class="icon icon-arrow-up"></span>
+                    {{-- <span class="icon icon-arrow-up"></span> --}}
                 </div>
                 <div id="categories" class="collapse show">
                     <ul class="list-categoris current-scrollbar mb_36">
-                        @foreach($produk as $item)
-                        <li class="cate-item"><a href=""><span>{{ $item->kategori }}</span></a></li>
-                        {{-- <li class="cate-item current"><a href="shop-default.html"><span>Fashion</span></a></li>
-                        <li class="cate-item"><a href="shop-default.html"><span>Men</span></a></li>
-                        <li class="cate-item"><a href="shop-default.html"><span>Women</span></a></li>
-                        <li class="cate-item"><a href="shop-default.html"><span>Denim</span></a></li>
-                        <li class="cate-item"><a href="shop-default.html"><span>Dress</span></a></li> --}}
+                        @foreach($category->unique('kategori_umum')->sortBy('kategori_umum') as $items)
+                        <li class="cate-item"><a href="#"><span>{{ $items->kategori_umum}}</span></a></li>
+                        {{-- <li class="cate-item"><a href="#"><span>Men</span><span>(9)</span></a></li>
+                        <li class="cate-item"><a href="#"><span>Women</span><span>(23)</span></a></li>
+                        <li class="cate-item"><a href="#"><span>Denim</span><span>(20)</span></a></li>
+                        <li class="cate-item"><a href="#"><span>Dress</span><span>(23)</span></a></li> --}}
                         @endforeach
                     </ul>
                 </div>
             </div>
             <form action="#" id="facet-filter-form" class="facet-filter-form">
-                <div class="widget-facet">
-                    <div class="facet-title" data-bs-target="#availability" data-bs-toggle="collapse" aria-expanded="true" aria-controls="availability">
-                        <span>Availability</span>
-                        <span class="icon icon-arrow-up"></span>
-                    </div>
-                    <div id="availability" class="collapse show">
-                        <ul class="tf-filter-group current-scrollbar mb_36">
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="availability" class="tf-check" id="inStock">
-                                <label for="inStock" class="label"><span>In
-                                        stock</span><span>(14)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="availability" class="tf-check" id="outStock">
-                                <label for="outStock" class="label"><span>Out of
-                                        stock</span><span>(2)</span></label>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="widget-facet">
+                
+                <div class="widget-facet" style="display: none">
                     <div class="facet-title" data-bs-target="#price" data-bs-toggle="collapse" aria-expanded="true" aria-controls="price">
                         <span>Price</span>
-                        <span class="icon icon-arrow-up"></span>
+                        {{-- <span class="icon icon-arrow-up"></span> --}}
                     </div>
                     <div id="price" class="collapse show">
                         <div class="widget-price filter-price">
@@ -479,273 +275,14 @@ img {
 
                     </div>
                 </div>
-                <div class="widget-facet">
-                    <div class="facet-title" data-bs-target="#brand" data-bs-toggle="collapse" aria-expanded="true" aria-controls="brand">
-                        <span>Brand</span>
-                        <span class="icon icon-arrow-up"></span>
-                    </div>
-                    <div id="brand" class="collapse show">
-                        <ul class="tf-filter-group current-scrollbar mb_36">
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="brand" class="tf-check" id="Ecomus">
-                                <label for="Ecomus" class="label"><span>Ecomus</span><span>(8)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="brand" class="tf-check" id="M&H">
-                                <label for="M&H" class="label"><span>M&H</span><span>(8)</span></label>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="widget-facet">
-                    <div class="facet-title" data-bs-target="#color" data-bs-toggle="collapse" aria-expanded="true" aria-controls="color">
-                        <span>Color</span>
-                        <span class="icon icon-arrow-up"></span>
-                    </div>
-                    <div id="color" class="collapse show">
-                        <ul class="tf-filter-group filter-color current-scrollbar mb_36">
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_beige" id="Beige" value="Beige">
-                                <label for="Beige" class="label"><span>Beige</span><span>(3)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_dark" id="Black" value="Black">
-                                <label for="Black" class="label"><span>Black</span><span>(18)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_blue-2" id="Blue" value="Blue">
-                                <label for="Blue" class="label"><span>Blue</span><span>(3)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_brown" id="Brown" value="Brown">
-                                <label for="Brown" class="label"><span>Brown</span><span>(3)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_cream" id="Cream" value="Cream">
-                                <label for="Cream" class="label"><span>Cream</span><span>(1)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_dark-beige" id="Dark Beige" value="Dark Beige">
-                                <label for="Dark Beige" class="label"><span>Dark
-                                        Beige</span><span>(1)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_dark-blue" id="Dark Blue" value="Dark Blue">
-                                <label for="Dark Blue" class="label"><span>Dark
-                                        Blue</span><span>(3)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_dark-green" id="Dark Green" value="Dark Green">
-                                <label for="Dark Green" class="label"><span>Dark
-                                        Green</span><span>(1)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_dark-grey" id="Dark Grey" value="Dark Grey">
-                                <label for="Dark Grey" class="label"><span>Dark
-                                        Grey</span><span>(1)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_grey" id="Grey" value="Grey">
-                                <label for="Grey" class="label"><span>Grey</span><span>(2)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_light-blue" id="Light Blue" value="Light Blue">
-                                <label for="Light Blue" class="label"><span>Light
-                                        Blue</span><span>(5)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_light-green" id="Light Green" value="Light Green">
-                                <label for="Light Green" class="label"><span>Light
-                                        Green</span><span>(3)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_light-grey" id="Light Grey" value="Light Grey">
-                                <label for="Light Grey" class="label"><span>Light
-                                        Grey</span><span>(1)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_light-pink" id="Light Pink" value="Light Pink">
-                                <label for="Light Pink" class="label"><span>Light
-                                        Pink</span><span>(2)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_purple" id="Light Purple" value="Light Purple">
-                                <label for="Light Purple" class="label"><span>Light
-                                        Purple</span><span>(2)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_light-yellow" id="Light Yellow" value="Light Yellow">
-                                <label for="Light Yellow" class="label"><span>Light
-                                        Yellow</span><span>(1)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_orange" id="Orange" value="Orange">
-                                <label for="Orange" class="label"><span>Orange</span><span>(1)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_pink" id="Pink" value="Pink">
-                                <label for="Pink" class="label"><span>Pink</span><span>(2)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_taupe" id="Taupe" value="Taupe">
-                                <label for="Taupe" class="label"><span>Taupe</span><span>(1)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_white" id="White" value="White">
-                                <label for="White" class="label"><span>White</span><span>(14)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="color" class="tf-check-color bg_yellow" id="Yellow" value="Yellow">
-                                <label for="Yellow" class="label"><span>Yellow</span><span>(1)</span></label>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="widget-facet">
-                    <div class="facet-title" data-bs-target="#size" data-bs-toggle="collapse" aria-expanded="true" aria-controls="size">
-                        <span>Size</span>
-                        <span class="icon icon-arrow-up"></span>
-                    </div>
-                    <div id="size" class="collapse show">
-                        <ul class="tf-filter-group current-scrollbar">
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="size" class="tf-check tf-check-size" value="S" id="S">
-                                <label for="S" class="label"><span>S</span><span>(7)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="size" class="tf-check tf-check-size" value="M" id="M">
-                                <label for="M" class="label"><span>M</span><span>(8)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="size" class="tf-check tf-check-size" value="L" id="L">
-                                <label for="L" class="label"><span>L</span><span>(8)</span></label>
-                            </li>
-                            <li class="list-item d-flex gap-12 align-items-center">
-                                <input type="radio" name="size" class="tf-check tf-check-size" value="XL" id="XL">
-                                <label for="XL" class="label"><span>XL</span><span>(6)</span></label>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                
+                
+                
             </form>
         </div>
     </div>
 </div>
 </body>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-  // Add mobile filter toggle button if it doesn't exist
-  if (!document.querySelector('.tf-control-filter')) {
-    const filterBtn = document.createElement('div');
-    filterBtn.className = 'tf-control-filter';
-    filterBtn.innerHTML = `
-      <a href="#filterShop" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="tf-btn-filter">
-        <span class="icon icon-filter"></span>
-        <span class="text">Filter</span>
-      </a>
-    `;
-    
-    const shopControl = document.querySelector('.tf-shop-control');
-    if (shopControl) {
-      shopControl.prepend(filterBtn);
-    } else {
-      // If shop control doesn't exist, add it before the grid layout
-      const gridLayout = document.getElementById('gridLayout');
-      if (gridLayout) {
-        const shopControlDiv = document.createElement('div');
-        shopControlDiv.className = 'tf-shop-control mobile-only';
-        shopControlDiv.appendChild(filterBtn);
-        gridLayout.parentNode.insertBefore(shopControlDiv, gridLayout);
-      }
-    }
-  }
-  
-  // Handle responsive product grid layout
-  function updateGridLayout() {
-    const width = window.innerWidth;
-    const gridLayout = document.getElementById('gridLayout');
-    
-    if (gridLayout) {
-      // Remove existing layout classes
-      gridLayout.classList.remove('tf-col-4', 'tf-col-3', 'tf-col-2', 'list-layout');
-      
-      // Add appropriate class based on screen width
-      if (width < 576) {
-        gridLayout.classList.add('tf-col-1');
-      } else if (width < 768) {
-        gridLayout.classList.add('tf-col-2');
-      } else if (width < 1200) {
-        gridLayout.classList.add('tf-col-3');
-      } else {
-        gridLayout.classList.add('tf-col-4');
-      }
-    }
-  }
-  
-  // Call initially and on resize
-  updateGridLayout();
-  window.addEventListener('resize', updateGridLayout);
-  
-  // Improve mobile UX for category filters
-  const categoryLists = document.querySelectorAll('.list-categoris');
-  if (window.innerWidth < 992) {
-    categoryLists.forEach(list => {
-      // Make horizontal scrolling smoother on touch devices
-      let isDown = false;
-      let startX;
-      let scrollLeft;
-      
-      list.addEventListener('mousedown', (e) => {
-        isDown = true;
-        startX = e.pageX - list.offsetLeft;
-        scrollLeft = list.scrollLeft;
-      });
-      
-      list.addEventListener('mouseleave', () => {
-        isDown = false;
-      });
-      
-      list.addEventListener('mouseup', () => {
-        isDown = false;
-      });
-      
-      list.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - list.offsetLeft;
-        const walk = (x - startX) * 2;
-        list.scrollLeft = scrollLeft - walk;
-      });
-    });
-  }
-  
-  // Add touch-friendly hover effects
-  const productCards = document.querySelectorAll('.card-product');
-  productCards.forEach(card => {
-    card.addEventListener('touchstart', function() {
-      this.classList.add('touch-active');
-    });
-    
-    // Remove active state when touch moves away
-    document.addEventListener('touchend', function() {
-      document.querySelectorAll('.card-product.touch-active').forEach(activeCard => {
-        activeCard.classList.remove('touch-active');
-      });
-    });
-  });
-  
-  // Ensure preloader doesn't interfere with mobile experience
-  const preloader = document.querySelector('.preload');
-  if (preloader) {
-    // Hide preloader after content loads
-    setTimeout(() => {
-      preloader.style.display = 'none';
-    }, 800);
-  }
-});
-</script>
-
 <script src="{!! asset('js/bootstrap.min.js') !!}"></script>
 <script src="{!! asset('js/jquery.min.js') !!}"></script>
 <script src="{!! asset('js/swiper-bundle.min.js') !!}"></script>
@@ -777,7 +314,6 @@ img {
     }).mount("#container")
 
 </script>
-
 <script>
     // Memilih semua elemen kartu dengan kelas "card"
     const cards = document.querySelectorAll('.card');

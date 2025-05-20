@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Modules\Cabang\Requests;
+namespace App\Modules\cabang\Requests;
 
 use App\Request\AppFormRequest;
 
 
-class CabangCreateRequest extends AppFormRequest
+class cabangCreateRequest extends AppFormRequest
 {
     public function rules(): array
     {

@@ -128,7 +128,30 @@
                                 
                                 <li class="nav-wishlist"><a href="{{ url('/p/pesanparcel') }}" class="nav-icon-item  align-items-center gap-10"><i class="icon icon-gift"></i><span class="text">Parcel</span></a></li>
                                 <li class="nav-cart cart-lg" v-if="this.isLoggedin == true"><a href="{{ url('/p/keranjang') }}" class="nav-icon-item"><i class="icon icon-bag"></i></a></li>
-                                <li class="nav-account" v-if="this.isLoggedin == false"><a href="{{ url('/p/login') }}" class="nav-icon-item align-items-center gap-10"><i class="icon icon-account"></i> <span class="text">Login</span></a></li>
+                                {{-- <li class="nav-account" v-if="this.isLoggedin == false"><a href="{{ url('/p/login') }}" class="nav-icon-item align-items-center gap-10"><i class="icon icon-account"></i> <span class="text">Login</span></a></li> --}}
+                                <div class="user-profile" v-if="this.isLoggedin == false">
+                                    <div class="dropdown">
+                                        <a href="#" role="button" id="userNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false" class="user-dropdown-link">
+                                            <div class="user-info">
+                                                <img :src="userData.fotodata || 'https://warungaspoo.com/img/portal/user-icon.png'" class="user-profile-img" alt="Profile">
+                                                <div class="box-user">
+                                                    {{-- <div class="user-name">@{{ userData.name }}</div> --}}
+                                                    {{-- <div class="user-role">@{{ userData.roleName }}</div> --}}
+                                                </div>
+                                                <i class="icon icon-chevron-down ms-2" style="font-size:12px"></i>
+                                            </div>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="userNavbarDropdown">
+                                            <br>
+                                            <a class="dropdown-item" 
+                                               href="{{ url('/p/login') }}">
+                                                Login
+                                            </a>
+                                            <br>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="user-profile" v-if="this.isLoggedin == true">
                                     <div class="dropdown">
                                         <a href="#" role="button" id="userNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true"
@@ -176,6 +199,45 @@
                     <div class="wrapper-header d-flex justify-content-between align-items-center">
                        
                     </div>
+                </div>
+            </div>
+            <div class="offcanvas offcanvas-start canvas-mb" id="mobileMenu">
+                <span class="icon-close icon-close-popup" data-bs-dismiss="offcanvas" aria-label="Close"></span>
+                <div class="mb-canvas-content">
+                    <div class="mb-body">
+                        <ul class="nav-ul-mb" id="wrapper-menu-navigation">
+                            <li class="nav-mb-item">
+                                <a href="{{ url('/p') }}" class="collapsed mb-menu-link current">
+                                    <span>Home</span>
+                                </a>
+                                
+        
+                            </li>
+                            <li class="nav-mb-item">
+                                <a href="{{ url('/p/listbarang') }}" class="collapsed mb-menu-link current">
+                                    <span>Produk</span>
+                                </a>
+                                
+                            </li>
+                            <li class="nav-mb-item">
+                                <a href="{{ url('/p/pesanparcel') }}" class="collapsed mb-menu-link current">
+                                    <span>Parcel</span>
+                                </a>
+                                
+                            </li>
+                            <li class="nav-mb-item">
+                                <a href="{{ url('/p/daftartransaksi') }}" class="collapsed mb-menu-link current">
+                                    <span>Daftar Transaksi</span>
+                                </a>
+                               
+        
+                            </li>
+                        
+                            
+                        </ul>
+                        
+                    </div>
+                    
                 </div>
             </div>
         </header>

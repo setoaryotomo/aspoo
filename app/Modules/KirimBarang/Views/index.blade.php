@@ -8,7 +8,7 @@
                     Approve
                 </button>
                 <a :href="`{!! url('kirim-barang') !!}/preview/${content.kode_transaksi}`" class="btn btn-xs btn-info mr-1">
-                    Lihat Data
+                    Detail
                 </a>
             </template>
         </default-datatable>

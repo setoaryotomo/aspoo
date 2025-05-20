@@ -2,11 +2,15 @@
 
 namespace App\Modules\Portal;
 
+use App\Modules\DataBarang\Models\DataBarang;
+use App\Modules\InputSCM\Models\Alamat\Kota;
 use App\Modules\permintaanparcel\Controllers\permintaanparcelController;
 use Illuminate\Support\Facades\Route;
 use App\Modules\Portal\Controller\PortalController;
 use App\Modules\PortalUser\Controllers\PortalUserController;
 use App\Modules\User\Controller\UserController;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 
 Route::prefix('/p')->group(function () {
     Route::post("/fetch-login",[PortalController::class,"fetchLogin"]);
@@ -39,6 +43,56 @@ Route::prefix('/p')->group(function () {
     Route::get('/bayarparcel', [PortalController::class, 'paymentparcel'])->name('paymentparcel');
     Route::post('/save-to-cart', [PortalController::class, 'saveToCart'])->name('save.to.cart');
     Route::get('/keranjang', [PortalController::class, 'keranjang'])->name('keranjang');
+    Route::get('/api/barang', [PortalController::class, 'apibarang']);
+
+    // Route::get('/send-wa', [PortalController::class, 'send-wa']);
+    // Route::get('send-wa', function(){
+    //     $response = Http::withHeaders([
+    //         'Authorization' => 'RNnk34zGgGPPxF7KLn8L',
+    //     ])->post('https://api.fonnte.com/send', [
+    //         'target' => '085747215411',
+    //         'message' => 'Haloo',
+    //     ]);
+
+    //     dd(json_decode($response, true));
+    // });
+
+    // Route::get('/api/barang', function() {
+    //     $barang = DataBarang::with(['user', 'user.detail', 'user.detail.kotaModel'])
+    //         ->where('berat', '>', 0)
+    //         // ->where('kategori_umum', '!=', '')
+    //         // ->where('bahan_dasar', '!=', '')
+    //         // ->where('basah_kering', '!=', '')
+    //         // ->where('rasa', '!=', '')
+    //         // ->where('produsen', '!=', '')
+    //         ->get();
+            
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => $barang->map(function($item) {
+    //             return [
+    //                 'id' => $item->id,
+    //                 'nama_barang' => $item->nama_barang,
+    //                 'harga_user' => $item->harga_user,
+    //                 'berat' => $item->berat,
+    //                 'kategori_umum' => $item->kategori_umum,
+    //                 'bahan_dasar' => $item->bahan_dasar,
+    //                 'basah_kering' => $item->basah_kering,
+    //                 'rasa' => $item->rasa,
+    //                 'produsen' => $item->produsen,
+    //                 'thumbnail_readable' => $item->thumbnail_readable ? URL::asset($item->thumbnail_readable) : null,
+    //                 'user' => [
+    //                     'nama' => $item->user->nama,
+    //                     'detail' => [
+    //                         'kotaModel' => [
+    //                             'name' => $item->user->detail->kotaModel->name ?? 'Unknown'
+    //                         ]
+    //                     ]
+    //                 ]
+    //             ];
+    //         })
+    //     ]);
+    // });
 
     Route::get('/parcel/search', [ParcelController::class, 'searchbarangparcel'])->name('parcel.search');
     // Route::post('/save-selected-items/{id}', [permintaanparcelController::class, 'saveSelectedItems'])->name('save-selected-items');
@@ -89,6 +143,15 @@ Route::prefix('/p')->group(function () {
         Route::post('/getkecamatan', [PortalController::class, 'getkecamatan'])->name('getkecamatan.fetch');
         Route::post('/getkelurahan', [PortalController::class, 'getkelurahan'])->name('getkelurahan.fetch');
     });
+
+    Route::get('/kota/{id}', function ($id) {
+        $kota = Kota::find($id);
+        return response()->json([
+            'rajaongkir_city' => $kota->rajaongkir_city,
+            'rajaongkir_postal' => $kota->rajaongkir_postal
+        ]);
+    });
+    
     
     Route::get("/status/{kode}",[PortalController::class,"statuspengiriman"]);
  

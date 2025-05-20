@@ -1,7 +1,7 @@
 @extends('dashboard_layout.index')
 @section('content')
 <div class="page-inner" id="app">
-    <default-datatable title="Module" url="{!! url('module') !!}" :headers="headers" :can-edit="false" :can-delete="false" />
+    <default-datatable title="Module" url="{!! url('module') !!}" :headers="headers" :can-edit="true" :can-delete="false" />
 </div>
 
 <script>

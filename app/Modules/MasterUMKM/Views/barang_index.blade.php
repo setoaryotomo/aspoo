@@ -4,7 +4,7 @@
     <div class="d-flex align-items-center mb-4">
         <h5 class="mb-0 mr-2">Data Barang {{ $umkm->nama }}</h5>
         
-        <a href="{{ url('masterumkm') }}" class="btn btn-sm btn-outline-primary ml-auto">
+        <a href="{{ url('mastertoko') }}" class="btn btn-sm btn-outline-primary ml-auto">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
         <a href="{{ url('data-barang/'.$id.'/create') }}" class="btn btn-sm btn-primary ml-2">
@@ -13,7 +13,7 @@
     </div>
     
     <default-datatable 
-        url="{!! url('masterumkm/'.$id.'/barang') !!}" 
+        url="{!! url('mastertoko/'.$id.'/barang') !!}" 
         :headers="headers" 
         :can-add="false"
         :can-edit="false"
@@ -46,10 +46,10 @@
                         text: 'Stok',
                         value: 'stock_global',
                     },
-                    {
-                        text: 'Satuan',
-                        value: 'satuan.satuan_nama',
-                    }
+                    // {
+                    //     text: 'Satuan',
+                    //     value: 'satuan.satuan_nama',
+                    // }
                 ],
             }
         },

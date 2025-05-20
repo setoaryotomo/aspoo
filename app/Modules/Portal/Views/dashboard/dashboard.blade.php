@@ -27,7 +27,7 @@
                         <div class="swiper-slide" lazy="true">
                             <div class="wrap-slider">
                                 @foreach($slider as $sliders)
-                                <img class="lazyload" data-src="{{ Storage::url($sliders->foto) }}" src="{{ Storage::url($sliders->foto) }}" alt="hp-slideshow-01">
+                                <img class="lazyload" data-src="{{ Storage::url($sliders->foto) }}" src="{{ Storage::url($sliders->foto) }}" alt="hp-slideshow-01" style="object-fit: contain;">
                                 @endforeach
                             </div>
                         </div>
@@ -36,9 +36,11 @@
             </div>
         </div>
         <!-- /slider -->
-        <!-- Categories -->
         <section class="flat-spacing-30 flat-control-sw">
-            {{-- <div class="container">
+        </section>
+        <!-- Categories -->
+        {{-- <section class="flat-spacing-30 flat-control-sw">
+            <div class="container">
                 <div class="flat-title flex-row justify-content-between px-0">
                     <span class="title fw-6 wow fadeInUp" data-wow-delay="0s" style="font-size: 30px">Featured Categories</span>
                     <div class="box-sw-navigation">
@@ -122,8 +124,8 @@
                         </div>
                     </div>
                 </div>
-            </div> --}}
-        </section>
+            </div>
+        </section> --}}
         <!-- /Categories -->
         <!-- Banner Collection -->
         <section class="flat-spacing-13 pt_0">

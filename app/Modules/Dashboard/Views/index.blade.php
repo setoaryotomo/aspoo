@@ -105,13 +105,13 @@
             <div class="container mt-5">
                 <div class="row">
                     <div class="col-md-12">
-                        <select name="periodeSelect" id="periodeSelect" onchange="runChart()" class="form-control">
+                        <select name="periodeSelect" id="periodeSelect" onchange="runChart2()" class="form-control">
                             <option value="7" selected>7 hari</option>
                             <option value="14">14 hari</option>
                             <option value="30">30 hari</option>
                             <option value="all">Semua</option>
                         </select>
-                        <canvas id="barChart1" width="400" height="300"></canvas>
+                        <canvas id="barChart2" width="400" height="300"></canvas>
                     </div>
 
                 </div>
@@ -180,8 +180,8 @@
 
         document.addEventListener("DOMContentLoaded", function() {
 
-            runChart()
-            // runChart2()
+            // runChart()
+            runChart2()
         });
 
         function runChart2() {

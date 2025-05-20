@@ -11,10 +11,12 @@ use App\Modules\ValidasiTransaksi\Requests\ValidasiTransaksiCreateRequest;
 use App\Modules\Permission\Repositories\PermissionRepository;
 use App\Modules\Portal\Model\Rekening;
 use App\Modules\Portal\Model\TransaksiMaster;
+use App\Modules\Portal\Model\UserDetail;
 use App\Modules\TransaksiBarang\Models\TransaksiBarang;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class ValidasiTransaksiController extends Controller
 {
@@ -65,50 +67,97 @@ class ValidasiTransaksiController extends Controller
     
     public function preview(Request $request, $kode){
         $data = TransaksiMaster::where('kode_transaksi',$kode)->with('transaksi')->first();
+        $datas = TransaksiBarang::where('kode_transaksi_master', $data->kode_transaksi)
+                    ->with(['pembeli', 'dataChildren.barang'])
+                    ->get();
+        $datauser = UserDetail::where('user_id', $datas[0]->pembeli->id)->with('userMaster')->first();            
         $rekening = Rekening::where('status',1)->first();
-        return view('ValidasiTransaksi::preview',compact('data','rekening'));
+        return view('ValidasiTransaksi::preview',compact('data','rekening','datas','datauser'));
     }
     
-    public function approve(Request $request,$kode){
-        $datas = TransaksiBarang::where('kode_transaksi_master',$kode)->get();
-        try{
+    public function approve(Request $request, $kode) {
+        $datas = TransaksiBarang::where('kode_transaksi_master', $kode)
+                    ->with(['pembeli', 'dataChildren.barang'])
+                    ->get();
+    
+        // Pastikan ada data transaksi
+        if ($datas->isEmpty()) {
+            return JsonResponseHandler::setResult([
+                'status' => 404,
+                'message' => 'Transaksi tidak ditemukan'
+            ])->send();
+        }
+    
+        // Ambil data pembeli (dari transaksi pertama)
+        $pembeli = $datas[0]->pembeli;
+        $datauser = UserDetail::where('user_id', $pembeli->id)->with('userMaster')->first();
+    
+        try {
             DB::beginTransaction();
-            $pesan = "Transaksi Anda ".$kode."\n";
+            
+            // Siapkan daftar item dari semua transaksi
+            $itemsList = "";
             $i = 1;
-            foreach($datas as $data){
-                $telp = $data->pembeli->nomor_telepon;
-                foreach($data->dataChildren as $child){
-                    $barang = $child->barang;
-
-                    $pesan .= $i++.". ".$barang->nama_barang." x".$child->jumlah."\n";
-                }
-             
-
+            $totalBiaya = 0;
+            
+            foreach ($datas as $data) {
+                // Update status setiap transaksi
                 $data->status = 2;
                 $data->save();
+                
+                // Hitung total biaya
+                $totalBiaya += $data->total_biaya;
+                
+                // Tambahkan item ke daftar
+                foreach ($data->dataChildren as $child) {
+                    $barang = $child->barang;
+                    $itemsList .= $i++ . ". " . $barang->nama_barang 
+                               . " x" . $child->jumlah 
+                               . " (" . number_format($child->harga, 0, ',', '.') . ")\n";
+                }
+                
+                // Buat record pengiriman
                 Pengiriman::create([
                     'transaksi_id' => $data->id,
                     'status' => 2,
-                    'keterangan' => 'Transaksi telah di validasi oleh ASPOO',
+                    'keterangan' => 'Transaksi telah divalidasi oleh ASPOO',
                 ]);
             }
-            $pesan .="Transaksi telah di validasi oleh ASPOO";
-            WatZapRepository::sendTextMessage($telp,$pesan);
-
+            
+            // Format total biaya
+            $totalBiayaFormatted = "Rp " . number_format($totalBiaya, 0, ',', '.');
+            
+            // Buat pesan WhatsApp
+            $whatsappMessage = "Halo " . $pembeli->username . ",\n";
+            $whatsappMessage .= "📦 *Detail Transaksi* #" . $kode . "\n\n";
+            $whatsappMessage .= "📋 *Daftar Produk*:\n" . $itemsList . "\n";
+            $whatsappMessage .= "💵 *Total Biaya*: " . $totalBiayaFormatted . "\n\n";
+            $whatsappMessage .= "✅ *Status*: Transaksi telah divalidasi oleh ASPOO\n";
+            $whatsappMessage .= "Terima kasih telah berbelanja dengan kami!";
+            
+            // Kirim WhatsApp
+            $response = Http::withHeaders([
+                'Authorization' => 'RNnk34zGgGPPxF7KLn8L',
+            ])->post('https://api.fonnte.com/send', [
+                'target' => $datauser->telepon,
+                'message' => $whatsappMessage,
+            ]);
+    
             DB::commit();
             
             $result = [
                 'status' => 200,
-                'message' => 'Data berhasil disimpan',
+                'message' => 'Data berhasil disimpan dan notifikasi terkirim',
                 'body' => $datas
             ];
-        }catch(Exception $e){
+        } catch (Exception $e) {
             DB::rollBack();
             $result = [
                 'status' => 400,
                 'message' => $e->getMessage()
             ];
         }
+        
         return JsonResponseHandler::setResult($result)->send();
     }
     

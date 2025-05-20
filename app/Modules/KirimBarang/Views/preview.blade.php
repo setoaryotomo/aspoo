@@ -35,7 +35,7 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <td>Nomor</td>
+                                    <td>No.</td>
                                     <td>Foto</td>
                                     <td>Nama Barang</td>
                                     <td>Harga</td>
@@ -51,8 +51,7 @@
                                 @foreach ($data->dataChildren as $child)
                                     <tr>
                                         <td>{{ $i++ }}</td>
-                                        <td> <img src="{{ asset(@$child->barang->thumbnail_readable) }}" height="50">
-                                        </td>
+                                        <td><img src="{{ asset(@$child->barang->thumbnail_readable) }}" style="object-fit: cover;height: 100px;width: 150px"></td>
                                         <td>{{ @$child->barang->nama_barang }}</td>
                                         <td>{{ rupiah($child->harga) }}</td>
                                         <td>{{ $child->jumlah }}</td>
@@ -87,8 +86,8 @@
                             </div>
                             <div class="col-md-6"></div>
                             <div class="col-md-6">
-                                <h3 class="text-danger"><b>Grand Total : </b>
-                                    {{ rupiah($total + $data->biaya_pengiriman) }}</h3>
+                                <h5 class="text-danger"><b>Total : </b>
+                                    {{ rupiah($total + $data->biaya_pengiriman) }}</h5>
                             </div>
                         </div>
                     </section>
@@ -96,7 +95,7 @@
             </div>
             <div class="card-footer">
                 <div class="float-right">
-                    <button class="btn btn-primary btn-sm" @click="approve('{{ $data->kode_transaksi }}')">Simpan</button>
+                    <button class="btn btn-primary btn-sm" style="margin-right: 5px;" @click="approve('{{ $data->kode_transaksi }}')">Simpan</button>
                     <button class="btn btn-danger btn-sm" @click="tolak('{{ $data->kode_transaksi }}')">Tolak</button>
                 </div>
             </div>

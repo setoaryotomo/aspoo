@@ -27,7 +27,7 @@ class InputSCMController extends Controller
         $role = Auth::user()->role_ids[0];
         if($role == 1 || $role == 5){
             $data = UMKM::paginate($per_page);
-            $data = UMKM::where('user_id',Auth::id())->paginate($per_page);
+            // $data = UMKM::where('user_id',Auth::id())->paginate($per_page);
         }else{
             $data = UMKM::where('user_id',Auth::id())->paginate($per_page);
         }
