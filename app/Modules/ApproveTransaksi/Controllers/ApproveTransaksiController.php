@@ -66,16 +66,17 @@ class ApproveTransaksiController extends Controller
 
     public function datatable(Request $request)
     {
-        $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
+        $per_page = $request->input('per_page') ?: 15;
+        $keyword = $request->input('keyword', '');
         $user = Auth::user();
         $role = $user->role_ids[0];
 
         if ($role == 1 || $role == 5) {
-            $data = ApproveTransaksiRepository::datatable($per_page);
+            $data = ApproveTransaksiRepository::datatable($per_page, $keyword);
         } else {
             // Ambil toko_id dari tabel users_toko
             $tokoIds = DB::table('users_toko')->where('user_id', $user->id)->pluck('user_id');
-            $data = ApproveTransaksiRepository::datatableByToko($per_page, $tokoIds);
+            $data = ApproveTransaksiRepository::datatableByToko($per_page, $tokoIds, $keyword);
         }
         return JsonResponseHandler::setResult($data)->send();
     }

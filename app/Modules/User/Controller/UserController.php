@@ -55,16 +55,20 @@ class UserController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return JsonResponseHandler::setMessage("Logout Berhasil")->send();
+        // Clear all session data
+        $request->session()->flush();
+        // Explicitly clear checkout_keranjang
+        $request->session()->forget('checkout_keranjang');
+        return redirect('/p/login');
     }
 
     public function logoutWeb(Request $request){
         Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return Redirect::to("/p/login");
+        // Clear all session data
+        $request->session()->flush();
+        // Explicitly clear checkout_keranjang
+        $request->session()->forget('checkout_keranjang');
+        return redirect('/p/login');
     }
     
     public function index()

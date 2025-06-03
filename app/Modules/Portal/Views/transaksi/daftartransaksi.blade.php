@@ -152,8 +152,11 @@
         background-color: #f8d7da;
         color: #721c24;
     }
+
     
-    .transaction-items {
+
+    /* Style untuk mobile (horizontal scroll) - tetap pakai yang semula */
+    .transaction-items-scroll {
         width: 1100px;
         margin: 0.75rem 0;
         display: flex;
@@ -164,6 +167,62 @@
         scrollbar-width: thin;
         scrollbar-color: var(--primary-color) #f0f0f0;
     }
+
+    .transaction-items-scroll::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .transaction-items-scroll::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 10px;
+    }
+
+    .transaction-items-scroll::-webkit-scrollbar-thumb {
+        background-color: var(--primary-color);
+        border-radius: 10px;
+    }
+
+    /* Media query untuk responsive */
+    @media (max-width: 1024px) {
+        .transaction-list .transaction-items-vertical {
+        display: none !important;
+    }
+        .transaction-items-scroll {
+            display: flex; /* Tampilkan scroll di mobile */
+            width: calc(100vw - 80px);
+            margin-left: -10px;
+            margin-right: -10px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    }
+
+    @media (min-width: 1025px) {
+       
+        .transaction-items-scroll {
+            display: none; /* Sembunyikan scroll di desktop */
+        }
+    }
+    
+    .transaction-items-vertical {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 1rem;
+        margin: 0.75rem 0;
+        padding: 0.5rem 0;
+    }
+
+    /* .transaction-items {
+        width: 1100px;
+        margin: 0.75rem 0;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 1rem;
+        padding: 0.5rem 0;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-color) #f0f0f0;
+    } */
     
     .transaction-items::-webkit-scrollbar {
         height: 6px;
@@ -433,44 +492,308 @@
         margin-bottom: 0.5rem;
     }
     
+    /* Enhanced Responsive Design */
+    @media (max-width: 1024px) {
+        .container {
+            max-width: 100%;
+            padding: 0 10px;
+        }
+        
+        .transaction-items {
+            width: calc(100vw - 80px);
+            margin-left: -10px;
+            margin-right: -10px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    }
     
     @media (max-width: 768px) {
+        .container {
+            padding: 0 10px;
+        }
+        
         .page-header {
             margin-top: 50px;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+        
+        .page-title {
+            font-size: 1.25rem;
+            text-align: center;
+        }
+        
+        .search-container {
+            max-width: 100%;
+            margin-bottom: 0;
+        }
+        
+        .master-transaction {
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
 
         .master-header {
             flex-direction: column;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+        
+        .order-info h6 {
+            font-size: 0.95rem;
+        }
+        
+        .order-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .meta-item {
+            font-size: 0.8rem;
         }
         
         .status-badge {
-            margin-top: 0.5rem;
             align-self: flex-start;
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
         }
         
         .transaction-items {
-            padding-bottom: 12px;
-            width: 320px;
+            width: calc(100vw - 40px);
+            margin-left: -10px;
+            margin-right: -10px;
+            padding-left: 10px;
+            padding-right: 10px;
+            gap: 0.75rem;
         }
         
         .transaction-item {
-            min-width: 150px;
+            min-width: 140px;
+            max-width: 160px;
+            padding: 0.6rem;
+        }
+        
+        .product-image {
+            height: 100px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .product-name {
+            font-size: 0.8rem;
+            margin-bottom: 0.4rem;
+            height: 2.4em;
+        }
+        
+        .product-meta {
+            font-size: 0.7rem;
+        }
+        
+        .product-price .amount {
+            font-size: 0.8rem;
+        }
+        
+        .product-price .qty {
+            font-size: 0.7rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        
+        .action-buttons .btn {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.5rem;
         }
         
         .master-footer {
             flex-direction: column-reverse;
             gap: 1rem;
+            align-items: stretch;
         }
         
         .total-price {
+            font-size: 1rem;
+            text-align: center;
             margin-bottom: 0.5rem;
+            padding: 0.75rem;
+            background-color: var(--bg-light);
+            border-radius: 8px;
+        }
+        
+        .master-footer > div:first-child {
+            display: flex;
+            justify-content: center;
         }
         
         .btn {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .review-section {
+            padding: 0.75rem;
+        }
+        
+        .review-title {
+            font-size: 0.9rem;
+        }
+        
+        .star-rating i {
+            font-size: 1.1rem;
+            margin-right: 0.25rem;
+        }
+        
+        .review-form label {
+            font-size: 0.8rem;
+        }
+        
+        .empty-state {
+            padding: 2rem 1rem;
+        }
+        
+        .empty-state i {
+            font-size: 2.5rem;
+        }
+        
+        .empty-state h5 {
+            font-size: 1rem;
+        }
+        
+        .empty-state p {
+            font-size: 0.8rem;
         }
     }
+    
+    @media (max-width: 480px) {
+        .container {
+            padding: 0 8px;
+        }
+        
+        .page-title {
+            font-size: 1.1rem;
+        }
+        
+        .master-transaction {
+            padding: 0.75rem;
+        }
+        
+        .order-info h6 {
+            font-size: 0.9rem;
+        }
+        
+        .meta-item {
+            font-size: 0.75rem;
+        }
+        
+        .transaction-items {
+            width: calc(100vw - 32px);
+            margin-left: -8px;
+            margin-right: -8px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        
+        .transaction-item {
+            min-width: 120px;
+            max-width: 140px;
+            padding: 0.5rem;
+        }
+        
+        .product-image {
+            height: 80px;
+        }
+        
+        .product-name {
+            font-size: 0.75rem;
+            height: 2.2em;
+        }
+        
+        .product-meta {
+            font-size: 0.65rem;
+        }
+        
+        .product-price .amount {
+            font-size: 0.75rem;
+        }
+        
+        .product-price .qty {
+            font-size: 0.65rem;
+        }
+        
+        .action-buttons .btn {
+            font-size: 0.65rem;
+            padding: 0.25rem 0.4rem;
+        }
+        
+        .total-price {
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.8rem;
+        }
+        
+        .star-rating i {
+            font-size: 1rem;
+            margin-right: 0.2rem;
+        }
+    }
+    
+    /* Landscape mobile devices */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .page-header {
+            margin-top: 20px;
+        }
+        
+        .transaction-items {
+            width: calc(100vw - 40px);
+        }
+        
+        .transaction-item {
+            min-width: 160px;
+            max-width: 180px;
+        }
+        
+        .product-image {
+            height: 90px;
+        }
+    }
+
+    .review-section {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius);
+}
+
+.review-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    resize: vertical;
+}
+
+.text-muted {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    display: block;
+    text-align: right;
+}
 </style>
 
 <div class="container">
@@ -503,6 +826,8 @@
                                 <span class="meta-item"><i class="bi bi-calendar3"></i>{{ $master['createdDate'] }}</span>
                                 <span class="meta-item"><i class="bi bi-upc"></i>ID: {{ $master['parcelId'] }}</span>
                             </div>
+                            <h6>Total: {{ $master['totalHargaFormatted'] }}</h6>
+                            
                         </div>
                         <div>
                             @php
@@ -514,26 +839,25 @@
                                 elseif(in_array($master['status'], [44])) $statusClass = 'status-failed';
                             @endphp
                             <span class="status-badge {{ $statusClass }}">{{ $master['statusReadable'] }}</span>
+                            
                         </div>
                     </div>
-
-                    {{-- <div class="transaction-items" style="width: 900px"> --}}
-                    <div class="transaction-items">
+                    <div class="transaction-items-scroll" style="width: 350px"> <!-- Versi scroll untuk mobile -->
                         @foreach($master['items'] as $item)
                             <div class="transaction-item">
+                                <!-- Isi item transaksi sama seperti di atas -->
                                 <img src="{{ url($item['thumbnail_readable']) }}" alt="{{ $item['namaBarang'] }}" class="product-image">
                                 
                                 <div class="product-details">
                                     <div class="product-name">{{ $item['namaBarang'] }}</div>
-                                    <div class="product-meta">
+                                    {{-- <div class="product-meta">
                                         <span><i class="bi bi-upc"></i> {{ $item['kodeTransaksi'] }}</span>
-                                        {{-- <span><i class="bi bi-truck"></i> {{ $item['kurirPengiriman'] }}</span> --}}
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 
                                 <div class="product-price">
-                                    <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</span>
-                                    <span class="qty">{{ $item['jumlah'] }} x Rp {{ number_format($item['harga'], 0, ',', '.') }}</span>
+                                    <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }} x {{ $item['jumlah'] }}</span> 
+                                    {{-- <span class="qty">{{ $item['jumlah'] }} x Rp {{ number_format($item['harga'], 0, ',', '.') }}</span> --}}
                                 </div>
                                 
                                 @if($item['status'] == 3 && $master['status'] == 3)
@@ -551,6 +875,39 @@
                             </div>
                         @endforeach
                     </div>
+                    {{-- <div class="transaction-items" style="width: 900px"> --}}
+                        <div class="transaction-items-vertical">
+                            @foreach($master['items'] as $item)
+                                <div class="transaction-item">
+                                    <img src="{{ url($item['thumbnail_readable']) }}" alt="{{ $item['namaBarang'] }}" class="product-image">
+                                    
+                                    <div class="product-details">
+                                        <div class="product-name">{{ $item['namaBarang'] }}</div>
+                                        {{-- <div class="product-meta">
+                                            <span><i class="bi bi-upc"></i> {{ $item['kodeTransaksi'] }}</span>
+                                        </div> --}}
+                                    </div>
+                                    
+                                    <div class="product-price">
+                                        <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }} x {{ $item['jumlah'] }}</span> 
+                                        {{-- <span class="qty">{{ $item['jumlah'] }} x Rp {{ number_format($item['harga'], 0, ',', '.') }}</span> --}}
+                                    </div>
+                                    
+                                    @if($item['status'] == 3 && $master['status'] == 3)
+                                        <div class="action-buttons">
+                                            <button type="button" class="btn btn-success ubah-status" 
+                                                    data-transaksi-id="{{ $item['transaksiId'] }}">
+                                                <i class="bi bi-check-circle"></i> Diterima
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-outline ubah-status-gagal" 
+                                                    data-transaksi-id="{{ $item['transaksiId'] }}">
+                                                <i class="bi bi-x-circle"></i> Tidak
+                                            </button>
+                                        </div>
+                                    @endif  
+                                </div>
+                            @endforeach
+                        </div>
 
                     @if($master['parcelId'])
                         <div class="review-section">
@@ -587,8 +944,8 @@
                                             </div>
                                         </div>
                                         
-                                        <button type="submit" class="btn btn-primary submit-review">
-                                            <i class="bi bi-send"></i> Kirim Review
+                                        <button type="submit" class="btn btn-primary submit-review" style="width: 100px">
+                                            <i class="bi bi-send" style="color: white"></i> <p style="color: white">Kirim</p>
                                         </button>
                                     </form>
                                 @elseif($parcel)
@@ -610,7 +967,36 @@
                         </div>
                     @endif
 
-                    <div class="master-footer">
+                    @if($master['parcelId'] && $master['status'] == 4) {{-- Only show comment form if transaction is completed --}}
+                        @php
+                            $parcel = \App\Modules\permintaanparcel\Models\permintaanparcel::find($master['parcelId']);
+                        @endphp
+
+                        <div class="review-section">
+                            @if($parcel && !$parcel->komentar)
+                                <div class="review-title">Komentar Parcel</div>
+                                <form id="commentForm-{{ $master['parcelId'] }}" class="review-form" data-parcel-id="{{ $master['parcelId'] }}">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label for="komentar">Komentar (max 30 karakter):</label>
+                                        <textarea class="form-control" name="komentar" id="komentar-{{ $master['parcelId'] }}" 
+                                                  maxlength="30" rows="2" required></textarea>
+                                        <small class="text-muted"><span id="charCount-{{ $master['parcelId'] }}">0</span>/30</small>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary submit-comment" style="width:100px">
+                                        <i class="bi bi-send" style="color: white"></i> <p style="color: white">Kirim</p>
+                                    </button>
+                                </form>
+                            @elseif($parcel && $parcel->komentar)
+                                <div class="review-title">Komentar Parcel</div>
+                                <div class="review-display">
+                                    <p>{{ $parcel->komentar }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    {{-- <div class="master-footer">
                         <div>
                             <a href="{{ url('p/status/').'/'.$master['masterKode'] }}" class="btn btn-primary" target="_blank" onclick="window.open(this.href, '_blank'); return false;" style="color: white;te">
                                 <i class="bi bi-info-circle" style="color: white;"> Detail</i> 
@@ -619,12 +1005,26 @@
                         <div class="total-price">
                             Total: {{ $master['totalHargaFormatted'] }}
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             @endforeach
         @endif
     </div>
 </div>
+
+    <script src="{!! asset('js/bootstrap.min.js') !!}"></script>
+    <script src="{!! asset('js/jquery.min.js') !!}"></script>
+    <script src="{!! asset('js/swiper-bundle.min.js') !!}"></script>
+    <script src="{!! asset('js/carousel.js') !!}"></script>
+    <script src="{!! asset('js/bootstrap-select.min.js') !!}"></script>
+    <script src="{!! asset('js/lazysize.min.js') !!}"></script>
+    <script src="{!! asset('js/bootstrap-select.min.js') !!}"></script>
+    <script src="{!! asset('js/count-down.js') !!}"></script>
+    <script src="{!! asset('js/wow.min.js') !!}"></script>
+    <script src="{!! asset('js/multiple-modal.js') !!}"></script>
+    <script src="{!! asset('js/shop.js') !!}"></script>
+    <script src="{!! asset('js/nouislider.min.js') !!}"></script>
+    <script src="{!! asset('js/main.js') !!}"></script>
 
 <script>
 $(document).ready(function() {
@@ -736,6 +1136,51 @@ $(document).ready(function() {
         $('.master-transaction').filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
+    });
+});
+</script>
+<script>
+    // Character counter
+$('[id^=komentar-]').on('input', function() {
+    const parcelId = $(this).attr('id').split('-')[1];
+    const currentLength = $(this).val().length;
+    $('#charCount-' + parcelId).text(currentLength);
+    
+    if (currentLength >= 30) {
+        $(this).val($(this).val().substring(0, 30));
+    }
+});
+
+// Comment submission
+$('.submit-comment').click(function(e) {
+    e.preventDefault();
+    const form = $(this).closest('form');
+    const parcelId = form.data('parcel-id');
+    const komentar = form.find('textarea[name="komentar"]').val();
+    
+    if (komentar.length > 30) {
+        alert('Komentar maksimal 30 karakter');
+        return;
+    }
+    
+    $.ajax({
+        type: "POST",
+        url: `/p/parcel/${parcelId}/comment`,
+        data: {
+            "_token": "{{ csrf_token() }}",
+            "komentar": komentar
+        },
+        success: function(response) {
+            if (response.success) {
+                alert("Komentar berhasil dikirim.");
+                location.reload();
+            } else {
+                alert("Gagal mengirim komentar.");
+            }
+        },
+        error: function() {
+            alert("Terjadi kesalahan saat mengirim komentar.");
+        }
     });
 });
 </script>

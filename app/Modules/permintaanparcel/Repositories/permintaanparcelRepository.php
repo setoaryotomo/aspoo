@@ -6,9 +6,21 @@ use App\Modules\permintaanparcel\Models\permintaanparcel;
 
 class permintaanparcelRepository
 {
-    public static function datatable($per_page = 15)
+    public static function datatable($per_page = 15, $keyword = '')
     {
-        $data = permintaanparcel::with('user')->paginate($per_page);
+        $query = permintaanparcel::with('user');
+
+        // Apply keyword search if provided
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('tanggal', 'LIKE', "%{$keyword}%")
+                  ->orWhereHas('user', function ($userQuery) use ($keyword) {
+                      $userQuery->where('name', 'LIKE', "%{$keyword}%");
+                  });
+            });
+        }
+
+        $data = $query->paginate($per_page);
         return $data;
     }
     public static function get($permintaan_parcel_id)

@@ -22,11 +22,12 @@ class permintaanparcelController extends Controller
     }
 
     public function datatable(Request $request)
-    {
-        $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
-        $data = permintaanparcelRepository::datatable($per_page);
-        return JsonResponseHandler::setResult($data)->send();
-    }
+{
+    $per_page = $request->input('per_page') ?: 15;
+    $keyword = $request->input('keyword', '');
+    $data = permintaanparcelRepository::datatable($per_page, $keyword);
+    return JsonResponseHandler::setResult($data)->send();
+}
 
     public function create()
     {

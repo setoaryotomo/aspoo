@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('/data-barang')->group(function() {
 
     Route::get('/all', [DataBarangController::class, 'all']);
+    Route::get('/produsenall', [DataBarangController::class, 'produsenAll']);
+    Route::get('/kategoriumumall', [DataBarangController::class, 'kategoriUmumAll']);
     // SUB MENU MARKER (DONT DELETE THIS LINE)
     Route::prefix("/komposisi/{kode_barang}")->group(function(){
         Route::prefix("/supplier/{kode_komposisi}")->group(function(){

@@ -63,24 +63,35 @@ class PortalController extends Controller
         return JsonResponseHandler::setResult($delete)->send();
     }
     public function postKeranjangToCheckout(Request $request)
-    {
-        $datas = json_decode($request->data);
-        $userId = Auth::user()->id;
+{
+    $datas = json_decode($request->data);
+    $userId = Auth::user()->id;
 
-        // Update quantities for selected items
-        foreach ($datas->data_keranjang as $data) {
-            $keranjang = Keranjang::where('id', $data->id)->where('user_id', $userId)->first();
-            if ($keranjang) {
-                $keranjang->jumlah = $data->jumlah;
-                $keranjang->save();
-            }
-        }
-
-        // Store selected items in session for checkout
-        Session::put('checkout_keranjang', $datas->data_keranjang);
-
-        return JsonResponseHandler::setResult(true)->send();
+    // Validate selected items
+    if (!isset($datas->data_keranjang) || empty($datas->data_keranjang)) {
+        return JsonResponseHandler::setResult('No items selected for checkout.')->setCode(400)->send();
     }
+
+    // Update quantities for selected items and verify they belong to the user
+    $validItems = [];
+    foreach ($datas->data_keranjang as $data) {
+        $keranjang = Keranjang::where('id', $data->id)->where('user_id', $userId)->first();
+        if ($keranjang) {
+            $keranjang->jumlah = $data->jumlah;
+            $keranjang->save();
+            $validItems[] = $data;
+        }
+    }
+
+    if (empty($validItems)) {
+        return JsonResponseHandler::setResult('No valid items found for checkout.')->setCode(400)->send();
+    }
+
+    // Store validated selected items in session
+    Session::put('checkout_keranjang', $validItems);
+
+    return JsonResponseHandler::setResult(true)->send();
+}
     public function getKeranjangData()
     {
         $user = Auth::user();
@@ -548,61 +559,65 @@ private function getMasterStatusReadable($transactions)
         return view('Portal::auth.profile', ['data' => $data, 'user' => $userMaster, 'asal' => $asal_daerah]);
     }
     public function updateProfile(Request $request)
-    {
-        $payload = $request->all();
+{
+    $payload = $request->all();
+    $userid = $request->input('user_id');
+    
+    // Ambil data existing
+    $existingData = UserDetail::where('user_id', $userid)->first();
 
-        if (!empty($payload['kota'])) {
-            $get_rajaongkircity = $payload['kota'];
-            $rajaongkir_city = Kota::find($get_rajaongkircity);
+    if (!empty($payload['kota'])) {
+        $get_rajaongkircity = $payload['kota'];
+        $rajaongkir_city = Kota::find($get_rajaongkircity);
 
-            if ($rajaongkir_city) {
-                $kota_rajaongkir = $rajaongkir_city->rajaongkir_city;
-                $postal_rajaongkir = $rajaongkir_city->rajaongkir_postal;
-            } else {
-                $kota_rajaongkir = null;
-                $postal_rajaongkir = null;
-            }
+        if ($rajaongkir_city) {
+            $kota_rajaongkir = $rajaongkir_city->rajaongkir_city;
+            $postal_rajaongkir = $rajaongkir_city->rajaongkir_postal;
         } else {
             $kota_rajaongkir = null;
             $postal_rajaongkir = null;
         }
-
-        $userDetail = [
-            'user_id' => $request->input('user_id'),
-            'alamat' => $request->input('alamat'),
-            'telepon' => $request->input('telepon'),
-            'tanggal_lahir' => $request->input('tanggal_lahir'),
-            'provinsi' => $request->input('provinsi'),
-            'kota' => $request->input('kota'),
-            'kota_rajaongkir' => $kota_rajaongkir,
-            'postal_rajaongkir' => $postal_rajaongkir,
-            'kecamatan' => $request->input('kecamatan'),
-            'kelurahan' => $request->input('kelurahan'),
-            'jenis_kelamin' => $request->input('jenis_kelamin'),
-        ];
-
-        if ($request->hasFile('foto')) {
-            $foto = FileHandler::store(file: $request->file('foto'), targetDir: "uploads/profile");
-            $userDetail['foto'] = $foto;
-        }
-
-        $userid = $request->input('user_id');
-
-        $insert = UserDetail::updateOrInsert(['user_id' => $userid], $userDetail);
-
-        $userMaster = User::find($userid);
-        $userMaster->username = $request->input('username');
-        $userMaster->email = $request->input('email');
-        $userMaster->name = $request->input('nama');
-        $userMaster->nomor_telepon = $request->input('telepon');
-        $userMaster->save();
-
-        if ($insert) {
-            return redirect()->back()->with('success', 'Profil berhasil diperbarui');
-        } else {
-            return redirect()->back()->with('error', 'Profil gagal diperbarui');
-        }
+    } else {
+        // Pertahankan data lama jika kota kosong
+        $kota_rajaongkir = $existingData ? $existingData->kota_rajaongkir : null;
+        $postal_rajaongkir = $existingData ? $existingData->postal_rajaongkir : null;
     }
+
+    $userDetail = [
+        'user_id' => $request->input('user_id'),
+        'alamat' => $request->input('alamat'),
+        'telepon' => $request->input('telepon'),
+        'tanggal_lahir' => $request->input('tanggal_lahir'),
+        // Gunakan data baru jika ada, jika tidak gunakan data lama
+        'provinsi' => $request->input('provinsi') ?: ($existingData ? $existingData->provinsi : null),
+        'kota' => $request->input('kota') ?: ($existingData ? $existingData->kota : null),
+        'kota_rajaongkir' => $kota_rajaongkir,
+        'postal_rajaongkir' => $postal_rajaongkir,
+        'kecamatan' => $request->input('kecamatan') ?: ($existingData ? $existingData->kecamatan : null),
+        'kelurahan' => $request->input('kelurahan') ?: ($existingData ? $existingData->kelurahan : null),
+        'jenis_kelamin' => $request->input('jenis_kelamin'),
+    ];
+
+    if ($request->hasFile('foto')) {
+        $foto = FileHandler::store(file: $request->file('foto'), targetDir: "uploads/profile");
+        $userDetail['foto'] = $foto;
+    }
+
+    $insert = UserDetail::updateOrInsert(['user_id' => $userid], $userDetail);
+
+    $userMaster = User::find($userid);
+    $userMaster->username = $request->input('username');
+    $userMaster->email = $request->input('email');
+    $userMaster->name = $request->input('nama');
+    $userMaster->nomor_telepon = $request->input('telepon');
+    $userMaster->save();
+
+    if ($insert) {
+        return redirect()->back()->with('success', 'Profil berhasil diperbarui');
+    } else {
+        return redirect()->back()->with('error', 'Profil gagal diperbarui');
+    }
+}
 
     public function detailproduk(Request $request)
     {
@@ -635,49 +650,99 @@ private function getMasterStatusReadable($transactions)
         return $responseCost['rajaongkir'];
     }
     public function checkout(Request $request)
-    {
-        $user = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
-        $userId = Auth::id();
+{
+    $user = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
+    $userId = Auth::id();
 
-        // Get selected items from session
-        $selectedKeranjang = Session::get('checkout_keranjang', []);
+    // Get selected items from session
+    $selectedKeranjang = Session::get('checkout_keranjang', []);
 
-        // Fetch full cart item details for selected items
-        $data = collect($selectedKeranjang)->groupBy(function ($item) {
-            // Fetch the barang to get created_by_user_id
+    // Validate session data
+    if (empty($selectedKeranjang)) {
+        return redirect()->route('keranjang')->with('error', 'No items selected for checkout.');
+    }
+
+    // Fetch full cart item details for selected items and ensure they belong to the current user
+    $data = collect($selectedKeranjang)
+        ->filter(function ($item) use ($userId) {
+            $keranjang = Keranjang::with(['barang', 'barang.user', 'parcel'])
+                ->where('id', $item->id)
+                ->where('user_id', $userId)
+                ->first();
+            return $keranjang !== null;
+        })
+        ->groupBy(function ($item) {
             $barang = DataBarang::find($item->barang_id);
             return $barang ? $barang->created_by_user_id : 0;
-        })->map(function ($group) {
+        })
+        ->map(function ($group) {
             return collect($group)->map(function ($item) {
-                $keranjang = Keranjang::with(['barang', 'barang.user', 'parcel'])
+                return Keranjang::with(['barang', 'barang.user', 'parcel'])
                     ->where('id', $item->id)
                     ->first();
-                return $keranjang;
-            })->filter(); // Remove null items
+            })->filter();
         });
 
-        $userdata = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
-        $kodeUnik = rand(10, 99);
-
-        $ret = ['data' => $data, 'userdetail' => $userdata, 'user' => $user, 'kodeUnik' => $kodeUnik];
-
-        return view('Portal::transaksi.checkout', $ret);
+    // If no valid items remain after filtering, redirect with error
+    if ($data->isEmpty()) {
+        return redirect()->route('keranjang')->with('error', 'Selected items are invalid or do not belong to the current user.');
     }
-    public function postCheckout(Request $request)
+
+    $userdata = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
+    $kodeUnik = rand(10, 99);
+
+    $ret = ['data' => $data, 'userdetail' => $userdata, 'user' => $user, 'kodeUnik' => $kodeUnik];
+
+    return view('Portal::transaksi.checkout', $ret);
+}
+public function postCheckout(Request $request)
     {
+        // Log request for debugging
+        Log::info('postCheckout request:', $request->all());
+
         $user = User::find(Auth::id())->with('detail')->first();
-        $userid = $user->id;
-        $datas = Keranjang::with(['barang', 'barang.user', 'parcel'])
-            ->where('user_id', Auth::user()->id)
-            ->get()
-            ->groupBy('barang.created_by_user_id');
-        
+        if (!$user || !$user->detail) {
+            Log::error('User or UserDetail not found for user_id: ' . Auth::id());
+            return JsonResponseHandler::setResult('User details not found.')->setCode(400)->send();
+        }
+
+        // Get selected items from session
+        $selectedKeranjang = session('checkout_keranjang', []);
+        if (empty($selectedKeranjang)) {
+            Log::error('No selected items in checkout_keranjang session for user_id: ' . Auth::id());
+            return JsonResponseHandler::setResult('No items selected for checkout.')->setCode(400)->send();
+        }
+
+        // Validate and fetch selected cart items
+        $datas = collect($selectedKeranjang)
+            ->map(function ($item) {
+                return Keranjang::with(['barang', 'barang.user', 'parcel'])
+                    ->where('id', $item->id)
+                    ->where('user_id', Auth::id())
+                    ->first();
+            })
+            ->filter()
+            ->groupBy(function ($item) {
+                return $item->barang->created_by_user_id . '-' . ($item->parcel_id ?? 'regular');
+            });
+
+        if ($datas->isEmpty()) {
+            Log::error('No valid cart items found for user_id: ' . Auth::id());
+            return JsonResponseHandler::setResult('Selected items are invalid or do not belong to the current user.')->setCode(400)->send();
+        }
+
         $input = $request->all();
         $kode_master = "TR-" . Str::random(8);
         $total_biaya = $request->totalPembayaran;
         $kode_unik = $request->kodeUnik;
         $total_pengiriman = $request->totalPengiriman;
-    
+
+        // Validate required input
+        if (!isset($input['checkout']['alamat']) || !isset($input['transaksi']['ongkir'])) {
+            Log::error('Missing required checkout data for user_id: ' . Auth::id(), $input);
+            return JsonResponseHandler::setResult('Invalid checkout data.')->setCode(400)->send();
+        }
+
         $barangs_midtrans = [
             [
                 'id' => 1398274,
@@ -692,26 +757,28 @@ private function getMasterStatusReadable($transactions)
                 'name' => 'Kode Unik'
             ]
         ];
-    
+
         DB::beginTransaction();
         try {
             $i = 0;
-            foreach ($datas as $barangs) {
+            foreach ($datas as $groupKey => $barangs) {
                 $total = 0;
+                $parcel_id = $barangs->first()->parcel_id ?? null;
+
                 $transaksi = TransaksiBarang::create([
                     'kode_transaksi' => "TR-" . Str::random(8),
                     'alamat' => $request->checkout['alamat'],
-                    'biaya_pengiriman' => intval($request->transaksi['ongkir'][$i]),
-                    'kurir_pengiriman' => $request->transaksi['ongkirData'][$i],
-                    'total_biaya' => $total_biaya + $total_pengiriman + $kode_unik,
+                    'biaya_pengiriman' => intval($request->transaksi['ongkir'][$i] ?? 0),
+                    'kurir_pengiriman' => $request->transaksi['ongkirData'][$i] ?? 'jne',
+                    'total_biaya' => 0,
                     'user_id' => Auth::id(),
-                    'toko_id' => 0, // temp
+                    'toko_id' => 0,
                     'kode_transaksi_master' => $kode_master,
-                    'pesan' => $request->transaksi['pesan'][$i],
-                    'parcel_id' => $barangs->first()->parcel_id ?? null, // Tambahkan parcel_id jika ada
+                    'pesan' => $request->transaksi['pesan'][$i] ?? '',
+                    'parcel_id' => $parcel_id,
                 ]);
+
                 $toko_id = 0;
-    
                 foreach ($barangs as $keranjang) {
                     $barang = $keranjang->barang;
                     $barangs_midtrans[] = [
@@ -720,7 +787,7 @@ private function getMasterStatusReadable($transactions)
                         'quantity' => $keranjang->jumlah,
                         'name' => $barang->nama_barang,
                     ];
-    
+
                     $tr_child = TransaksiBarangChildren::create([
                         'transaksi_id' => $transaksi->id,
                         'barang_id' => $keranjang->barang_id,
@@ -731,25 +798,25 @@ private function getMasterStatusReadable($transactions)
                     $toko_id = $barang->created_by_user_id;
                     Keranjang::where('id', $keranjang->id)->delete();
                 }
-                $transaksi->total_biaya = $total;
+                $transaksi->total_biaya = $total + ($request->transaksi['ongkir'][$i] ?? 0);
                 $transaksi->toko_id = $toko_id;
                 $transaksi->save();
                 $i++;
                 $total_biaya += $transaksi->biaya_pengiriman;
             }
-    
+
             $return = TransaksiMaster::create([
                 'kode_transaksi' => $kode_master,
                 'kode_unik' => $kode_unik,
-                'total_biaya' => $total_biaya,
+                'total_biaya' => $total_biaya + $total_pengiriman + $kode_unik,
             ]);
-    
-            // Midtrans configuration and payment URL generation
+
+            // Midtrans configuration
             Config::$serverKey = config('services.midtrans.serverKey');
             Config::$isProduction = config('services.midtrans.isProduction');
             Config::$isSanitized = config('services.midtrans.isSanitized');
             Config::$is3ds = config('services.midtrans.is3ds');
-    
+
             $midtrans = [
                 'transaction_details' => [
                     'order_id' => $kode_master,
@@ -764,20 +831,23 @@ private function getMasterStatusReadable($transactions)
                 ],
                 'vtweb' => []
             ];
-    
+
             $paymentUrl = Snap::createTransaction($midtrans)->redirect_url;
             TransaksiMaster::where('kode_transaksi', $kode_master)->update(['midtrans_link' => $paymentUrl]);
-    
-            $link = [
-                'midtrans_link' => $paymentUrl,
-            ];
+
+            $link = ['midtrans_link' => $paymentUrl];
             $dataResponse = array_merge($return->toArray(), $link);
             DB::commit();
-    
+
+            // Clear session
+            session()->forget('checkout_keranjang');
+            Log::info('Checkout session cleared for user_id: ' . Auth::id());
+
             return JsonResponseHandler::setResult($dataResponse)->send();
         } catch (Exception $e) {
             DB::rollBack();
-            return JsonResponseHandler::setResult($e->getMessage())->send();
+            Log::error('Checkout error for user_id: ' . Auth::id(), ['error' => $e->getMessage()]);
+            return JsonResponseHandler::setResult($e->getMessage())->setCode(500)->send();
         }
     }
     public function listToko(Request $request)
@@ -797,23 +867,38 @@ private function getMasterStatusReadable($transactions)
 
         return view('Portal::listtoko', compact('results'));
     }
-    public function listBarang(Request $request)
-    {
-        // Mengambil semua data barang dari database
-        // $produk = DataBarang::paginate(24);
-        $produk = DataBarang::paginate(12);
-        $category = DataBarang::all();
 
-        // Mengambil data dari jsonplaceholder
-        $response = Http::get('https://jsonplaceholder.typicode.com/posts');
+    // public function listBarang(Request $request)
+    // {
+    //     // Mengambil semua data barang dari database
+    //     // $produk = DataBarang::paginate(24);
+    //     $produk = DataBarang::paginate(12);
+    //     $category = DataBarang::all();
 
-        // Mengkonversi respons JSON menjadi array
-        $placeholder = $response->json(); // atau $response->json() jika ingin mendapatkan array
+    //     // Mengambil data dari jsonplaceholder
+    //     $response = Http::get('https://jsonplaceholder.typicode.com/posts');
 
-        return view('Portal::listbarang', compact('produk','category', 'placeholder'));
-    }
+    //     // Mengkonversi respons JSON menjadi array
+    //     $placeholder = $response->json(); // atau $response->json() jika ingin mendapatkan array
 
+    //     return view('Portal::listbarang', compact('produk','category', 'placeholder'));
+    // }
 
+public function listBarang(Request $request)
+{
+    $produk = DataBarang::paginate(16);
+    $category = DataBarang::select('kategori_umum')->distinct()->get();
+    
+    return view('Portal::listbarang', compact('produk','category'));
+}
+
+public function listBarangByKategori($kategori)
+{
+    $produk = DataBarang::where('kategori_umum', $kategori)->paginate(12);
+    $category = DataBarang::select('kategori_umum')->distinct()->get();
+    
+    return view('Portal::listbarang', compact('produk','category', 'kategori'));
+}
 
 
     public function listParcel(Request $request)
@@ -999,6 +1084,29 @@ private function getMasterStatusReadable($transactions)
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+
+    public function submitParcelComment(Request $request, $id)
+{
+    try {
+        $request->validate([
+            'komentar' => 'required|string|max:30'
+        ]);
+
+        $parcel = permintaanparcel::findOrFail($id);
+        
+        // Pastikan hanya pemilik parcel yang bisa mengomentari
+        if ($parcel->user_id != Auth::id()) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        }
+
+        $parcel->komentar = $request->komentar;
+        $parcel->save();
+        
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
 
     public function pesanparcel(Request $request)
     {

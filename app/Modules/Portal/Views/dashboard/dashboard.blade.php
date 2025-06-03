@@ -20,7 +20,7 @@
        
         <!-- /header -->
         <!-- slider -->
-        <div class="tf-slideshow slider-effect-fade slider-grocery position-relative flat-spacing-25 pb_0">
+        <div class="slider-effect-fade slider-grocery position-relative flat-spacing-25 pb_0">
             <div class="container">
                 <div dir="ltr" class="swiper tf-sw-slideshow radius-20" data-preview="1" data-tablet="1" data-mobile="1" data-centered="false" data-space="0" data-loop="false" data-auto-play="false" data-delay="2000" data-speed="1000">
                     <div class="swiper-wrapper">
@@ -35,9 +35,10 @@
                 </div>
             </div>
         </div>
+        <br>
         <!-- /slider -->
-        <section class="flat-spacing-30 flat-control-sw">
-        </section>
+        {{-- <section class="flat-spacing-30 flat-control-sw">
+        </section> --}}
         <!-- Categories -->
         {{-- <section class="flat-spacing-30 flat-control-sw">
             <div class="container">
@@ -193,12 +194,14 @@
                                 @foreach($barang as $barangs)
                                 <div class="card-product style-9">
                                     <div class="card-product-wrapper">
-                                        <a data-href="{{ url('/p/barang/' . $barangs->id) }}" class="product-img">
+                                        <a href="{{ url('/p/barang/' . $barangs->id) }}" class="product-img">
                                             
-                                            <img src="{{ URL::asset($barangs->thumbnail_readable) }}" alt="{{ $barangs->nama_barang }}" class="img-fluid" style="height: 187px">
+                                            {{-- <img src="{{ URL::asset($barangs->thumbnail_readable) }}" alt="{{ $barangs->nama_barang }}" class="img-fluid" style="height: 187px"> --}}
+                                            <img class="lazyload img-product" src="{{ URL::asset($barangs->thumbnail_readable) }}" alt="image-product" style="height: 187px;width: 100%;">
+                                            <img class="lazyload img-hover" src="{{ URL::asset($barangs->thumbnail_readable) }}" alt="image-product" style="height: 187px;width: 100%; object-fit: contain;">
                                       
                                         </a>
-                                        <div class="list-product-btn absolute-2">
+                                        {{-- <div class="list-product-btn absolute-2">
                                             <a href="javascript:void(0);" class="box-icon bg_white wishlist btn-icon-action">
                                                 <span class="icon icon-heart"></span>
                                                 <span class="tooltip">Add to Wishlist</span>
@@ -213,19 +216,19 @@
                                                 <span class="icon icon-view"></span>
                                                 <span class="tooltip">Quick View</span>
                                             </a>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <div class="card-product-info">
                                         <div class="inner-info">
-                                            <a href="product-detail.html" class="title link fw-6">{{ $barangs->nama_barang }}</a>
+                                            <a href="{{ url('/p/barang/' . $barangs->id) }}" class="title link fw-6">{{ $barangs->nama_barang }}</a>
                                             <span class="">Rp.{{ number_format($barangs->harga_user, 2) }}</span>
                                         </div>
-                                        <div class="list-product-btn">
+                                        {{-- <div class="list-product-btn">
                                             <a href="#quick_add" data-bs-toggle="modal" class="box-icon quick-add tf-btn-loading">
                                                 <span class="icon icon-bag"></span>
                                                 <span class="tooltip">Add to cart</span>
                                             </a>
-                                        </div>
+                                        </div> --}}
 
                                     </div>
                                 </div>

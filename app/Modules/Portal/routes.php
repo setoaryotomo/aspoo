@@ -31,6 +31,7 @@ Route::prefix('/p')->group(function () {
     Route::get("/toko", [PortalController::class, "toko"]);
     Route::get("/ratingdanulasan",[PortalController::class,"ratingdanulasan"]);
     Route::get("/listbarang",[PortalController::class,"listbarang"]);
+    Route::get("/listbarang/{kategori}",[PortalController::class,"listBarangByKategori"])->name('listbarang.kategori');
     Route::get("/listtoko",[PortalController::class,"listtoko"]);
     Route::get("/listparcel",[PortalController::class,"listparcel"]);
     Route::get("/paketparcel",[PortalController::class,"paketparcel"]);
@@ -98,6 +99,7 @@ Route::prefix('/p')->group(function () {
     // Route::post('/save-selected-items/{id}', [permintaanparcelController::class, 'saveSelectedItems'])->name('save-selected-items');
     Route::post('/permintaan-parcel/save-selected-items/{id}', [permintaanparcelController::class, 'saveSelectedItems']);
     Route::post('/parcel/{id}/review', [PortalController::class, 'submitParcelReview'])->name('parcel.review');
+    Route::post('/parcel/{id}/comment', [PortalController::class, 'submitParcelComment'])->name('parcel.comment');
 
     Route::prefix("toko")->group(function(){
         Route::get("/", [PortalController::class, "toko"]);
@@ -159,3 +161,5 @@ Route::prefix('/p')->group(function () {
 
     Route::get("/logout",[UserController::class,"logoutWeb"]);
 });
+
+Route::get('/api/barang', [PortalController::class, 'apibarang']);

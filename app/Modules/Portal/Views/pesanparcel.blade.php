@@ -346,6 +346,18 @@
                 max-height: 150px;
             }
         }
+        .selected-filters-container {
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa !important;
+}
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+}
     </style>
 
     <body class="preload-wrapper">
@@ -453,9 +465,9 @@
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
-                            <label for="desired-weight" class="form-label">Berat yang Diinginkan (Gram)</label>
+                            <label for="desired-weight" class="form-label">Berat yang Diinginkan (Kilogram)</label>
                             <input type="number" id="desired-weight" name="berat" class="form-control"
-                                placeholder="Masukkan berat" required>
+                                placeholder="Masukkan berat" required step="0.01" min="0">
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
@@ -485,15 +497,14 @@
                     </div>
                     <!-- Di dalam form Anda, sebelum tag penutup form -->
                     
-
-                    @foreach ($parcel as $index => $parcel)
+                    <!-- List Pesanan Parcel sebelumnya -->
+                    {{-- @foreach ($parcel as $index => $parcel)
                         @if (!$parcel->parcel_children->isEmpty())
-                            {{-- <div class="content-container" style="display: none"> --}}
                             <div class="content-container d-none" data-load-later>
                                 @php
                                     $number = 1;
                                 @endphp
-                                {{-- <h2>Parcel {{ $index + 1 }}</h2> --}}
+                                <h2>Parcel {{ $index + 1 }}</h2>
                                 <p>Id Parcel : {{ $parcel->id }}</p>
                                 <p>Review Pelayanan : {{ $parcel->review_pelayanan }}</p>
                                 <p>{{ $parcel->created_at }}</p>
@@ -508,11 +519,11 @@
                                         <p>Berat: {{ $child->barang->berat }}</p>
                                     </div>
                                 @endforeach
-                                {{-- <a href="{{ url('p/status/') }}" class="caption-link">Lihat Status Transaksi</a> --}}
+                                <a href="{{ url('p/status/') }}" class="caption-link">Lihat Status Transaksi</a>
                             </div>
                             <br>
                         @endif
-                    @endforeach
+                    @endforeach --}}
 
 
                     <!-- Filter Categories Section -->
@@ -598,7 +609,7 @@
                                 <div class="col-12 mb-3">
                                     <div class="card">
                                         <div class="card-header bg-success text-white">
-                                            <h6 class="mb-0 text-white text-center">Basah/Kering yang Diinginkan</h6>
+                                            <h6 class="mb-0 text-white text-center">Basah/Kering yang Diinginkan ({{ count($uniqueData['basah_kering']) }})</h6> 
                                         </div>
                                         <div class="card-body" style="max-height: 150px; overflow-y: auto;">
                                             <div id="desired-basah-kering" class="category-container">
@@ -648,7 +659,8 @@
                                 <div class="col-12 mb-3">
                                     <div class="card">
                                         <div class="card-header bg-success text-white">
-                                            <h6 class="mb-0 text-white text-center">Produsen yang Diinginkan</h6>
+                                            {{-- <h6 class="mb-0 text-white text-center">Produsen yang Diinginkan ({{ count($uniqueData['produsen']) }})</h6>  --}}
+                                            <h6 class="mb-0 text-white text-center">Produsen yang Diinginkan</h6> 
                                         </div>
                                         <div class="card-body" style="max-height: 150px; overflow-y: auto;">
                                             <div id="desired-produsen" class="category-container">
@@ -673,7 +685,8 @@
                                 <div class="col-12 mb-3">
                                     <div class="card">
                                         <div class="card-header bg-success text-white">
-                                            <h6 class="mb-0 text-white text-center">Nama Produk yang Diinginkan</h6>
+                                            {{-- <h6 class="mb-0 text-white text-center">Nama Produk yang Diinginkan ({{ count($uniqueData['nama_produk']) }})</h6>  --}}
+                                            <h6 class="mb-0 text-white text-center">Nama Produk yang Diinginkan</h6> 
                                         </div>
                                         <div class="card-body" style="max-height: 150px; overflow-y: auto;">
                                             <div id="desired-nama-produk" class="category-container">
@@ -847,13 +860,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="selected-filters-display" class="mb-3 text-center" style="display: none;">
+
+                        {{-- <div id="selected-filters-display" class="mb-3 text-center" style="display: none;">
                             <p id="selected-filters-text" class="text-muted"></p>
-                        </div>
+                        </div> --}}
+                        
                         <div class="text-center mb-5">
                             {{-- <button type="button" id="random-filter-button" class="btn btn-info btn-lg me-3">
                                 <i class="fas fa-random me-2"></i>Random
                             </button> --}}
+                            <div class="selected-filters-container mb-3 p-3 bg-light rounded">
+                                <h6 class="font-weight-bold">Filter yang Dipilih:</h6>
+                                <div id="selected-filters-display" class="d-flex flex-wrap"></div>
+                            </div>
                             <button id="process-button" class="btn btn-primary btn-lg">
                                 <i class="fas fa-magic me-2"></i>Proses
                             </button>
@@ -2165,7 +2184,8 @@ function displayRecommendations(recommendations, id) {
     container.innerHTML = '';
 
     const desiredPrice = parseFloat(document.getElementById('desired-price').value);
-    const desiredWeight = parseFloat(document.getElementById('desired-weight').value);
+    const desiredWeightKg = parseFloat(document.getElementById('desired-weight').value);
+    const desiredWeight = desiredWeightKg * 1000; // Convert to grams for internal use
     const desiredTotalItems = document.getElementById('total-items').value ? 
         parseInt(document.getElementById('total-items').value) : null;
     
@@ -2330,12 +2350,13 @@ function displayRecommendations(recommendations, id) {
                         
                     </div>
                     <div class="card-body">
-                        <h7>Total Item: ${totalItems} ${desiredTotalItems ? `/ ${desiredTotalItems} diinginkan` : ''}</h7><br>
+                        
                         <h7>Total Harga: Rp ${rec.totalPrice.toLocaleString()} (Rp ${desiredPrice.toLocaleString()})</h7><br>
-                        <h7>Total Berat: ${rec.totalWeight} Gram (${desiredWeight} Gram)</h7>
+                        <h7>Total Berat: ${rec.totalWeight.toLocaleString()} g (${desiredWeightKg.toFixed(2)} kg)</h7>
                         
                         ${referenceInfo}
                         <hr>
+                        <h7>Total Item: ${totalItems} ${desiredTotalItems ? `/ ${desiredTotalItems} diinginkan` : ''}</h7><br>
                         <h6>Isi Parcel:</h6>
                         ${categoryBreakdownHtml}
                         <button class="btn btn-primary select-parcel" data-index="${i}">
@@ -2381,7 +2402,8 @@ document.getElementById("process-button").addEventListener("click", async functi
     console.log("Process button clicked");
 
     const desiredPrice = parseFloat(document.getElementById('desired-price').value);
-    const desiredWeight = parseFloat(document.getElementById('desired-weight').value);
+    const desiredWeightKg = parseFloat(document.getElementById('desired-weight').value);
+    const desiredWeight = desiredWeightKg * 1000; // Convert kilograms to grams
 
     if (!desiredPrice || !desiredWeight) {
         alert("Masukkan harga dan berat yang diinginkan");
@@ -2478,6 +2500,7 @@ document.getElementById("process-button").addEventListener("click", async functi
         formData.set('desired_categories', JSON.stringify(desiredCategories));
         formData.set('desired_filters', JSON.stringify(desiredFilters));
         formData.set('unwanted_filters', JSON.stringify(unwantedFilters));
+        formData.set('berat', desiredWeight); // Store weight in grams
 
         const _token = document.querySelector('input[name="_token"]').value;
 
@@ -2707,6 +2730,8 @@ document.getElementById("process-button").addEventListener("click", async functi
                 return;
             }
 
+            this.innerHTML ='<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
             // Get the parcel quantity
             const parcelQuantity = parseInt(document.getElementById('parcel-quantity').value) || 1;
 
@@ -2874,6 +2899,90 @@ document.getElementById("process-button").addEventListener("click", async functi
     alert('Filter acak telah dipilih! Klik "Proses" untuk melihat rekomendasi.');
 });
     </script>
+<script>
+    // Add this function to update the selected filters display
+    function updateSelectedFiltersDisplay() {
+        const displayContainer = document.getElementById('selected-filters-display');
+        displayContainer.innerHTML = '';
+    
+        // Get all selected filters
+        const desiredCategories = Array.from(document.querySelectorAll('#desired-categories input:checked')).map(cb => cb.value);
+        const desiredBahan = Array.from(document.querySelectorAll('#desired-bahan input:checked')).map(cb => cb.value);
+        const desiredBasahKering = Array.from(document.querySelectorAll('#desired-basah-kering input:checked')).map(cb => cb.value);
+        const desiredRasa = Array.from(document.querySelectorAll('#desired-rasa input:checked')).map(cb => cb.value);
+        const desiredProdusen = Array.from(document.querySelectorAll('#desired-produsen input:checked')).map(cb => cb.value);
+        const desiredNamaProduk = Array.from(document.querySelectorAll('#desired-nama-produk input:checked')).map(cb => cb.value);
+        const unwantedCategories = Array.from(document.querySelectorAll('#unwanted-categories input:checked')).map(cb => cb.value);
+        const unwantedBahan = Array.from(document.querySelectorAll('#unwanted-bahan input:checked')).map(cb => cb.value);
+        const unwantedBasahKering = Array.from(document.querySelectorAll('#unwanted-basah-kering input:checked')).map(cb => cb.value);
+        const unwantedRasa = Array.from(document.querySelectorAll('#unwanted-rasa input:checked')).map(cb => cb.value);
+        const unwantedProdusen = Array.from(document.querySelectorAll('#unwanted-produsen input:checked')).map(cb => cb.value);
+        const unwantedNamaProduk = Array.from(document.querySelectorAll('#unwanted-nama-produk input:checked')).map(cb => cb.value);
+    
+        // Create filter chips
+        const createFilterChip = (label, values, isDesired = true) => {
+            if (values.length === 0) return '';
+            
+            const chip = document.createElement('div');
+            chip.className = `badge ${isDesired ? 'badge-success' : 'badge-danger'} m-1 p-2`;
+            chip.innerHTML = `<strong>${label}:</strong> ${values.join(', ')}`;
+            return chip;
+        };
+    
+        // Add desired filters
+        if (desiredCategories.length > 0) {
+            displayContainer.appendChild(createFilterChip('Kategori', desiredCategories));
+        }
+        if (desiredBahan.length > 0) {
+            displayContainer.appendChild(createFilterChip('Bahan', desiredBahan));
+        }
+        if (desiredBasahKering.length > 0) {
+            displayContainer.appendChild(createFilterChip('Basah/Kering', desiredBasahKering));
+        }
+        if (desiredRasa.length > 0) {
+            displayContainer.appendChild(createFilterChip('Rasa', desiredRasa));
+        }
+        if (desiredProdusen.length > 0) {
+            displayContainer.appendChild(createFilterChip('Produsen', desiredProdusen));
+        }
+        if (desiredNamaProduk.length > 0) {
+            displayContainer.appendChild(createFilterChip('Produk', desiredNamaProduk));
+        }
+    
+        // Add unwanted filters
+        if (unwantedCategories.length > 0) {
+            displayContainer.appendChild(createFilterChip('Kategori', unwantedCategories, false));
+        }
+        if (unwantedBahan.length > 0) {
+            displayContainer.appendChild(createFilterChip('Bahan', unwantedBahan, false));
+        }
+        if (unwantedBasahKering.length > 0) {
+            displayContainer.appendChild(createFilterChip('Basah/Kering', unwantedBasahKering, false));
+        }
+        if (unwantedRasa.length > 0) {
+            displayContainer.appendChild(createFilterChip('Rasa', unwantedRasa, false));
+        }
+        if (unwantedProdusen.length > 0) {
+            displayContainer.appendChild(createFilterChip('Produsen', unwantedProdusen, false));
+        }
+        if (unwantedNamaProduk.length > 0) {
+            displayContainer.appendChild(createFilterChip('Produk', unwantedNamaProduk, false));
+        }
+    
+        // Show/hide container based on whether there are any filters
+        document.querySelector('.selected-filters-container').style.display = 
+            displayContainer.children.length > 0 ? 'block' : 'none';
+    }
+    
+    // Add event listeners to all filter checkboxes
+    document.querySelectorAll('.desired-category, .desired-filter, .unwanted-filter').forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedFiltersDisplay);
+    });
+    
+    // Initial update when page loads
+    document.addEventListener('DOMContentLoaded', updateSelectedFiltersDisplay);
+    </script>
+
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>

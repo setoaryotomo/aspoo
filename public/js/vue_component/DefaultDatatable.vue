@@ -4,19 +4,17 @@
             <div class="card-head-row justify-content-between">
                 <h4 class="card-title"><strong>{{ title }}</strong></h4>
                 <div class="d-flex align-items-center">
-                    <!-- <div class="form-group">
-                        <div class="input-icon">
-                            <input
-                                type="text"
-                                v-model="keyword"
-                                class="form-control"
-                                placeholder="Search for..."
-                            />
-                            <span class="input-icon-addon">
-                                <i class="fa fa-search"></i>
-                            </span>
-                        </div>
-                    </div> -->
+                    <!-- Search Bar -->
+                    <div class="mr-3">
+                        <input
+                            v-model="keyword"
+                            type="text"
+                            class="form-control"
+                            placeholder="Search..."
+                            @focus="isSearchFocused = true"
+                            @blur="isSearchFocused = false"
+                        />
+                    </div>
                     <div>
                         <a
                             v-if="canAdd"
@@ -59,7 +57,6 @@
                         </tr>
                         <template v-if="!isContentLoading">
                             <tr v-for="(content, index) in contents" :key="index">
-                                <!-- Perubahan ada di sini -->
                                 <td class="text-center">{{ (page - 1) * per_page + index + 1 }}</td>
                                 <td
                                     v-for="(header, _index) in headers"
@@ -153,7 +150,7 @@ export default {
         },
         title: {
             type: String,
-            reqired: true,
+            required: true,
         },
         canAdd: {
             type: Boolean,
@@ -177,12 +174,12 @@ export default {
             page: 1,
             per_page: 15,
             isSearchFocused: false,
-            debounceTimeout: null, // Tambahkan debounceTimeout
+            debounceTimeout: null,
         };
     },
     watch: {
         keyword() {
-            this.debounceFetchData(); // Panggil debounceFetchData saat keyword berubah
+            this.debounceFetchData();
         },
         page(newPage, oldPage) {
             this.fetchData();
@@ -200,10 +197,10 @@ export default {
             this.page = page;
         },
         debounceFetchData() {
-            clearTimeout(this.debounceTimeout); // Hapus timeout sebelumnya
+            clearTimeout(this.debounceTimeout);
             this.debounceTimeout = setTimeout(() => {
-                this.fetchData(); // Panggil fetchData setelah 300ms
-            }, 300); // Waktu debounce: 300ms
+                this.fetchData();
+            }, 300);
         },
         async fetchData() {
             try {

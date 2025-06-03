@@ -88,6 +88,7 @@ class PortalUserController extends Controller
                     'user_id' => $dataUser->id,
                     'alamat' => $payload['alamat'],
                     'tanggal_lahir' => $payload['tanggal_lahir'],
+                    'telepon' => $payload['telepon'],
                     'provinsi' => $payload['provinsi_id'],
                     'kota' => $payload['kota_id'] ?? null,
                     'kota_rajaongkir' => $kota_rajaongkir,
@@ -100,6 +101,13 @@ class PortalUserController extends Controller
                     'user_id' => $dataUser->id,
                     'alamat' => $payload['alamat'],
                     'tanggal_lahir' => $payload['tanggal_lahir'],
+                    'telepon' => $payload['telepon'],
+                    'provinsi' => $payload['provinsi_id'],
+                    'kota' => $payload['kota_id'] ?? null,
+                    'kota_rajaongkir' => $kota_rajaongkir,
+                    'postal_rajaongkir' => $postal_rajaongkir,
+                    'kecamatan' => $payload['kecamatan_id'] ?? null,
+                    'kelurahan' => $payload['kelurahan_id'] ?? null,
                 ]);
             }
     

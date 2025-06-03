@@ -126,8 +126,15 @@
                                 
                                 <li class="nav-compare"><a href="{{ url('/p/listbarang') }}" class="nav-icon-item align-items-center gap-10"><i class="icon icon-shopping"></i><span class="text">Product</span></a></li>
                                 
-                                <li class="nav-wishlist"><a href="{{ url('/p/pesanparcel') }}" class="nav-icon-item  align-items-center gap-10"><i class="icon icon-gift"></i><span class="text">Parcel</span></a></li>
-                                <li class="nav-cart cart-lg" v-if="this.isLoggedin == true"><a href="{{ url('/p/keranjang') }}" class="nav-icon-item"><i class="icon icon-bag"></i></a></li>
+                                <li class="nav-wishlist">
+                                    <a v-if="this.isLoggedin == true" href="{{ url('/p/pesanparcel') }}" class="nav-icon-item align-items-center gap-10">
+                                        <i class="icon icon-gift"></i><span class="text">Parcel</span>
+                                    </a>
+                                    <a v-else href="{{ url('/p/login') }}" class="nav-icon-item align-items-center gap-10">
+                                        <i class="icon icon-gift"></i><span class="text">Parcel</span>
+                                    </a>
+                                </li>
+                                <li class="nav-cart cart-lg" v-if="this.isLoggedin == true"><a href="{{ url('/p/keranjang') }}" class="nav-icon-item"><i class="fa-sharp fa-solid fa-cart-shopping"></i></a></li>
                                 {{-- <li class="nav-account" v-if="this.isLoggedin == false"><a href="{{ url('/p/login') }}" class="nav-icon-item align-items-center gap-10"><i class="icon icon-account"></i> <span class="text">Login</span></a></li> --}}
                                 <div class="user-profile" v-if="this.isLoggedin == false">
                                     <div class="dropdown">
@@ -220,9 +227,13 @@
                                 
                             </li>
                             <li class="nav-mb-item">
-                                <a href="{{ url('/p/pesanparcel') }}" class="collapsed mb-menu-link current">
+                                <a v-if="this.isLoggedin == true" href="{{ url('/p/pesanparcel') }}" class="collapsed mb-menu-link current">
                                     <span>Parcel</span>
                                 </a>
+                                <a v-if="this.isLoggedin == false" href="{{ url('/p/login') }}" class="collapsed mb-menu-link current">
+                                    <span>Parcel</span>
+                                </a>
+                                
                                 
                             </li>
                             <li class="nav-mb-item">

@@ -116,20 +116,41 @@ class DataBarangController extends Controller
     }
 
     public function datatable(Request $request)
-    {
-        $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
-        $role = Auth::user()->role_ids[0];
-        if($role == 1 || $role == 5){
-            $data = DataBarang::with(['user','satuan'])->paginate($per_page);
-        }else{
-            $data = DataBarang::with(['user','satuan'])->where('created_by_user_id',Auth::id())->paginate($per_page);
-        }
+{
+    $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
+    $keyword = $request->input('keyword', ''); // Get keyword from request
+    $role = Auth::user()->role_ids[0];
 
-        return JsonResponseHandler::setResult($data)->send();
+    $query = DataBarang::with(['user', 'satuan']);
+
+    // Apply role-based filtering
+    if ($role != 1 && $role != 5) {
+        $query->where('created_by_user_id', Auth::id());
     }
+
+    // Apply keyword search
+    if (!empty($keyword)) {
+        $query->where('nama_barang', 'LIKE', "%{$keyword}%");
+            //   ->orWhere('kategori_umum', 'LIKE', "%{$keyword}%");
+    }
+
+    $data = $query->paginate($per_page);
+
+    return JsonResponseHandler::setResult($data)->send();
+}
     public function all(Request $request){
         $data = DataBarang::get();
         return JsonResponseHandler::setResult($data)->send();
+    }
+    public function produsenAll(Request $request)
+    {
+        $produsen = DataBarang::select('produsen')->where('produsen', '!=', '')->distinct()->get();
+        return JsonResponseHandler::setResult($produsen)->send();
+    }
+    public function kategoriUmumAll(Request $request)
+    {
+        $kategori_umum = DataBarang::select('kategori_umum')->where('kategori_umum', '!=', '')->distinct()->get();
+        return JsonResponseHandler::setResult($kategori_umum)->send();
     }
 
     public function create()

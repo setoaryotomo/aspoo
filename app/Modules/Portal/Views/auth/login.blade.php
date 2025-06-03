@@ -7,78 +7,149 @@
 <style>
     /* Add the Poppins font */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    
     body {
-        font-family: 'Poppins';
+        font-family: 'Poppins', sans-serif;
+        /* background-color: #FBD9C0; */
     }
+    
     main#login-page {
-        /* background: #FBD9C0; */
-        height: 100vh;
-        position: relative;
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
+        padding: 20px;
     }
-
+    
+    .login-card {
+        background: white;
+        border-radius: 30px;
+        width: 100%;
+        max-width: 1100px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .login-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+    }
+    
+    .login-image img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+    }
+    
+    .login-form {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .form-control-lg {
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+    }
+    
+    .btn-login {
+        background-color: #606C5D;
+        color: white;
+        font-weight: bold;
+        padding: 12px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-login:hover {
+        background-color: #4e584d;
+        transform: translateY(-2px);
+    }
+    
+    .logo-container {
+        padding: 20px;
+        text-align: center;
+    }
+    
     /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .login-card {
+            margin: 20px 0;
+        }
+        
+        .login-image {
+            padding: 20px;
+        }
+        
+        .login-form {
+            padding: 30px;
+        }
+    }
+    
     @media (max-width: 768px) {
-        .card-plain {
-            margin: 50px 0 0 0;
+        .login-card {
+            flex-direction: column;
+            height: auto;
         }
-
-        .col-md-6 {
-            margin-top: 15px; 
+        
+        .login-image img {
+            max-height: 250px;
         }
-
-        img {
-            max-width: 100%;
-            height: auto; 
+        
+        .login-form {
+            padding: 25px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .login-form {
+            padding: 20px;
+        }
+        
+        .logo-container img {
+            width: 120px;
+            height: auto;
         }
     }
 </style>
 
-<main id="login-page" class="main-content mt-0">
-    <section>
-        <div class="page-header min-vh-100">
-            <div class="container">
-                <div class="row">
-                    <div style="display: flex; justify-content: center;">
-                        <div class="card card-plain" style="max-width: 1100px; height: 550px; border-radius: 30px; margin: 92px 0 0 15px;">
-                            <div class="row">
-                                <div class="col-md-12" style="text-align: center; margin-top: 20px;">
-                                    <img src="../img/portal/logo.png" width="160" height="100"/>
-                                </div>
-                                <div class="col-md-6" style="display: flex; align-items: center; justify-content: center; margin-top: 25px;">
-                                    <div style="text-align: center;">
-                                        <img src="{{URL::asset('/img/portal/login_logo.png')}}" width="450" height="357"/>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div style="padding-right: 24px;">
-                                        <br>
-                                        <h4 style="text-align: center; font-weight: bold; color: #rgba(0, 0, 0, 0.90);">User Login</h4>
-                                        <br>
-                                        <form role="form">
-                                            <div class="mb-3">
-                                                <input v-model="email" type="email" class="form-control form-control-lg" placeholder="email" aria-label="email">
-                                            </div>
-                                            <div class="mb-3">
-                                                <input v-model="password" type="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
-                                                <a href="{{ url('/p/registrasi') }}" style="font-size: 13px;">Don't have an account?</a>
-                                            </div>
-                                            <div class="text-center">
-                                                <button @click="login" type="button" class="btn btn-lg btn-lg w-100 mt-4 mb-0" style="background-color: #606C5D; color: white; font-weight: bold;">Login</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+<main id="login-page" class="main-content">
+    <div class="container">
+        <div class="login-card row g-0">
+            <div class="logo-container col-12">
+                <img src="../img/portal/logo.png" alt="Logo" style="width: 200px" class="img-fluid"/>
+            </div>
+            
+            <div class="col-md-6 login-image">
+                <img src="{{URL::asset('/img/portal/login_logo.png')}}" alt="Login Illustration" class="img-fluid"/>
+            </div>
+            
+            <div class="col-md-6 login-form">
+                <h4 class="text-center fw-bold mb-4" style="color: rgba(0, 0, 0, 0.9);">Login</h4>
+                
+                <form role="form">
+                    <div class="mb-3">
+                        <input v-model="email" type="email" class="form-control form-control-lg" placeholder="Email" aria-label="Email">
+                    </div>
+                    <div class="mb-3">
+                        <input v-model="password" type="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password">
+                        <div class="mt-2 text-end">
+                            <a href="{{ url('/p/registrasi') }}" style="font-size: 13px; color: #606C5D;">Don't have an account?</a>
                         </div>
                     </div>
-                </div>
+                    <div class="text-center">
+                        <button @click="login" type="button" class="btn btn-login w-100 mt-4 mb-0">Login</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </section>
+    </div>
 </main>
+
 <script>
     createApp({
         data() {

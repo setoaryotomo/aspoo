@@ -28,14 +28,30 @@ class KirimBarangController extends Controller
     public function datatable(Request $request)
     {
         $auth = Auth::user();
-        $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
+        $keyword = $request->input('keyword', '');
+        $per_page = $request->input('per_page') ?: 15;
         $role = $auth->role_ids[0];
-        $kirim = TransaksiBarang::with("pembeli");
-        if($role != 1){
-            $kirim = $kirim->where('toko_id',$auth->id);
+
+        $kirim = TransaksiBarang::with('pembeli')
+            ->where('status', 2);
+
+        // Apply toko_id filter for non-admin users
+        if ($role != 1) {
+            $kirim = $kirim->where('toko_id', $auth->id);
         }
-        
-        $kirim = $kirim->where('status',2)->paginate($per_page);
+
+        // Apply keyword search if provided
+        if (!empty($keyword)) {
+            $kirim = $kirim->where(function ($q) use ($keyword) {
+                $q->where('kode_transaksi', 'LIKE', "%{$keyword}%")
+                  ->orWhere('kode_transaksi_master', 'LIKE', "%{$keyword}%")
+                  ->orWhereHas('pembeli', function ($pembeliQuery) use ($keyword) {
+                      $pembeliQuery->where('name', 'LIKE', "%{$keyword}%");
+                  });
+            });
+        }
+
+        $kirim = $kirim->paginate($per_page);
         return JsonResponseHandler::setResult($kirim)->send();
     }
 

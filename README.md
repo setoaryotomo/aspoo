@@ -1,4 +1,4 @@
-## Requirement
+## Requirements
 
 -   PHP 8.1 (beberapa packages requires php >= 8.2)
 -   MYSQL

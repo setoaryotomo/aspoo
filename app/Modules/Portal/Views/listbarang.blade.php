@@ -1,5 +1,109 @@
 @extends('portal_layout.templates')
 @section('content')
+<style>
+    .applied-filter {
+        background: #f5f5f5;
+        padding: 5px 10px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+    
+    .remove-filter {
+        margin-left: 8px;
+        color: #999;
+        text-decoration: none;
+    }
+    
+    .remove-filter:hover {
+        color: #333;
+    }
+    
+    .list-categoris .cate-item a {
+        display: flex;
+        justify-content: space-between;
+    }
+    .wg-pagination.tf-pagination-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Allows pagination items to wrap on smaller screens */
+    gap: 5px; /* Space between pagination items */
+    margin-top: 20px;
+}
+
+.pagination {
+    margin: 0;
+    padding: 0;
+}
+
+.pagination .page-item {
+    margin: 0 2px;
+}
+
+.pagination .page-link {
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: #333;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: #f5f5f5;
+    border-color: #ccc;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff; /* Bootstrap primary color */
+    border-color: #007bff;
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #ddd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .wg-pagination.tf-pagination-list {
+        gap: 3px;
+    }
+
+    .pagination .page-link {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    /* Hide "Previous" and "Next" text on small screens, show icons only */
+    .pagination .page-link span {
+        display: none;
+    }
+
+    .pagination .page-item:first-child .page-link::before {
+        content: "«";
+        font-size: 12px;
+    }
+
+    .pagination .page-item:last-child .page-link::before {
+        content: "»";
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 400px) {
+    .pagination .page-link {
+        font-size: 10px;
+        padding: 5px 8px;
+    }
+}
+    </style>
 <body class="preload-wrapper">
 {{-- <div class="preload preload-container">
     <div class="preload-logo">
@@ -9,11 +113,11 @@
 <section class="flat-spacing-1">
     <div class="container">
         <div class="tf-shop-control grid-3 align-items-center">
-            <div class="tf-control-filter">
+            <div class="tf-control-filter" style="display: none">
                 <a href="#filterShop" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="tf-btn-filter"><span class="icon icon-filter"></span><span class="text">Filter</span></a>
             </div>
             <ul class="tf-control-layout d-flex justify-content-center">
-                <li class="tf-view-layout-switch sw-layout-list list-layout" data-value-layout="list">
+                {{-- <li class="tf-view-layout-switch sw-layout-list list-layout" data-value-layout="list">
                     <div class="item"><span class="icon icon-list"></span></div>
                 </li>
                 <li class="tf-view-layout-switch sw-layout-2" data-value-layout="tf-col-2">
@@ -21,12 +125,12 @@
                 </li>
                 <li class="tf-view-layout-switch sw-layout-3" data-value-layout="tf-col-3">
                     <div class="item"><span class="icon icon-grid-3"></span></div>
-                </li>
-                <li class="tf-view-layout-switch sw-layout-4 active" data-value-layout="tf-col-4">
+                </li> --}}
+                <li class="tf-view-layout-switch sw-layout-4 active" data-value-layout="tf-col-4" style="display: none">
                     <div class="item"><span class="icon icon-grid-4"></span></div>
                 </li>
             </ul>
-            <div class="tf-control-sorting d-flex justify-content-end">
+            {{-- <div class="tf-control-sorting d-flex justify-content-end">
                 <div class="tf-dropdown-sort" data-bs-toggle="dropdown">
                     <div class="btn-select">
                         <span class="text-sort-value">Featured</span>
@@ -59,7 +163,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
         <div class="tf-row-flex">
             <aside class="tf-shop-sidebar wrap-sidebar-mobile">
@@ -70,12 +174,15 @@
                     </div>
                     <div id="categories" class="collapse show">
                         <ul class="list-categoris current-scrollbar mb_36">
-                            @foreach($category->unique('kategori_umum')->sortBy('kategori_umum') as $items)
-                            <li class="cate-item"><a href="#"><span>{{ $items->kategori_umum}}</span></a></li>
-                            {{-- <li class="cate-item"><a href="#"><span>Men</span><span>(9)</span></a></li>
-                            <li class="cate-item"><a href="#"><span>Women</span><span>(23)</span></a></li>
-                            <li class="cate-item"><a href="#"><span>Denim</span><span>(20)</span></a></li>
-                            <li class="cate-item"><a href="#"><span>Dress</span><span>(23)</span></a></li> --}}
+                            @foreach($category->unique('kategori_umum')->sortBy('kategori_umum') as $item)
+                                @if(!empty($item->kategori_umum))
+                                    <li class="cate-item">
+                                        <a href="{{ route('listbarang.kategori', $item->kategori_umum) }}">
+                                            <span>{{ $item->kategori_umum }}</span>
+                                            {{-- <span>({{ DataBarang::where('kategori_umum', $item->kategori_umum)->count() }})</span> --}}
+                                        </a>
+                                    </li>
+                                @endif
                             @endforeach
                         </ul>
                     </div>
@@ -142,27 +249,33 @@
                 </div>
             </aside>
             <div class="wrapper-control-shop tf-shop-content">
-                <div class="meta-filter-shop">
-                    <div id="product-count-grid" class="count-text"></div>
-                    <div id="product-count-list" class="count-text"></div>
+                <div class="mb-2">
+                    @if(isset($kategori))
+                        <div class="applied-filter">
+                            Kategori: {{ $kategori }}
+                            <a href="{{ url('/p/listbarang') }}" class="remove-filter">
+                                <i class="icon icon-close"></i>
+                            </a>
+                        </div>
+                    @endif
                     <div id="applied-filters"></div>
                     <button id="remove-all" class="remove-all-filters" style="display: none;">Remove All <i class="icon icon-close"></i></button>
                 </div>
                
                 <div class="tf-grid-layout wrapper-shop tf-col-4" id="gridLayout">
-                    <div class="preload preload-container">
+                    {{-- <div class="preload preload-container">
                         <div class="preload-logo">
                             <div class="spinner"></div>
                         </div>
-                    </div>
+                    </div> --}}
                     @foreach($produk as $barang)
                     <!-- card product 1 -->
                     <div class="card-product grid" data-availability="In stock" data-brand="Ecomus">
                         <div class="card-product-wrapper">
                             <a href="{{ url('/p/barang/' . $barang->id) }}" class="product-img">
                                 
-                                <img class="lazyload img-product" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" style="height: 187px;width: 100%;">
-                                <img class="lazyload img-hover" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" style="height: 187px;width: 100%; object-fit: contain;">
+                                <img class="lazyload img-product" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" style="height: 187px;width: 100%;padding: 7px">
+                                <img class="lazyload img-hover" src="{{ URL::asset($barang->thumbnail_readable) }}" alt="image-product" style="height: 187px;width: 100%; object-fit: contain;padding: 10px">
                                 
                             </a>
                             {{-- <div class="list-product-btn absolute-2">

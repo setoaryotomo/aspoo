@@ -20,11 +20,12 @@ class MasterUMKMController extends Controller
     }
 
     public function datatable(Request $request)
-    {
-        $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
-        $data = MasterUMKMRepository::datatable($per_page);
-        return JsonResponseHandler::setResult($data)->send();
-    }
+{
+    $per_page = $request->input('per_page') ?: 15;
+    $keyword = $request->input('keyword', ''); // Get keyword from request
+    $data = MasterUMKMRepository::datatable($per_page, $keyword);
+    return JsonResponseHandler::setResult($data)->send();
+}
 
     public function create()
     {
@@ -99,8 +100,19 @@ class MasterUMKMController extends Controller
 
 public function barang_datatable(Request $request, $id)
 {
-    $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
-    $data = DataBarang::where('created_by_user_id', $id)->with(['user', 'satuan'])->paginate($per_page);
+    $per_page = $request->input('per_page') ?: 15;
+    $keyword = $request->input('keyword', '');
+
+    $query = DataBarang::where('created_by_user_id', $id)->with(['user', 'satuan']);
+
+    // Apply keyword search if provided
+    if (!empty($keyword)) {
+        $query->where(function ($q) use ($keyword) {
+            $q->where('nama_barang', 'LIKE', "%{$keyword}%");
+        });
+    }
+
+    $data = $query->paginate($per_page);
     return JsonResponseHandler::setResult($data)->send();
 }
 

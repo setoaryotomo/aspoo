@@ -77,6 +77,16 @@
                                     required>
                                 </vue-multiselect>
                             </div>
+                            <div class="form-group">
+                                <label class="form-control-label">Produsen </label>
+                                <vue-multiselect 
+                                    v-model="barang.produsen" 
+                                    :searchable="true" 
+                                    :options="produsen_list"
+                                    placeholder="Pilih produsen"
+                                    required>
+                                </vue-multiselect>
+                            </div>
 
                             <div class="form-group">
                                 <label class="form-control-label">Keterangan</label>
@@ -188,7 +198,10 @@
                                     required>
                                 </vue-multiselect>
                             </div>
-
+                            <div class="form-group">
+                                <label class="form-control-label">Expired</label>
+                                <input v-model="barang.expired" class="form-control" type="date">
+                            </div>
                             <div class="form-group">
                                 <label class="form-control-label">Info Penting</label>
                                 <textarea class="form-control" v-model="barang.info_penting" rows="3" placeholder="Informasi penting tentang produk"></textarea>
@@ -271,6 +284,7 @@
                         kategori_umum: null,
                         kategori_nama: null,
                         kategori_produk: null,
+                        produsen: null,
                         rasa: null,
                         jenis_kemasan: null,
                         bahan_dasar: null,
@@ -279,6 +293,7 @@
                         bahan_kemasan: null,
                     },
                     satuan_list: [],
+                    produsen_list: [],
                     
                     // Options for dropdowns
                     // kategoriUmumOptions: ['Makanan', 'Minuman', 'Snack', 'Kue', 'Rempah', 'Buah', 'Sayur', 'Daging'],
@@ -316,6 +331,9 @@
             computed: {
                 satuan_id() {
                     return this.barang.satuan_id
+                },
+                produsen() {
+                    return this.barang.produsen
                 }
             },
             watch: {
@@ -327,10 +345,19 @@
                     }
                     this.barang.satuan_id = value
                 },
+                // produsen(value) {
+                //     let satuan_data = this.satuan_list.find(satuan_item => satuan_item.value == value)
+                //     this.path = `${satuan_data.label.toLowerCase().split(" ").join("-")}`
+                //     if (this.name != null && this.name != "") {
+                //         this.path += `/${this.name.toLowerCase().split(" ").join("-")}`
+                //     }
+                //     this.barang.satuan_id = value
+                // },
             },
             async created() {
                 showLoading()
                 await this.fetchSatuanList()
+                await this.fetchProdusenList()
                 await this.fetchData()
                 hideLoading()
             },
@@ -350,6 +377,18 @@
                             return {
                                 value: el.id,
                                 label: el.satuan_nama
+                            }
+                        })
+                    ]
+                },
+                async fetchProdusenList() {
+                    const response = await httpClient.get("{!! url('data-barang/produsenall') !!}")
+                    this.produsen_list = [
+                        ...this.produsen_list,
+                        ...response.data.result.map(el => {
+                            return {
+                                value: el.produsen,
+                                label: el.produsen
                             }
                         })
                     ]

@@ -29,29 +29,30 @@
         }
     </style>
 
-    <main id="registrasi-page" class="main-content mt-0" style="background: #FBD9C0;">
+    <main id="registrasi-page" class="main-content mt-0">
         <section>
             <div class="page-header min-vh-100">
                 <div class="container">
                     <div class="row">
                         <div style="display: flex; justify-content: center;">
                             <div class="card card-plain"
-                                style="max-width: 1100px; border-radius: 30px; margin: 92px 0 92px 15px;">
+                                style="max-width: 900px; border-radius: 30px; margin: 92px 0 92px 15px;">
                                 <div class="row">
                                     <div class="col-md-12" style="text-align: center; margin-top: 20px;">
                                         <img src="../img/portal/logo.png" width="160" height="100" />
                                     </div>
-                                    <div class="col-md-6"
+
+                                    {{-- <div class="col-md-6"
                                         style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
                                         <div style="text-align: center;">
                                             <img src="{{ URL::asset('/img/portal/registrasi_logo.png') }}" width="520"
                                                 height="600" />
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
+                                    </div> --}}
+                                    <div class="col-md-8 mx-auto">
                                         <div style="padding: 20px;">
-                                            <h1 style="text-align: center; font-weight: bold; color: rgba(0, 0, 0, 0.90); ">
-                                                Register</h1>
+                                            <h5 style="text-align: center; font-weight: bold; color: rgba(0, 0, 0, 0.90); ">
+                                                Register</h5>
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="form-group">
@@ -80,15 +81,21 @@
                                                 </div>
                                                 <div class="col-md-12">
                                                     <div class="form-group">
+                                                        <label class="form-label">Nomor Telepon</label>
+                                                        <input type="text" class="form-control" v-model="user.telepon">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
                                                         <label class="form-label">Alamat</label>
                                                         <input type="text" class="form-control" v-model="user.alamat">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <label class="form-label"> Role</label>
+                                                        <label class="form-control-label"> Role</label>
                                                         <vue-multiselect v-model="user.role_id" :options="role_list"
-                                                            class="form-control" />
+                                                            />
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12" v-if="showDetails">
@@ -145,7 +152,7 @@
         createApp({
             data() {
                 return {
-                    showDetails: false,
+                    showDetails: true,
                     role_list: [{
                             value: 2,
                             label: "Konsumen"
@@ -178,7 +185,7 @@
                         if(value != 2){
                             this.showDetails = true
                         }else{
-                            this.showDetails = false
+                            this.showDetails = true
                         }
                     }
                 },

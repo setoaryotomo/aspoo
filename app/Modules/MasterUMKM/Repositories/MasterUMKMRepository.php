@@ -7,15 +7,24 @@ use App\Modules\MasterUMKM\Models\MasterUMKM;
 
 class MasterUMKMRepository
 {
-    public static function datatable($per_page = 15)
+    public static function datatable($per_page = 15, $keyword = '')
     {
-        $data = MasterUMKM::paginate($per_page);
+        $query = MasterUMKM::query();
+
+        // Apply keyword search if provided
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nama', 'LIKE', "%{$keyword}%");
+            });
+        }
+
+        $data = $query->paginate($per_page);
         return $data;
     }
 
     public static function barang_datatable($per_page = 15)
     {
-        $data = DataBarang::with(['user','satuan'])->paginate($per_page);
+        $data = DataBarang::with(['user', 'satuan'])->paginate($per_page);
         return $data;
     }
 
@@ -24,6 +33,7 @@ class MasterUMKMRepository
         $masterumkm = MasterUMKM::where('id', $masterumkm_id)->first();
         return $masterumkm;
     }
+
     public static function create($masterumkm)
     {
         $masterumkm = MasterUMKM::create($masterumkm);

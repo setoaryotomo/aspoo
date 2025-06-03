@@ -7,10 +7,9 @@ use App\Modules\ValidasiTransaksi\Models\ValidasiTransaksi;
 
 class ValidasiTransaksiRepository
 {
-    public static function datatable($per_page = 15)
+    public static function datatable($per_page = 15, $keyword = '')
     {
-        // Ambil semua TransaksiMaster yang memiliki transaksi
-        $data = TransaksiMaster::with(['transaksi'])
+        $query = TransaksiMaster::with(['transaksi'])
             // Pastikan minimal ada 1 transaksi dengan status = 1
             ->whereHas('transaksi', function ($query) {
                 $query->where('status', 1);
@@ -25,9 +24,16 @@ class ValidasiTransaksiRepository
                     ->from('transaksi')
                     ->whereColumn('transaksi.kode_transaksi_master', 'transaksi_master.kode_transaksi')
                     ->where('transaksi.status', 1);
-            })
-            ->paginate($per_page);
+            });
 
+        // Apply keyword search if provided
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('kode_transaksi', 'LIKE', "%{$keyword}%");
+            });
+        }
+
+        $data = $query->paginate($per_page);
         return $data;
     }
     public static function get($validasi_transaksi_id)

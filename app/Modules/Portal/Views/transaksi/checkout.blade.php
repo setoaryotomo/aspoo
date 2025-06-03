@@ -49,71 +49,70 @@
                 $iteration = 0;
                 ?>
                 @foreach ($data as $data_group_seller_id)
-                    @if ($data_group_seller_id[0]->barang->harga_user != null)
-                        <div class="col-md-12 mb-1">
-                                <span class="badge">{{ @$data_group_seller_id[0]->barang->user->nama }}</span>
-                            
-                        </div>
-                    @endif
-                    <?php
-                    $totalHargaPerSeller = 0;
-                    $isParcel = $data_group_seller_id[0]->parcel_id != null;
-                    $parcelAddress = $isParcel ? json_decode($data_group_seller_id[0]->parcel->alamat, true) : null;
-                    ?>
-                    @foreach ($data_group_seller_id as $keranjang)
-                        <?php $barang = $keranjang->barang; ?>
-                        <div class="col-md-12">
-                            <div class="card bg-light mb-3">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-2">
-                                            <img src="{{ $barang->thumbnail_readable }}" alt="Product Image"
-                                                class="product-image" width="100">
-                                        </div>
-                                        <div class="col-md-10">
-                                            <div class="row justify-content-between">
-                                                <div class="col-md-6">
-                                                    <p style="font-size: 18px"><b>{{ $barang->nama_barang }}</b></p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    @php
-                                                        $satuanTotalHarga = $barang->harga_user * $keranjang->jumlah;
-                                                        $totalHarga += $satuanTotalHarga;
-                                                        $totalHargaPerSeller += $satuanTotalHarga;
-                                                    @endphp
-                                                    
-                                                    <p style="text-align: right">Total Harga: <b>{{ rupiah($satuanTotalHarga) }}</b></p>
-                                                    <p style="text-align: right">X {{ $keranjang->jumlah }}</p>                                                
-                                                </div>
+                @if ($data_group_seller_id[0]->barang->harga_user != null)
+                    <div class="col-md-12 mb-1">
+                        <span class="badge">{{ @$data_group_seller_id[0]->barang->user->nama }}</span>
+                    </div>
+                @endif
+                <?php
+                $totalHargaPerSeller = 0;
+                $isParcel = $data_group_seller_id[0]->parcel_id != null;
+                $parcelAddress = $isParcel ? json_decode($data_group_seller_id[0]->parcel->alamat, true) : null;
+                ?>
+                @foreach ($data_group_seller_id as $keranjang)
+                    <?php $barang = $keranjang->barang; ?>
+                    <div class="col-md-12">
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <img src="{{ $barang->thumbnail_readable }}" alt="Product Image"
+                                            class="product-image" width="100">
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="row justify-content-between">
+                                            <div class="col-md-6">
+                                                <p style="font-size: 18px"><b>{{ $barang->nama_barang }}</b></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                @php
+                                                    $satuanTotalHarga = $barang->harga_user * $keranjang->jumlah;
+                                                    $totalHarga += $satuanTotalHarga;
+                                                    $totalHargaPerSeller += $satuanTotalHarga;
+                                                @endphp
+                                                
+                                                <p style="text-align: right">Total Harga: <b>{{ rupiah($satuanTotalHarga) }}</b></p>
+                                                <p style="text-align: right">X {{ $keranjang->jumlah }}</p>                                                
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                    @if ($data_group_seller_id[0]->barang->harga_user != null)
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label>Pilih Pengiriman</label>
-                                <select v-model="transaksi.ongkirData[{{ $iteration }}]" 
-                                        @change="fetchRajaOngkir(transaksi.ongkirData[{{ $iteration }}],{{ $iteration }}, {{ $isParcel ? 'true' : 'false' }}, {{ $isParcel ? json_encode($parcelAddress) : 'null' }})"
-                                        name="courier" id="courier" class="form-control" required>
-                                    <option value="jne">JNE</option>
-                                    <option value="pos">POS</option>
-                                    <option value="tiki">TIKI</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Pesan</label>
-                                <input type="text" v-model="transaksi.pesan[{{ $iteration }}]" value=" "
-                                    name="pesan[]" class="form-control">
-                            </div>
-                            <hr class="border border-danger border-2 opacity-50">
-                        </div>
-                        <?php $iteration++; ?>
-                    @endif
+                    </div>
                 @endforeach
+                @if ($data_group_seller_id[0]->barang->harga_user != null)
+                    <div class="col-md-12" @if($iteration !== count($data) - 1 && $isParcel) style="display: none;" @endif>
+                        <div class="form-group">
+                            <label>Pilih Pengiriman</label>
+                            <select v-model="transaksi.ongkirData[{{ $iteration }}]" 
+                                    @change="fetchRajaOngkir(transaksi.ongkirData[{{ $iteration }}],{{ $iteration }}, {{ $isParcel ? 'true' : 'false' }}, {{ $isParcel ? json_encode($parcelAddress) : 'null' }})"
+                                    name="courier" id="courier" class="form-control" required>
+                                <option value="jne">JNE</option>
+                                <option value="pos">POS</option>
+                                <option value="tiki">TIKI</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Pesan</label>
+                            <input type="text" v-model="transaksi.pesan[{{ $iteration }}]" value=" "
+                                name="pesan[]" class="form-control">
+                        </div>
+                        <hr class="border border-danger border-2 opacity-50">
+                    </div>
+                    <?php $iteration++; ?>
+                @endif
+            @endforeach
             </div>
 
             <!-- Right Column: Address, Payment Methods, and Checkout -->
@@ -216,36 +215,50 @@
                     rajaongkirData: 0,
                     totalPengiriman: 0,
                     totalPembayaran: "{{ $totalHarga }}",
-                    kodeUnik: "{{ $kodeUnik }}"
+                    kodeUnik: "{{ $kodeUnik }}",
+                    defaultOngkir: 20000
                 }
             },
             methods: {
                 async fetchRajaOngkir(value, id, isParcel, parcelAddress) {
-                    try {
-                        showLoading();
-                        var data = {
-                            courier: value,
-                            is_parcel: isParcel,
-                            parcel_address: parcelAddress
-                        };
-                        const response = await httpClient.post("{{ url('p/checkout/rajaongkir') }}", data);
-                        if (response.data.result && response.data.result.results && response.data.result.results[0].costs) {
-                            this.transaksi.ongkir[id] = response.data.result.results[0].costs[0].cost[0].value;
-                            this.transaksi.ongkirData[id] = value;
-                            this.countTotalPembayaran();
-                        } else {
-                            throw new Error("Pilihan pengiriman tidak tersedia untuk toko ini.");
-                        }
-                        hideLoading();
-                    } catch (e) {
-                        hideLoading();
-                        console.log(e);
-                        Swal.fire({
-                            title: `Pilihan Pengiriman Tidak Tersedia Pada Daerah Anda`,
-                            message: e.message
-                        });
-                    }
-                },
+    try {
+        showLoading();
+        var data = {
+            courier: value,
+            is_parcel: isParcel,
+            parcel_address: isParcel ? parcelAddress : null
+        };
+
+        // Validate parcel address if isParcel is true
+        if (isParcel && (!parcelAddress || !parcelAddress.kota || !parcelAddress.kota.kota_rajaongkir)) {
+            throw new Error("Invalid parcel address provided.");
+        }
+
+        const response = await httpClient.post("{{ url('p/checkout/rajaongkir') }}", data);
+        if (response.data.result && response.data.result.results && response.data.result.results[0].costs) {
+            this.transaksi.ongkir[id] = response.data.result.results[0].costs[0].cost[0].value;
+            this.transaksi.ongkirData[id] = value;
+            this.countTotalPembayaran();
+        } else {
+            throw new Error("Pilihan pengiriman tidak tersedia untuk toko ini.");
+        }
+        hideLoading();
+    } catch (e) {
+        hideLoading();
+        console.log(e);
+
+        // Set default ongkir instead of showing error
+        this.transaksi.ongkir[id] = this.defaultOngkir;
+        this.transaksi.ongkirData[id] = value;
+        this.countTotalPembayaran();
+
+        // Optionally notify the user
+        showToast({
+            message: `Pilihan pengiriman tidak tersedia. Menggunakan ongkir default sebesar ${this.rupiah(this.defaultOngkir)}.`,
+            type: 'warning'
+        });
+    }
+},
                 countTotalPembayaran() {
                     this.totalPengiriman = 0;
                     this.transaksi.ongkir.forEach(e => {
@@ -259,31 +272,32 @@
                     return rupiahFormat;
                 },
                 async saveCheckout() {
-                    try {
-                        showLoading();
-                        var data = {
-                            "checkout": this.checkout,
-                            "transaksi": this.transaksi,
-                            "totalPengiriman": this.totalPengiriman,
-                            "totalPembayaran": this.totalPembayaran,
-                            'kodeUnik': this.kodeUnik
-                        };
-                        const response = await httpClient.post("{{ url()->current() }}", data);
-                        console.log(response);
-                        hideLoading();
-                        showToast({
-                            message: "Data berhasil ditambahkan"
-                        });
-                        var data = response.data.result;
-                        window.location.href = data.midtrans_link;
-                    } catch (err) {
-                        hideLoading();
-                        showToast({
-                            message: err.message,
-                            type: 'error'
-                        });
-                    }
-                }
+    try {
+        showLoading();
+        var data = {
+            "checkout": this.checkout,
+            "transaksi": this.transaksi,
+            "totalPengiriman": this.totalPengiriman,
+            "totalPembayaran": this.totalPembayaran,
+            'kodeUnik': this.kodeUnik
+        };
+        // Use explicit route instead of url()->current()
+        const response = await httpClient.post("{{ url('p/checkout') }}", data);
+        console.log(response);
+        hideLoading();
+        showToast({
+            message: "Data berhasil ditambahkan"
+        });
+        var data = response.data.result;
+        window.location.href = data.midtrans_link;
+    } catch (err) {
+        hideLoading();
+        showToast({
+            message: err.message,
+            type: 'error'
+        });
+    }
+}
             }
         }).mount("#container");
     </script>

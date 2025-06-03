@@ -82,7 +82,16 @@
                                     required>
                                 </vue-multiselect>
                             </div>
-                            
+                            <div class="form-group">
+                                <label class="form-control-label">Produsen</label>
+                                <vue-multiselect 
+                                    v-model="barang.produsen" 
+                                    :options="produsen_list"
+                                    placeholder="Pilih Produsen"
+                                    :allow-empty="true"
+                                    :searchable="true">
+                                </vue-multiselect>
+                            </div>
 
                             <div class="form-group">
                                 <label class="form-control-label">Keterangan</label>
@@ -134,10 +143,7 @@
                                         <input v-model="barang.stock_global" class="form-control" type="number" required>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-control-label">Expired</label>
-                                    <input v-model="barang.expired" class="form-control" type="date">
-                                </div>
+                                
                             </div>
 
                             
@@ -210,7 +216,10 @@
                                     required>
                                 </vue-multiselect>
                             </div>
-
+                            <div class="form-group">
+                                <label class="form-control-label">Expired</label>
+                                <input v-model="barang.expired" class="form-control" type="date">
+                            </div>
                             <div class="form-group">
                                 <label class="form-control-label">Info Penting</label>
                                 <textarea class="form-control" v-model="barang.info_penting" rows="3" placeholder="Informasi penting tentang produk"></textarea>
@@ -277,6 +286,7 @@
                                     </div>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
 
@@ -304,6 +314,7 @@
                         created_by_user_id: {{ $specified_user_id }},
                         @endif
                     },
+                    produsen_list: [],
                     barang_list: [],
                     satuan_list: [],
                     
@@ -346,6 +357,7 @@
                 }
             },
             created() {
+                this.fetchProdusenList(),
                 this.fetchBarangList(),
                 this.fetchSatuanList()
             },
@@ -362,6 +374,18 @@
                     },
                     deep: true,
                 },
+                // "barang.produsen": {
+                //     handler: function(value) {
+                //         let barang_data = this.produsen_list.find(barang_item => barang_item.value == value)
+                //         this.path = `${barang_data.label.toLowerCase().split(" ").join("-")}`
+                //         if (this.name != null && this.name != "") {
+                //             this.path += `/${this.name.toLowerCase().split(" ").join("-")}`
+                //         }
+                //         this.barang.produsen = value
+                //         console.log(this.barang)
+                //     },
+                //     deep: true,
+                // },
                 "barang.satuan_id": {
                     handler: function(value) {
                         let satuan_data = this.satuan_list.find(satuan_item => satuan_item.value == value)
@@ -391,6 +415,18 @@
                             return {
                                 value: el.id,
                                 label: el.nama_barang
+                            }
+                        })
+                    ]
+                },
+                async fetchProdusenList() {
+                    const response = await httpClient.get("{!! url('data-barang/produsenall') !!}")
+                    this.produsen_list = [
+                        ...this.produsen_list,
+                        ...response.data.result.map(el => {
+                            return {
+                                value: el.produsen,
+                                label: el.produsen
                             }
                         })
                     ]
