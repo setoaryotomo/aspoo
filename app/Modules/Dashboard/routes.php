@@ -8,4 +8,6 @@ Route::prefix('/dashboard')->group(function() {
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('/komposisi',[DashboardController::class,'cekKomposisi']);  
     Route::get('/transaction-data', [DashboardController::class, 'getTransactionData']);
+    Route::get('/laporan-penjualan', [DashboardController::class, 'laporanPenjualan'])->name('laporan.penjualan');
+    Route::get('/laporan-penjualan-admin', [DashboardController::class, 'laporanPenjualanAdmin'])->name('laporan.penjualan.admin');
 });

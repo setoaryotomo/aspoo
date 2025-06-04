@@ -21,6 +21,9 @@
                 <div>
                     <h5 class="text-white pb-2 fw-bold">Dashboard</h5>
                     <h5 class="text-white op-7 mb-2">SmartAspoo Admin Panel</h5>
+                    {{-- <a href="{{ url('dashboard/laporan-penjualan-admin') }}" class="btn btn-sm ml-2" style="background-color: lime;text-color:white">
+                    Laporan
+                    </a> --}}
                 </div>
             </div>
         </div>
@@ -46,8 +49,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-12 p-0">
+                        <div class="card" style="background-color: #E1EFFA; color: #3621c2;">
+                            <div class="card-header align-items-center">
+                                <h5 class="card-text text-center"><a href="{{ url('dashboard/laporan-penjualan-admin') }}">Laporan Penjualan <i class="fa-solid fa-arrow-up-right-from-square"></i></a></h5>
+                            </div>
+                        </div>
+                    </div>
                     <!-- Tabel Data Barang -->
-                    <div class="col-md-12 mt-4" mb-4>
+                    {{-- <div class="col-md-12 mt-4" mb-4>
                         <div class="table-responsive" style="background-color: #E1EFFA; color: #3621c2;">
                             <div class="card-header align-items-center">
                                 <div class="card-head-row align-items-center">
@@ -92,7 +102,7 @@
                             </div>
                         </div>
 
-                    </div>
+                    </div> --}}
 
                 </div>
             </div>

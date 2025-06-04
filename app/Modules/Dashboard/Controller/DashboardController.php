@@ -192,4 +192,76 @@ class DashboardController extends Controller
         return JsonResponseHandler::setResult($listData)->send();
     }
     
+    public function laporanPenjualan(Request $request)
+    {
+        $user = Auth::user();
+        $userid = $user->id;
+        
+        // Filter tanggal
+        $startDate = $request->input('tanggal_mulai', date('Y-m-01'));
+        $endDate = $request->input('tanggal_selesai', date('Y-m-d'));
+        $status = $request->input('status', 'semua');
+        
+        // Query transaksi
+        $transaksi = TransaksiBarang::whereBetween('created_at', [$startDate, $endDate]);
+            
+        // if ($status != 'semua') {
+        //     $transaksi->where('status', $status);
+        // }
+        
+        $transaksi = $transaksi->orderBy('created_at', 'desc')->get();
+            
+        $totalPenjualan = $transaksi->sum('total_biaya');
+        
+        return view('Dashboard::laporan_penjualan', [
+            'transaksi' => $transaksi,
+            'totalPenjualan' => $totalPenjualan,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'status' => $status
+        ]);
+    }
+
+    public function laporanPenjualanAdmin(Request $request)
+{
+    // Filter tanggal
+    $startDate = $request->input('tanggal_mulai', date('Y-m-01'));
+    $endDate = $request->input('tanggal_selesai', date('Y-m-d'));
+    $status = $request->input('status', 'semua');
+    $tokoId = $request->input('toko_id', 'semua');
+    
+    // Query transaksi
+    $transaksi = TransaksiBarang::with(['pembeli', 'penjual'])
+        ->whereBetween('created_at', [$startDate, $endDate]);
+        
+    // Filter status
+    if ($status != 'semua') {
+        $transaksi->where('status', $status);
+    }
+    
+    // Filter toko
+    if ($tokoId != 'semua') {
+        $transaksi->where('toko_id', $tokoId);
+    }
+    
+    $transaksi = $transaksi->orderBy('created_at', 'desc')
+        ->get(); // Menggunakan get() bukan paginate()
+        
+    $totalPenjualan = $transaksi->sum('total_biaya');
+    
+    // Daftar toko untuk dropdown filter
+    $tokos = TokoUser::all();
+    
+    return view('Dashboard::laporan_penjualan_admin', [
+        'transaksi' => $transaksi,
+        'totalPenjualan' => $totalPenjualan,
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+        'status' => $status,
+        'tokoId' => $tokoId,
+        'tokos' => $tokos,
+        'totalTransaksi' => $transaksi->count() // Menambahkan total transaksi
+    ]);
+}
+
 }
