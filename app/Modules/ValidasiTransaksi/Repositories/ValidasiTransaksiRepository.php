@@ -33,7 +33,7 @@ class ValidasiTransaksiRepository
             });
         }
 
-        $data = $query->paginate($per_page);
+        $data = $query->orderByDesc('created_at')->paginate($per_page);
         return $data;
     }
     public static function get($validasi_transaksi_id)

@@ -218,6 +218,12 @@ export default {
             this.total = result.total;
             this.isContentLoading = false;
         },
+        async deleteWithPost(url, data = {}) {
+    return await httpClient.post(url, {
+        ...data,
+        _method: 'DELETE'
+    });
+},
         async deleteData(id) {
             Swal.fire({
                 title: "Apakah anda yakin ingin menghapus data ini?",
@@ -226,7 +232,7 @@ export default {
                 denyButtonText: `Tidak`,
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    await httpClient.delete(`${this.url}/${id}`);
+                    await this.deleteWithPost(`${this.url}/${id}`);
                     Swal.fire("Data berhasil dihapus!", "", "");
                     this.fetchData();
                 } else if (result.isDenied) {

@@ -135,7 +135,7 @@
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
                             <div class="collection-item-v4 hover-img">
-                                <a href="product-detail.html" class="collection-inner">
+                                <a href="{{ url('/p/listbarang') }}" class="collection-inner">
                                     <div class="collection-image radius-10 img-style">
                                         <img class="lazyload" data-src="https://www.themesflat.co/html/ecomus/images/collections/banner-collection-grocery.jpg" src="https://www.themesflat.co/html/ecomus/images/collections/banner-collection-grocery.jpg" alt="collection-img">
                                     </div>
@@ -154,7 +154,7 @@
                         </div>
                         <div class="swiper-slide">
                             <div class="collection-item-v4 hover-img">
-                                <a href="product-detail.html" class="collection-inner">
+                                <a href="{{ url('/p/listbarang') }}" class="collection-inner">
                                     <div class="collection-image radius-10 img-style">
                                         <img class="lazyload" data-src="https://www.themesflat.co/html/ecomus/images/collections/banner-collection-grocery2.jpg" src="https://www.themesflat.co/html/ecomus/images/collections/banner-collection-grocery2.jpg" alt="collection-img">
                                     </div>

@@ -71,7 +71,7 @@
                                 </vue-multiselect>
                             </div>
                             
-                            <div class="form-group" style="">
+                            <div class="form-group">
                                 <label class="form-control-label">Jenis Kemasan *</label>
                                 <vue-multiselect 
                                     v-model="barang.jenis_kemasan" 
@@ -101,7 +101,7 @@
                             
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6" style="display: none">
                                     <div class="form-group">
                                         <label class="form-control-label">Harga Supplier *</label>
                                         <div class="input-group">
@@ -123,10 +123,21 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Berat *</label>
+                                        <div class="input-group">
+                                            <input v-model="barang.berat" class="form-control" type="number" required>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">gram</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4" style="display: none">
                                     <div class="form-group">
                                         <label class="form-control-label">Diskon</label>
                                         <div class="input-group">
@@ -143,7 +154,17 @@
                                         <input v-model="barang.stock_global" class="form-control" type="number" required>
                                     </div>
                                 </div>
-                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Available</label>
+                                        <vue-multiselect 
+                                            v-model="barang.available" 
+                                            :options="availableOptions"
+                                            :allow-empty="false"
+                                            required>
+                                        </vue-multiselect>
+                                    </div>
+                                </div>
                             </div>
 
                             
@@ -216,7 +237,7 @@
                                     required>
                                 </vue-multiselect>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="margin-bottom: 13px">
                                 <label class="form-control-label">Expired</label>
                                 <input v-model="barang.expired" class="form-control" type="date">
                             </div>
@@ -226,18 +247,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label">Berat *</label>
-                                        <div class="input-group">
-                                            <input v-model="barang.berat" class="form-control" type="number" required>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text">gram</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6" style="display: none">
                                     <div class="form-group">
                                         <label class="form-control-label">Satuan *</label>
                                         <vue-multiselect 
@@ -249,17 +259,12 @@
                                         </vue-multiselect>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="form-control-label">Panjang</label>
                                         <div class="input-group">
                                             <input v-model="barang.panjang" class="form-control" type="number">
-                                            {{-- <div class="input-group-append">
-                                                <span class="input-group-text">cm</span>
-                                            </div> --}}
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -268,9 +273,7 @@
                                         <label class="form-control-label">Lebar</label>
                                         <div class="input-group">
                                             <input v-model="barang.lebar" class="form-control" type="number">
-                                            {{-- <div class="input-group-append">
-                                                <span class="input-group-text">cm</span>
-                                            </div> --}}
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -279,9 +282,37 @@
                                         <label class="form-control-label">Tinggi</label>
                                         <div class="input-group">
                                             <input v-model="barang.tinggi" class="form-control" type="number">
-                                            {{-- <div class="input-group-append">
-                                                <span class="input-group-text">cm</span>
-                                            </div> --}}
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" style="display: none">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Panjang</label>
+                                        <div class="input-group">
+                                            <input v-model="barang.panjang" class="form-control" type="number">
+                                           
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Lebar</label>
+                                        <div class="input-group">
+                                            <input v-model="barang.lebar" class="form-control" type="number">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Tinggi</label>
+                                        <div class="input-group">
+                                            <input v-model="barang.tinggi" class="form-control" type="number">
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -310,6 +341,9 @@
                     barang: {
                         satuan_id: null,
                         berat: null,
+                        available: 'Yes',
+                        diskon: 0,
+                        harga_supplier: 0,
                         @if(isset($specified_user_id))
                         created_by_user_id: {{ $specified_user_id }},
                         @endif
@@ -344,6 +378,8 @@
                     // basahKeringOptions: ['Basah', 'Kering', 'Semi Basah', 'Cair'],
                     basahKeringOptions: ['Basah', 'Kering', 'Semi Basah', 'Cair','Serbuk'],
                     bahanKemasanOptions: ['kardus','Karton','kertas','Metalized','Plastik'],
+
+                    availableOptions: ['Yes','No'],
                     
                     path: null,
                     name: null,
@@ -359,7 +395,13 @@
             created() {
                 this.fetchProdusenList(),
                 this.fetchBarangList(),
-                this.fetchSatuanList()
+                this.fetchSatuanList().then(() => {
+                // Set default satuan to "Gram" after fetching satuan_list
+                const gramOption = this.satuan_list.find(satuan => satuan.label.toLowerCase() === 'gram');
+                if (gramOption) {
+                    this.barang.satuan_id = gramOption.value;
+                }
+            });
             },
             watch: {
                 "barang.scm_barang_id": {

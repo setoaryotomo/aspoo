@@ -21,7 +21,7 @@ class DataBarang extends Model
     use SoftDeletes;
     protected $table = 'barang';
     protected $guarded = [];
-    protected $fillable = ['nama_barang','kategori_umum','kategori_nama','kategori_produk','bahan_dasar','kekhasan','basah_kering','rasa','jenis_kemasan','komposisi','harga_supplier','harga_umum','diskon','berat','keterangan','info_penting','stock_global','created_by_user_id','satuan_id','thumbnail','produsen','expired','dimensi','scm_barang_id','panjang','lebar','tinggi'];
+    protected $fillable = ['nama_barang','kategori_umum','kategori_nama','kategori_produk','bahan_dasar','kekhasan','basah_kering','rasa','jenis_kemasan','bahan_kemasan','komposisi','harga_supplier','harga_umum','diskon','berat','keterangan','info_penting','stock_global','created_by_user_id','satuan_id','thumbnail','produsen','expired','available','dimensi','scm_barang_id','panjang','lebar','tinggi'];
     protected $appends = ['harga_user','harga_user_asli','thumbnail_readable'];
 
     // public function getThumbnailReadableAttribute(){

@@ -1,77 +1,99 @@
 @extends('portal_layout.templates')
 @section('content')
-    <style>
-        .content {
-            margin-bottom: 14rem;
-        }
-        .right-column {
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-            padding-left: 20px;
-            padding-top: 80px;
-            /* border-left: 1px solid #ddd; */
-        }
-        .payment-box {
-            margin-top: 20px;
-        }
-        .btn-checkout {
-            width: 100%;
-            background-color: #28a745;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        .btn-checkout:hover {
-            background-color: #218838;
-        }
-        .total-section {
-            margin-bottom: 10px;
-        }
-        .order-group {
-            margin-bottom: 30px;
-        }
-        .order-group-title {
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-            margin-bottom: 15px;
-        }
-        .parcel-group {
-            margin-bottom: 25px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .parcel-group-header {
-            padding: 12px 15px;
-            background-color: #f1f3f4;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .parcel-group-title {
-            font-weight: 600;
-            color: #495057;
-            margin: 0;
-        }
-        .parcel-select-all {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: #6c757d;
-        }
-        .parcel-table-container {
-            background-color: white;
-        }
-        .parcel-table-container table {
-            margin-bottom: 0;
-        }
-    </style>
+<style>
+    /* Add this to your existing styles */
+    .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: contain; /* Ensures the image maintains aspect ratio */
+        border: 1px solid #eee;
+        padding: 5px;
+        background: white;
+        border-radius: 4px;
+    }
+    
+    /* Keep your existing styles */
+    .content {
+        margin-bottom: 14rem;
+    }
+    .right-column {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+        padding-left: 20px;
+        padding-top: 80px;
+        /* border-left: 1px solid #ddd; */
+    }
+    .payment-box {
+        margin-top: 20px;
+    }
+    .btn-checkout {
+        width: 100%;
+        background-color: #28a745;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    .btn-checkout:hover {
+        background-color: #218838;
+    }
+    .total-section {
+        margin-bottom: 10px;
+    }
+    .order-group {
+        margin-bottom: 30px;
+    }
+    .order-group-title {
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+        margin-bottom: 15px;
+    }
+    .parcel-group {
+        margin-bottom: 25px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .parcel-group-header {
+        padding: 12px 15px;
+        background-color: #f1f3f4;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .parcel-group-title {
+        font-weight: 600;
+        color: #495057;
+        margin: 0;
+    }
+    .parcel-select-all {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #6c757d;
+    }
+    .parcel-table-container {
+        background-color: white;
+    }
+    .parcel-table-container table {
+        margin-bottom: 0;
+    }
+    .parcel-info-row {
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .parcel-actions {
+        padding: 10px 15px;
+        text-align: right;
+        background-color: #f8f9fa;
+    }
+</style>
 
 <body class="preload-wrapper">
     <div class="preload preload-container">
@@ -144,8 +166,21 @@
                                         <input type="checkbox" 
                                                :id="'select-parcel-' + parcelId"
                                                v-model="parcelSelectAll[parcelId]" 
-                                               @change="toggleSelectParcelGroup(parcelId)" style="display: none">
-                                        <label :for="'select-parcel-' + parcelId" class="mb-0" sty>Pilih Semua</label>
+                                               style="display: none"
+                                               @change="toggleSelectParcelGroup(parcelId)">
+                                        <label :for="'select-parcel-' + parcelId" class="mb-0">Pilih Semua</label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Parcel info row (quantity and delete button) -->
+                                <div class="parcel-info-row">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <strong>Jumlah:</strong> @{{ parcelItems[0].jumlah }} <!-- Taking quantity from first item -->
+                                        </div>
+                                        <div class="col-md-6 text-right">
+                                            <button @click="hapusParcel(parcelItems)" class="btn btn-danger btn-sm">Hapus Parcel</button>
+                                        </div>
                                     </div>
                                 </div>
                                 
@@ -155,16 +190,15 @@
                                             <thead>
                                                 <tr>
                                                     <th scope="col">
-                                                        <input type="checkbox" 
-                                                               v-model="parcelSelectAll[parcelId]" 
+                                                        <input type="checkbox"
+                                                               v-model="parcelSelectAll[parcelId]"
+                                                               style="display: none" 
                                                                @change="toggleSelectParcelGroup(parcelId)">
                                                     </th>
                                                     <th scope="col">Foto Produk</th>
                                                     <th scope="col">Nama Produk</th>
                                                     <th scope="col">Harga</th>
-                                                    <th scope="col">Jumlah</th>
-                                                    <th scope="col">Total</th>
-                                                    <th scope="col">Action</th>
+                                                    {{-- <th scope="col">Subtotal</th> --}}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -181,12 +215,7 @@
                                                     </td>
                                                     <td>@{{ keranjang.barang.nama_barang }}</td>
                                                     <td class="product-price">@{{ rupiah(keranjang.barang.harga_user) }}</td>
-                                                    <td>
-                                                        <input class="form-control-sm form-control" type="number" name="quantity"
-                                                            value="1" min="1" v-model="keranjang.jumlah" @change="updateCartItem(keranjang)">
-                                                    </td>
-                                                    <td><span class="total-sar">@{{ rupiah(keranjang.barang.harga_user * keranjang.jumlah) }}</span></td>
-                                                    <td><button @click="hapusKeranjang(keranjang.id)" class="btn btn-danger">Hapus</button></td>
+                                                    {{-- <td>@{{ rupiah(keranjang.barang.harga_user * keranjang.jumlah) }}</td> --}}
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -309,6 +338,59 @@
                 }
             },
             methods: {
+                async deleteWithPost(url, data = {}) {
+                    return await httpClient.post(url, {
+                        ...data,
+                        _method: 'DELETE'
+                    });
+                },
+                async updateWithPost(url, data = {}) {
+                        return await httpClient.post(url, {
+                            ...data,
+                            _method: 'PATCH'
+                        });
+                    },
+                async requestWithPost(url, data = {}, method = 'POST') {
+                    const requestData = method === 'POST' ? data : {
+                        ...data,
+                        _method: method
+                    };
+                    
+                    return await httpClient.post(url, requestData);
+                },
+                async hapusParcel(parcelItems) {
+                    try {
+                        showLoading();
+                        
+                        // Delete each item in the parcel group individually
+                        const deletePromises = parcelItems.map(item => 
+                            this.deleteWithPost(`{{ url('') }}/p/keranjang/${item.id}`)
+                        );
+                        
+                        // Wait for all deletions to complete
+                        await Promise.all(deletePromises);
+                        
+                        // Refresh data after all items are deleted
+                        await this.fetchData();
+                        await this.fetchUserRole();
+                        
+                        // Clear session to ensure checkout data is refreshed
+                        await httpClient.post('{{ url('p/keranjang') }}', { 
+                            data: JSON.stringify({ data_keranjang: [] }) 
+                        });
+                        
+                        hideLoading();
+                        showToast({
+                            message: "Parcel berhasil dihapus!"
+                        });
+                    } catch (err) {
+                        hideLoading();
+                        showToast({
+                            message: err.message || "Gagal menghapus parcel",
+                            type: 'error'
+                        });
+                    }
+                },
                 async barcodeKeyUp() {
                     try {
                         keranjangController.abort();
@@ -332,9 +414,9 @@
                 async updateCartItem(keranjang) {
                     try {
                         showLoading();
-                        await httpClient.patch(`{{ url('') }}/p/keranjang/${keranjang.id}`, {
-                            jumlah: keranjang.jumlah
-                        });
+                        await this.updateWithPost(`{{ url('') }}/p/keranjang/${keranjang.id}`, {
+                             jumlah: keranjang.jumlah
+                         });
                         hideLoading();
                     } catch (err) {
                         hideLoading();
@@ -345,44 +427,44 @@
                     }
                 },
                 async checkout() {
-    try {
-        showLoading();
-        // Filter selected items from both regular and parcel orders
-        const selectedKeranjang = this.keranjangList.filter(item => item.selected);
-        if (selectedKeranjang.length === 0) {
-            hideLoading();
-            showToast({
-                message: "Pilih setidaknya satu item untuk checkout!",
-                type: 'error'
-            });
-            return;
-        }
+                    try {
+                        showLoading();
+                        // Filter selected items from both regular and parcel orders
+                        const selectedKeranjang = this.keranjangList.filter(item => item.selected);
+                        if (selectedKeranjang.length === 0) {
+                            hideLoading();
+                            showToast({
+                                message: "Pilih setidaknya satu item untuk checkout!",
+                                type: 'error'
+                            });
+                            return;
+                        }
 
-        // Prepare data for checkout
-        const all = {
-            data_keranjang: selectedKeranjang,
-            keranjang_total: this.keranjangTotal
-        };
-        const data = {
-            data: JSON.stringify(all)
-        };
+                        // Prepare data for checkout
+                        const all = {
+                            data_keranjang: selectedKeranjang,
+                            keranjang_total: this.keranjangTotal
+                        };
+                        const data = {
+                            data: JSON.stringify(all)
+                        };
 
-        // Send selected items to backend
-        const response = await httpClient.post(`{{ url('') }}/p/keranjang`, data);
+                        // Send selected items to backend
+                        const response = await httpClient.post(`{{ url('') }}/p/keranjang`, data);
 
-        hideLoading();
-        showToast({
-            message: "Berhasil checkout!"
-        });
-        window.location.href = "{{ url('') }}/p/checkout";
-    } catch (err) {
-        hideLoading();
-        showToast({
-            message: err.message,
-            type: 'error'
-        });
-    }
-},
+                        hideLoading();
+                        showToast({
+                            message: "Berhasil checkout!"
+                        });
+                        window.location.href = "{{ url('') }}/p/checkout";
+                    } catch (err) {
+                        hideLoading();
+                        showToast({
+                            message: err.message,
+                            type: 'error'
+                        });
+                    }
+                },
                 totalKeranjang() {
                     this.keranjangTotal = 0;
                     this.keranjangList.forEach(keranjang => {
@@ -396,38 +478,39 @@
                     const rupiahFormat = "Rp." + amount.toLocaleString("id-ID");
                     return rupiahFormat;
                 },
+                
                 async hapusKeranjang(id) {
-    try {
-        showLoading();
-        const response = await httpClient.delete(`{{ url('') }}/p/keranjang/${id}`);
-        await this.fetchData();
-        await this.fetchUserRole();
-        // Clear session to ensure checkout data is refreshed
-        await httpClient.post('{{ url('p/keranjang') }}', { data: JSON.stringify({ data_keranjang: [] }) });
-        hideLoading();
-        showToast({
-            message: "Data berhasil dihapus!"
-        });
-    } catch (err) {
-        hideLoading();
-        showToast({
-            message: err.message,
-            type: 'error'
-        });
-    }
-},
+                    try {
+                        showLoading();
+                        const response = await this.deleteWithPost(`{{ url('') }}/p/keranjang/${id}`);
+                        await this.fetchData();
+                        await this.fetchUserRole();
+                        // Clear session to ensure checkout data is refreshed
+                        await httpClient.post('{{ url('p/keranjang') }}', { data: JSON.stringify({ data_keranjang: [] }) });
+                        hideLoading();
+                        showToast({
+                            message: "Data berhasil dihapus!"
+                        });
+                    } catch (err) {
+                        hideLoading();
+                        showToast({
+                            message: err.message,
+                            type: 'error'
+                        });
+                    }
+                },
                 async fetchData() {
-    const response = await httpClient.post('{{ url('') }}/p/keranjang/data');
-    this.keranjangList = response.data.result.map(item => ({
-        ...item,
-        selected: false // Initialize selected state
-    }));
-    this.keranjangTotal = 0;
-    console.log(this.keranjangList);
+                    const response = await httpClient.post('{{ url('') }}/p/keranjang/data');
+                    this.keranjangList = response.data.result.map(item => ({
+                        ...item,
+                        selected: false // Initialize selected state
+                    }));
+                    this.keranjangTotal = 0;
+                    console.log(this.keranjangList);
 
-    // Initialize parcel select all states
-    this.initializeParcelSelectAll();
-},
+                    // Initialize parcel select all states
+                    this.initializeParcelSelectAll();
+                },
                 async fetchUserRole() {
                     const response = await httpClient.post('{{ url('') }}/p/user-role');
                     this.userRole = response.data.result;
@@ -453,21 +536,21 @@
                     this.totalKeranjang();
                 },
                 toggleSelectParcelGroup(parcelId) {
-    const parcelItems = this.groupedParcelOrders[parcelId];
-    const selectAll = this.parcelSelectAll[parcelId];
+                    const parcelItems = this.groupedParcelOrders[parcelId];
+                    const selectAll = this.parcelSelectAll[parcelId];
 
-    parcelItems.forEach(item => {
-        item.selected = selectAll;
-    });
-    this.totalKeranjang();
-},
-updateParcelGroupSelection(parcelId) {
-    const parcelItems = this.groupedParcelOrders[parcelId];
-    const allSelected = parcelItems.every(item => item.selected);
+                    parcelItems.forEach(item => {
+                        item.selected = selectAll;
+                    });
+                    this.totalKeranjang();
+                },
+                updateParcelGroupSelection(parcelId) {
+                    const parcelItems = this.groupedParcelOrders[parcelId];
+                    const allSelected = parcelItems.every(item => item.selected);
 
-    this.parcelSelectAll[parcelId] = allSelected;
-    this.totalKeranjang();
-},
+                    this.parcelSelectAll[parcelId] = allSelected;
+                    this.totalKeranjang();
+                },
                 toggleSelectAllParcel() {
                     this.parcelOrders.forEach(item => {
                         item.selected = this.selectAllParcel;

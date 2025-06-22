@@ -4,7 +4,7 @@
     .applied-filter {
         background: #f5f5f5;
         padding: 5px 10px;
-        border-radius: 4px;
+        border-radius: 20px;
         display: inline-flex;
         align-items: center;
         margin-right: 10px;
@@ -46,7 +46,7 @@
 .pagination .page-link {
     font-size: 14px;
     padding: 8px 12px;
-    border-radius: 4px;
+    border-radius: 20px;
     color: #333;
     border: 1px solid #ddd;
     transition: all 0.3s ease;
@@ -103,6 +103,69 @@
         padding: 5px 8px;
     }
 }
+
+  /* CSS untuk search box */
+  .tf-form-search {
+        width: 100%;
+    }
+    
+    .tf-form-search .search-box {
+        display: flex;
+        width: 100%;
+    }
+    
+    .tf-form-search input[type="search"] {
+        flex-grow: 1;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        font-size: 14px;
+    }
+    
+    .tf-form-search .tf-btn {
+        margin-left: 10px;
+        padding: 10px 15px;
+        background-color: #606C5D;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .tf-shop-control.grid-3 {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .tf-control-filter {
+            order: 1;
+        }
+        
+        .tf-form-search {
+            order: 2;
+            width: 100%;
+        }
+        
+        .tf-control-sorting {
+            order: 3;
+            width: 100%;
+            justify-content: flex-start !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .tf-form-search input[type="search"] {
+            width: 80%;
+        }
+        
+        .tf-form-search .tf-btn {
+            width: 20%;
+        }
+    }
+
     </style>
 <body class="preload-wrapper">
 {{-- <div class="preload preload-container">
@@ -113,19 +176,19 @@
 <section class="flat-spacing-1">
     <div class="container">
         <div class="tf-shop-control grid-3 align-items-center">
-            <div class="tf-control-filter" style="display: none">
-                <a href="#filterShop" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="tf-btn-filter"><span class="icon icon-filter"></span><span class="text">Filter</span></a>
+            <div class="tf-control-filter" style="">
+                <a href="#filterShop" style="display: none" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="tf-btn-filter"><span class="icon icon-filter"></span><span class="text">Filter</span></a>
             </div>
-            <ul class="tf-control-layout d-flex justify-content-center">
-                {{-- <li class="tf-view-layout-switch sw-layout-list list-layout" data-value-layout="list">
+            <ul class="tf-control-layout d-flex justify-content-center" style="display:none">
+                <li class="tf-view-layout-switch sw-layout-list list-layout" style="display:none" data-value-layout="list">
                     <div class="item"><span class="icon icon-list"></span></div>
                 </li>
-                <li class="tf-view-layout-switch sw-layout-2" data-value-layout="tf-col-2">
+                <li class="tf-view-layout-switch sw-layout-2" style="display:none" data-value-layout="tf-col-2">
                     <div class="item"><span class="icon icon-grid-2"></span></div>
                 </li>
-                <li class="tf-view-layout-switch sw-layout-3" data-value-layout="tf-col-3">
+                <li class="tf-view-layout-switch sw-layout-3" style="display:none" data-value-layout="tf-col-3">
                     <div class="item"><span class="icon icon-grid-3"></span></div>
-                </li> --}}
+                </li>
                 <li class="tf-view-layout-switch sw-layout-4 active" data-value-layout="tf-col-4" style="display: none">
                     <div class="item"><span class="icon icon-grid-4"></span></div>
                 </li>
@@ -164,6 +227,13 @@
                     </div>
                 </div>
             </div> --}}
+            <div class="tf-form-search justify-content-end" style="">
+                <form action="{{ url('/p/cari') }}" role="search" method="GET" class="search-box">
+                    <input type="search" name="q" aria-label="Search" placeholder="Search...">
+                    <input type="hidden" name="tipe" value="barang">
+                    <button type="submit" class="tf-btn" name="cari"><i class="icon icon-search"></i></button>
+                </form>
+            </div>
         </div>
         <div class="tf-row-flex">
             <aside class="tf-shop-sidebar wrap-sidebar-mobile">
@@ -300,7 +370,7 @@
                             </div> --}}
                         </div>
                         <div class="card-product-info" style="padding: 7px">
-                            <a href="product-detail.html" class="title link">{{ $barang->nama_barang }}</a>
+                            <a href="{{ url('/p/barang/' . $barang->id) }}" class="title link">{{ $barang->nama_barang }}</a>
                             <span class="price current-price">Rp.
                                 {{ number_format($barang->harga_user, 2) }}</span>
                            

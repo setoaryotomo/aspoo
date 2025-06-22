@@ -112,7 +112,7 @@ public function barang_datatable(Request $request, $id)
         });
     }
 
-    $data = $query->paginate($per_page);
+    $data = $query->orderByDesc('created_at')->paginate($per_page);
     return JsonResponseHandler::setResult($data)->send();
 }
 

@@ -148,7 +148,7 @@ class ValidasiTransaksiController extends Controller
             
             $result = [
                 'status' => 200,
-                'message' => 'Data berhasil disimpan dan notifikasi terkirim',
+                'message' => 'Data berhasil disimpan',
                 'body' => $datas
             ];
         } catch (Exception $e) {

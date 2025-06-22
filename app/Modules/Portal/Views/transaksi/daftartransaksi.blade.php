@@ -763,36 +763,204 @@
         }
     }
 
-    .review-section {
-    margin-top: 1rem;
-    padding: 1rem;
+    /* Compact Review Section Styles */
+.review-section {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
     background-color: var(--bg-light);
     border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
 }
 
 .review-title {
     font-weight: 600;
-    margin-bottom: 1rem;
-    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-dark);
 }
 
+.review-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.review-form > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.review-form label {
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.star-rating {
+    display: flex;
+    gap: 0.125rem;
+    align-items: center;
+}
+
+.star-rating i {
+    color: #ddd;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.star-rating i:hover, 
+.star-rating i.active {
+    color: #FFD700;
+    transform: scale(1.05);
+}
+
+.review-form .btn {
+    align-self: flex-start;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* Comment Form Styles */
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+    display: block;
 }
 
 .form-control {
     width: 100%;
-    padding: 0.5rem;
+    padding: 0.4rem;
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
+    border-radius: 6px;
     resize: vertical;
+    font-size: 0.8rem;
+    min-height: 60px;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(251, 217, 192, 0.2);
 }
 
 .text-muted {
     color: var(--text-muted);
-    font-size: 0.75rem;
-    display: block;
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
     text-align: right;
+}
+
+/* Review Display Styles */
+.review-display {
+    margin-top: 0;
+    font-size: 0.8rem;
+}
+
+.review-display p {
+    margin-bottom: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.review-display p:last-child {
+    margin-bottom: 0;
+}
+
+.review-display strong {
+    min-width: 80px;
+    font-weight: 600;
+}
+
+.review-display .fas.fa-star {
+    font-size: 0.875rem;
+    margin-right: 0.125rem;
+}
+
+/* Compact layout for review sections */
+.review-sections-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+/* Two-column layout for larger screens */
+@media (min-width: 768px) {
+    .review-sections-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .review-section {
+        margin-top: 0;
+    }
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+    .review-section {
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .review-title {
+        font-size: 0.85rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .review-form {
+        gap: 0.4rem;
+    }
+    
+    .review-form label {
+        font-size: 0.75rem;
+    }
+    
+    .star-rating i {
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        padding: 0.35rem;
+        font-size: 0.75rem;
+        min-height: 50px;
+    }
+    
+    .review-form .btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+    
+    .text-muted {
+        font-size: 0.65rem;
+    }
+    
+    .review-display {
+        font-size: 0.75rem;
+    }
+    
+    .review-display p {
+        margin-bottom: 0.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .review-display strong {
+        min-width: auto;
+    }
 }
 </style>
 
@@ -860,7 +1028,7 @@
                                     {{-- <span class="qty">{{ $item['jumlah'] }} x Rp {{ number_format($item['harga'], 0, ',', '.') }}</span> --}}
                                 </div>
                                 
-                                @if($item['status'] == 3 && $master['status'] == 3)
+                                {{-- @if($item['status'] == 3 && $master['status'] == 3)
                                     <div class="action-buttons">
                                         <button type="button" class="btn btn-success ubah-status" 
                                                 data-transaksi-id="{{ $item['transaksiId'] }}">
@@ -871,7 +1039,7 @@
                                             <i class="bi bi-x-circle"></i> Tidak
                                         </button>
                                     </div>
-                                @endif  
+                                @endif   --}}
                             </div>
                         @endforeach
                     </div>
@@ -893,7 +1061,7 @@
                                         {{-- <span class="qty">{{ $item['jumlah'] }} x Rp {{ number_format($item['harga'], 0, ',', '.') }}</span> --}}
                                     </div>
                                     
-                                    @if($item['status'] == 3 && $master['status'] == 3)
+                                    {{-- @if($item['status'] == 3 && $master['status'] == 3)
                                         <div class="action-buttons">
                                             <button type="button" class="btn btn-success ubah-status" 
                                                     data-transaksi-id="{{ $item['transaksiId'] }}">
@@ -904,24 +1072,38 @@
                                                 <i class="bi bi-x-circle"></i> Tidak
                                             </button>
                                         </div>
-                                    @endif  
+                                    @endif   --}}
                                 </div>
                             @endforeach
                         </div>
 
-                    @if($master['parcelId'])
-                        <div class="review-section">
-                            @if($master['status'] == 4) {{-- Only show review form if transaction is completed --}}
-                                @php
-                                    $parcel = \App\Modules\permintaanparcel\Models\permintaanparcel::find($master['parcelId']);
-                                @endphp
-                                
+                        @if($master['status'] == 3)
+                            <div class="action-buttons" style="margin-top: 1rem;width: 120px;height: 35px">
+                                <button type="button" class="btn btn-success ubah-status" 
+                                        data-master-kode="{{ $master['masterKode'] }}">
+                                    <i class="bi bi-check-circle"></i> Barang Terima
+                                </button>
+                                {{-- <button type="button" class="btn btn-danger btn-outline ubah-status-gagal" 
+                                        data-master-kode="{{ $master['masterKode'] }}">
+                                    <i class="bi bi-x-circle"></i> Barang Tidak Diterima
+                                </button> --}}
+                            </div>
+                        @endif
+
+                        @if($master['parcelId'] && $master['status'] == 4)
+                        @php
+                            $parcel = \App\Modules\permintaanparcel\Models\permintaanparcel::find($master['parcelId']);
+                        @endphp
+                        
+                        <div class="review-sections-container">
+                            {{-- Review Section --}}
+                            <div class="review-section">
                                 @if($parcel && !$parcel->review_komposisi && !$parcel->review_pelayanan)
                                     <div class="review-title">Review Parcel</div>
                                     <form id="reviewForm-{{ $master['parcelId'] }}" class="review-form" data-parcel-id="{{ $master['parcelId'] }}">
                                         @csrf
                                         <div>
-                                            <label>Rating Komposisi:</label>
+                                            <label>Komposisi:</label>
                                             <div class="star-rating komposisi-rating">
                                                 <i class="fas fa-star" data-rating="1"></i>
                                                 <i class="fas fa-star" data-rating="2"></i>
@@ -933,7 +1115,7 @@
                                         </div>
                                         
                                         <div>
-                                            <label>Rating Pelayanan:</label>
+                                            <label>Pelayanan:</label>
                                             <div class="star-rating pelayanan-rating">
                                                 <i class="fas fa-star" data-rating="1"></i>
                                                 <i class="fas fa-star" data-rating="2"></i>
@@ -944,55 +1126,58 @@
                                             </div>
                                         </div>
                                         
-                                        <button type="submit" class="btn btn-primary submit-review" style="width: 100px">
-                                            <i class="bi bi-send" style="color: white"></i> <p style="color: white">Kirim</p>
+                                        <button type="submit" class="btn btn-primary submit-review" style="margin-top: 21px">
+                                            <i class="bi bi-send" style="color: white"></i> <p style="color: white">Kirim Review</p>
                                         </button>
                                     </form>
                                 @elseif($parcel)
                                     <div class="review-title">Review Anda</div>
                                     <div class="review-display">
-                                        <p><strong>Komposisi:</strong> 
-                                            @for($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star" style="@if($i <= $parcel->review_komposisi) color: #FFD700; @else color: #ddd; @endif"></i>
-                                            @endfor
+                                        <p>
+                                            <strong>Komposisi:</strong> 
+                                            <span>
+                                                @for($i = 1; $i <= 5; $i++)
+                                                <i class="fas fa-star" style="@if($i <= $parcel->review_komposisi) color: #FFD700; @else color: #ddd; @endif"></i>
+                                                @endfor
+                                            </span>
                                         </p>
-                                        <p><strong>Pelayanan:</strong> 
-                                            @for($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star" style="@if($i <= $parcel->review_pelayanan) color: #FFD700; @else color: #ddd; @endif"></i>
-                                            @endfor
+                                        <p>
+                                            <strong>Pelayanan:</strong> 
+                                            <span>
+                                                @for($i = 1; $i <= 5; $i++)
+                                                <i class="fas fa-star" style="@if($i <= $parcel->review_pelayanan) color: #FFD700; @else color: #ddd; @endif"></i>
+                                                @endfor
+                                            </span>
                                         </p>
                                     </div>
                                 @endif
-                            @endif
-                        </div>
-                    @endif
-
-                    @if($master['parcelId'] && $master['status'] == 4) {{-- Only show comment form if transaction is completed --}}
-                        @php
-                            $parcel = \App\Modules\permintaanparcel\Models\permintaanparcel::find($master['parcelId']);
-                        @endphp
-
-                        <div class="review-section">
-                            @if($parcel && !$parcel->komentar)
-                                <div class="review-title">Komentar Parcel</div>
-                                <form id="commentForm-{{ $master['parcelId'] }}" class="review-form" data-parcel-id="{{ $master['parcelId'] }}">
-                                    @csrf
-                                    <div class="form-group">
-                                        <label for="komentar">Komentar (max 30 karakter):</label>
-                                        <textarea class="form-control" name="komentar" id="komentar-{{ $master['parcelId'] }}" 
-                                                  maxlength="30" rows="2" required></textarea>
-                                        <small class="text-muted"><span id="charCount-{{ $master['parcelId'] }}">0</span>/30</small>
+                            </div>
+                    
+                            {{-- Comment Section --}}
+                            <div class="review-section">
+                                @if($parcel && !$parcel->komentar)
+                                    <div class="review-title">Komentar</div>
+                                    <form id="commentForm-{{ $master['parcelId'] }}" class="review-form" data-parcel-id="{{ $master['parcelId'] }}">
+                                        @csrf
+                                        <div class="form-group">
+                                            <label for="komentar-{{ $master['parcelId'] }}">Tulis komentar:</label>
+                                            <textarea class="form-control" name="komentar" id="komentar-{{ $master['parcelId'] }}" 
+                                                      maxlength="30" rows="2" placeholder="Maksimal 30 karakter" required></textarea>
+                                            {{-- <small class="text-muted"><span id="charCount-{{ $master['parcelId'] }}">0</span>/30</small> --}}
+                                        </div>
+                                        <button type="submit" class="btn btn-primary submit-comment">
+                                            <i class="bi bi-send" style="color: white"></i> <p style="color: white">Kirim Komentar</p>
+                                        </button>
+                                    </form>
+                                @elseif($parcel && $parcel->komentar)
+                                    <div class="review-title">Komentar Anda</div>
+                                    <div class="review-display">
+                                        <p style="font-style: italic; background: #f8f9fa; padding: 0.5rem; border-radius: 6px; margin: 0;">
+                                            "{{ $parcel->komentar }}"
+                                        </p>
                                     </div>
-                                    <button type="submit" class="btn btn-primary submit-comment" style="width:100px">
-                                        <i class="bi bi-send" style="color: white"></i> <p style="color: white">Kirim</p>
-                                    </button>
-                                </form>
-                            @elseif($parcel && $parcel->komentar)
-                                <div class="review-title">Komentar Parcel</div>
-                                <div class="review-display">
-                                    <p>{{ $parcel->komentar }}</p>
-                                </div>
-                            @endif
+                                @endif
+                            </div>
                         </div>
                     @endif
 
@@ -1028,34 +1213,35 @@
 
 <script>
 $(document).ready(function() {
-    // Status update functions
     $(".ubah-status").click(function() {
-        var transaksiId = $(this).data("transaksi-id");
+        var masterKode = $(this).data("master-kode");
         
-        $.ajax({
-            type: "POST",
-            url: "{{ route('update.status') }}",
-            data: {
-                "_token": "{{ csrf_token() }}",
-                "transaksiId": transaksiId,
-                "newStatus": "4"
-            },
-            success: function(response) {
-                if (response.success) {
-                    alert("Status berhasil diupdate.");
-                    location.reload();
-                } else {
-                    alert("Gagal mengupdate status.");
+        if(confirm("Apakah Anda yakin ingin menerima semua barang dalam transaksi ini?")) {
+            $.ajax({
+                type: "POST",
+                url: "{{ route('update.status.master') }}",
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "masterKode": masterKode,
+                    "newStatus": "4"
+                },
+                success: function(response) {
+                    if (response.success) {
+                        alert("Status semua barang berhasil diupdate.");
+                        location.reload();
+                    } else {
+                        alert("Gagal mengupdate status.");
+                    }
+                },
+                error: function(err) {
+                    alert("Terjadi kesalahan: " + err.responseText);
                 }
-            },
-            error: function(err) {
-                alert("Terjadi kesalahan: " + err.responseText);
-            }
-        });
+            });
+        }
     });
 
     $(".ubah-status-gagal").click(function() {
-        var transaksiId = $(this).data("transaksi-id");
+        var masterKode = $(this).data("master-kode");
         var barangtidakditerima = prompt("Masukkan alasan barang tidak diterima:");
 
         if (barangtidakditerima === null || barangtidakditerima === "") {
@@ -1065,16 +1251,16 @@ $(document).ready(function() {
         
         $.ajax({
             type: "POST",
-            url: "{{ route('update.status.gagal') }}",
+            url: "{{ route('update.status.master.gagal') }}",
             data: {
                 "_token": "{{ csrf_token() }}",
-                "transaksiId": transaksiId,
+                "masterKode": masterKode,
                 "newStatus": "44",
                 "barangtidakditerima": barangtidakditerima
             },
             success: function(response) {
                 if (response.success) {
-                    alert("Status berhasil diupdate.");
+                    alert("Status semua barang berhasil diupdate.");
                     location.reload();
                 } else {
                     alert("Gagal mengupdate status.");
@@ -1085,6 +1271,65 @@ $(document).ready(function() {
             }
         });
     });
+
+
+    // Status update functions
+    // $(".ubah-status").click(function() {
+    //     var transaksiId = $(this).data("transaksi-id");
+        
+    //     $.ajax({
+    //         type: "POST",
+    //         url: "{{ route('update.status') }}",
+    //         data: {
+    //             "_token": "{{ csrf_token() }}",
+    //             "transaksiId": transaksiId,
+    //             "newStatus": "4"
+    //         },
+    //         success: function(response) {
+    //             if (response.success) {
+    //                 alert("Status berhasil diupdate.");
+    //                 location.reload();
+    //             } else {
+    //                 alert("Gagal mengupdate status.");
+    //             }
+    //         },
+    //         error: function(err) {
+    //             alert("Terjadi kesalahan: " + err.responseText);
+    //         }
+    //     });
+    // });
+
+    // $(".ubah-status-gagal").click(function() {
+    //     var transaksiId = $(this).data("transaksi-id");
+    //     var barangtidakditerima = prompt("Masukkan alasan barang tidak diterima:");
+
+    //     if (barangtidakditerima === null || barangtidakditerima === "") {
+    //         alert("Silakan masukkan alasan barang tidak diterima");
+    //         return;
+    //     }
+        
+    //     $.ajax({
+    //         type: "POST",
+    //         url: "{{ route('update.status.gagal') }}",
+    //         data: {
+    //             "_token": "{{ csrf_token() }}",
+    //             "transaksiId": transaksiId,
+    //             "newStatus": "44",
+    //             "barangtidakditerima": barangtidakditerima
+    //         },
+    //         success: function(response) {
+    //             if (response.success) {
+    //                 alert("Status berhasil diupdate.");
+    //                 location.reload();
+    //             } else {
+    //                 alert("Gagal mengupdate status.");
+    //             }
+    //         },
+    //         error: function() {
+    //             alert("Terjadi kesalahan saat mengupdate status.");
+    //         }
+    //     });
+    // });
 
     // Star rating functionality
     $('.star-rating i').hover(

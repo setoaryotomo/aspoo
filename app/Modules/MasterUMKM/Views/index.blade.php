@@ -22,14 +22,14 @@
                     //     text: 'Pengikut',
                     //     value: 'pengikut',
                     // },    
-                    {
-                        text: 'user id',
-                        value: 'user_id',
-                    },    
-                    {
-                        text: 'toko id',
-                        value: 'id',
-                    },    
+                    // {
+                    //     text: 'user id',
+                    //     value: 'user_id',
+                    // },    
+                    // {
+                    //     text: 'toko id',
+                    //     value: 'id',
+                    // },    
 					],
             }
         },

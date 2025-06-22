@@ -9,12 +9,9 @@
         <section class="card mb-0">
             <div class="card-header">
                 <div class="card-title">Detail</div>
-                {{-- <div class="card-title">Detail Permintaan Parcel</div> --}}
             </div>
             <div class="card-body">
                 <div class="row">
-                    <section class="col-md-12">
-                        <section class="row">
                             <div class="col-md-6">
                                 <p><b>Nama Pemesan : </b> {{ $data->user->name }}</p>
 
@@ -37,29 +34,41 @@
                                     CEK
                                 @endif
                             </p>
+                            @if ($data->review_komposisi)
+                            <p><b>Review Komposisi : </b>{{ $data->review_komposisi }}</p>
+                            @endif
+                            @if ($data->review_pelayanan)
+                            <p><b>Review Pelayanan : </b>{{ $data->review_pelayanan }}</p>
+                            @endif
+                            @if ($data->komentar)
+                            <p><b>Komentar : </b>{{ $data->komentar }}</p>
+                            @endif
+                            <br>
                         </section>
+                        <hr style="color: rgba(0, 0, 0, 0.201)">
                     </section>
-                    <hr>
+                    
                     <section class="col-md-12">
                         <table class="table">
                             <thead>
                                 <tr>
                                     {{-- <td>Nomor</td> --}}
-                                    <td>Harga Yang Di Inginkan</td>
-                                    <td>Berat Yang Di Inginkan</td>
+                                    <td><b>Harga Yang Diinginkan</b></td>
+                                    <td><b>Berat Yang Diinginkan</b></td>
                                     {{-- <td>Barang Permintaan</td> --}}
-                                    <td>Tanggal Dibutuhkan</td>
+                                    <td><b>Tanggal Dibutuhkan</b></td>
                                     {{-- <td>Alamat</td> --}}
                                 </tr>
                             </thead>
                             <tbody>
                                 @php
                                     $number = 1;
+                                    $beratKg = $data->berat/1000;
                                 @endphp
                                 <tr>
                                     {{-- <td>{{ $number++ }}</td> --}}
-                                    <td>{{ $data->harga }}</td>
-                                    <td>{{ $data->berat }}</td>
+                                    <td>Rp. {{ $data->harga }}</td>
+                                    <td>{{ $beratKg }} Kg</td>
                                     {{-- <td>{{ $data->barang }}</td> --}}
                                     <td>{{ $data->tanggal }}</td>
                                     {{-- <td>{{ $data->alamat }}</td> --}}
@@ -71,7 +80,7 @@
                     @if ($data->transaksi)
                         <section class="col-md-12 mt-4">
                             <div class="alert alert-info">
-                                <p><b>Kode Transaksi :</b>
+                                <p><b>Kode Transaksi Master:</b>
                                     @if ($data->transaksi->status == "")
                                     <a href="{{ url('approve-transaksi/preview/' . $data->transaksi->kode_transaksi) }}"
                                         class="text-primary font-weight-bold">
@@ -81,101 +90,203 @@
                                     </a>
                                     @elseif ($data->transaksi->status == 4)
                                         {{-- class="text-primary font-weight-bold" target="_blank"> --}}
-                                        {{ $data->transaksi->kode_transaksi }}
+                                        {{ $data->transaksi->kode_transaksi_master }}
                                     @else
-                                        {{ $data->transaksi->kode_transaksi }}
+                                        {{ $data->transaksi->kode_transaksi_master }}
                                     @endif
                                 </p>
                             </div>
                         </section>
                     @endif
 
-                    <!-- Rekomendasi Parcel Section -->
+                    <!-- Add this section after the Rekomendasi Parcel section -->
                     <section class="col-md-12 mt-4">
-                        <h4 class="text-center mb-4">Rekomendasi Parcel</h4>
-                        @php
-                            $recommendations = json_decode($data->barang, true);
-                            $selectedItemIds = $card['selectedItems']->pluck('barang.id')->toArray();
-                            $deliveryCity = json_decode($data->alamat)->kota->name;
-                        @endphp
-
-                        <div class="row">
-                            @foreach ($recommendations as $index => $recommendation)
+                        <div class="card">
+                            <div class="card-body">
                                 @php
-                                    // Check if all items in this recommendation are in the selected items
-                                    $isFullySelected = collect($recommendation['items'])->every(function ($item) use (
-                                        $selectedItemIds,
-                                    ) {
-                                        return in_array($item['id'], $selectedItemIds);
-                                    });
-
-                                    // Determine background color
-                                    $bgClass = $isFullySelected
-                                        ? 'bg-info'
-                                        : ($index == 0
-                                            ? 'bg-warning'
-                                            : ($index == 1
-                                                ? 'bg-warning'
-                                                : 'bg-warning'));
-
-                                    $borderClass = $isFullySelected ? 'border-primary' : '';
+                                    $recommendations = json_decode($data->barang, true);
+                                    $firstRecommendation = $recommendations[0] ?? null;
+                                    $userFilters = $firstRecommendation['userFilters'] ?? null;
                                 @endphp
 
-                                <div class="col-md-4 mb-4">
-                                    <div class="card h-100 {{ $borderClass }}">
-                                        <div class="card-header {{ $bgClass }} text-white">
-                                            <h5 class="card-title mb-0" style="color: white">
-                                                Rekomendasi {{ $index + 1 }}
-                                                @if ($isFullySelected)
-                                                    (Selected)
+                                @if($userFilters)
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6 style="color: green">Filter yang diinginkan:</h6>
+                                            @php
+                                                $desiredCategories = $userFilters['desiredCategories'] ?? [];
+                                                $desiredFilters = $userFilters['desiredFilters'] ?? [];
+                                                
+                                                // Check if kategori umum exists and is different from kategori
+                                                $showKategoriUmum = isset($desiredFilters['kategori_umum']) && 
+                                                                   array_diff($desiredFilters['kategori_umum'], $desiredCategories);
+                                            @endphp
+                                            
+                                            <p>Kategori: {{ implode(', ', $desiredCategories) }}</p>
+                                            
+                                            @foreach($desiredFilters as $filterType => $filters)
+                                                @if(count($filters) > 0 && $filterType !== 'kategori_umum')
+                                                    <p>{{ ucfirst(str_replace('_', ' ', $filterType)) }}:
+                                                        {{ implode(', ', $filters) }}
+                                                    </p>
                                                 @endif
-                                            </h5>
-                                            <small>Total Item: {{ count($recommendation['items']) }}</small>
+                                            @endforeach
+                                            
+                                            @if($showKategoriUmum)
+                                                <p>Kategori Umum: {{ implode(', ', $desiredFilters['kategori_umum']) }}</p>
+                                            @endif
                                         </div>
-                                        <div class="card-body">
-                                            <div class="mb-3">
-                                                <p class="font-weight-bold mb-1">Total Harga: Rp
-                                                    {{ number_format($recommendation['totalPrice'], 0, ',', '.') }}</p>
-                                                Selisih: Rp
-                                                {{ number_format($recommendation['totalPrice'] - $data->harga, 0, ',', '.') }}
-                                                {{-- <p class="mb-0">Total Berat:
-                                                    {{ number_format($recommendation['totalWeight'] / 1000, 2) }} kg
-                                                    ({{ $recommendation['totalWeight'] }} gram)</p> --}}
-                                                <p class="font-weight-bold mb-1">Total Berat:
-                                                    {{ $recommendation['totalWeight'] }} gram</p>Selisih:
-                                                {{ $recommendation['totalWeight'] - $data->berat }} gram
-                                            </div>
-                                            <div class="table-responsive">
-                                                <ul>
-                                                    @foreach ($recommendation['items'] as $item)
-                                                        @php
-                                                            // Check if the seller's city matches the delivery city
-$isCityMatch = $item['sellerCity'] === $deliveryCity;
-                                                        @endphp
-                                                        <img src="{{ $item['thumbnail'] }}" alt=""
-                                                            style="width: 200px; height: 200px; object-fit: cover; margin-right: 10px;display: none;">
-                                                        <b>{{ $item['name'] }}</b> <br>Berat : {{ $item['berat'] }}g
-                                                        <br>Harga : Rp {{ number_format($item['price'], 0, ',', '.') }}
-                                                        <br> Toko: {{ $item['seller'] }} <br>
-                                                        <span
-                                                            style="color: {{ $isCityMatch ? 'blue' : 'red' }}">({{ $item['sellerCity'] }})</span>
-                                                        <br><br><br>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="card-footer" style="display: none">
-                                            <button
-                                                class="btn {{ $index == 0 ? 'btn-success' : ($index == 1 ? 'btn-info' : 'btn-primary') }} btn-block btn-pilih-rekomendasi"
-                                                data-items='@json($recommendation['items'])'>
-                                                Pilih Paket Ini
-                                            </button>
+                                        <div class="col-md-6">
+                                            <h6 style="color: red">Filter yang tidak diinginkan:</h6>
+                                            @foreach($userFilters['unwantedFilters'] as $filterType => $filters)
+                                                @if(count($filters) > 0)
+                                                    <p>{{ ucfirst(str_replace('_', ' ', $filterType)) }}:
+                                                        {{ implode(', ', $filters) }}
+                                                    </p>
+                                                @endif
+                                            @endforeach
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
+                                @else
+                                    <p>No user filters available.</p>
+                                @endif
+                            </div>
                         </div>
                     </section>
+
+                    <!-- Rekomendasi Parcel Section -->
+<!-- Rekomendasi Parcel Section -->
+<section class="col-md-12 mt-4">
+    <h5 class="text-center mb-4">Rekomendasi Parcel</h5>
+    @php
+        $recommendations = json_decode($data->barang, true);
+        
+        // Urutkan rekomendasi berdasarkan jumlah item (descending) dan berat (descending)
+        usort($recommendations, function($a, $b) {
+            // Pertama urutkan berdasarkan jumlah item
+            $itemCountCompare = count($b['items']) - count($a['items']);
+            if ($itemCountCompare !== 0) {
+                return $itemCountCompare;
+            }
+            
+            // Jika jumlah item sama, urutkan berdasarkan berat (descending)
+            return $b['totalWeight'] - $a['totalWeight'];
+        });
+        
+        $selectedItemIds = $card['selectedItems']->pluck('barang.id')->toArray();
+        $deliveryCity = json_decode($data->alamat)->kota->name;
+        
+        // Get user filters from the first recommendation
+        $userFilters = $recommendations[0]['userFilters'] ?? null;
+        $desiredCategories = $userFilters['desiredCategories'] ?? [];
+        $desiredFilters = $userFilters['desiredFilters'] ?? [];
+    @endphp
+
+    <div class="row">
+        @foreach ($recommendations as $index => $recommendation)
+            @php
+                // Check if all items in this recommendation are in the selected items
+                $isFullySelected = collect($recommendation['items'])->every(function ($item) use ($selectedItemIds) {
+                    return in_array($item['id'], $selectedItemIds);
+                });
+
+                // Determine background color
+                $bgClass = $isFullySelected
+                    ? 'bg-primary'
+                    : ($index == 0
+                        ? 'bg-warning'
+                        : ($index == 1
+                            ? 'bg-warning'
+                            : 'bg-warning'));
+
+                $borderClass = $isFullySelected ? 'border-primary' : '';
+            @endphp
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 {{ $borderClass }}">
+                    <div class="card-header {{ $bgClass }} text-white">
+                        <h6 class="card-title mb-0" style="color: white">
+                            @if ($isFullySelected)
+                            Rekomendasi {{ $index + 1 }} <i class="fa-solid fa-check"></i>
+                            @else
+                            Rekomendasi {{ $index + 1 }}
+                            @endif
+                        </h6>
+                        <small>Total Item: {{ count($recommendation['items']) }}</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <p class="font-weight-bold mb-1">Total Harga: Rp
+                                {{ number_format($recommendation['totalPrice'], 0, ',', '.') }}</p>
+                            <p class="font-weight-bold mb-1">Total Berat:
+                                {{ $recommendation['totalWeight']/1000 }} Kg</p>
+                        </div>
+                        <div class="table-responsive">
+                            <ul>
+                                @foreach ($recommendation['items'] as $item)
+                                    @php
+                                        // Check if the seller's city matches the delivery city
+                                        $isCityMatch = $item['sellerCity'] === $deliveryCity;
+                                        
+                                        // Check if item matches any desired filters
+                                        $matchesCategory = in_array($item['category'], $desiredCategories);
+                                        $matchesFilters = false;
+                                        $matchedFilters = [];
+                                        
+                                        foreach ($desiredFilters as $filterType => $filters) {
+                                            if (isset($item[$filterType])) {
+                                                $itemValue = is_array($item[$filterType]) ? $item[$filterType] : [$item[$filterType]];
+                                                foreach ($filters as $filter) {
+                                                    if (in_array($filter, $itemValue)) {
+                                                        $matchesFilters = true;
+                                                        $matchedFilters[$filterType] = $filter;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    @endphp
+                                    <div class="mb-2">
+                                        @if (in_array($item['name'], $desiredFilters['nama_barang'] ?? []))
+                                            <span class="text-success font-weight-bold">{{ $item['name'] }} ✓</span>
+                                        @else
+                                            <b>{{ $item['name'] }}</b>
+                                        @endif
+                                        <br>
+                                        Berat: {{ $item['berat'] }}g
+                                        <br>
+                                        Harga: Rp {{ number_format($item['price'], 0, ',', '.') }}
+                                        <br>
+                                        ({{ $item['seller'] }})
+                                        <br>
+                                        
+                                        @if ($matchesCategory)
+                                            <span class="text-success font-weight-bold">Kategori: {{ $item['category'] }} ✓</span><br>
+                                        @endif
+                                        
+                                        @foreach ($matchedFilters as $filterType => $filterValue)
+                                            @php
+                                                $filterLabel = ucwords(str_replace('_', ' ', $filterType));
+                                            @endphp
+                                            <span class="text-success font-weight-bold">{{ $filterLabel }}: {{ $filterValue }} ✓</span><br>
+                                        @endforeach
+                                    </div>
+                                    <hr>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-footer" style="display: none">
+                        <button
+                            class="btn {{ $index == 0 ? 'btn-success' : ($index == 1 ? 'btn-info' : 'btn-primary') }} btn-block btn-pilih-rekomendasi"
+                            data-items='@json($recommendation['items'])'>
+                            Pilih Paket Ini
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</section>
 
                     <!-- Selected Items Section -->
                     @if (count($card['selectedItems']) > 0)

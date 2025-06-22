@@ -253,10 +253,10 @@
         this.countTotalPembayaran();
 
         // Optionally notify the user
-        showToast({
-            message: `Pilihan pengiriman tidak tersedia. Menggunakan ongkir default sebesar ${this.rupiah(this.defaultOngkir)}.`,
-            type: 'warning'
-        });
+        // showToast({
+        //     message: `Pilihan pengiriman tidak tersedia. Menggunakan ongkir default sebesar ${this.rupiah(this.defaultOngkir)}.`,
+        //     type: 'warning'
+        // });
     }
 },
                 countTotalPembayaran() {

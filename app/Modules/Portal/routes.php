@@ -27,6 +27,8 @@ Route::prefix('/p')->group(function () {
     Route::get("/daftarparcel",[PortalController::class,"daftarparcel"]);
     Route::post('/updatestatus', [PortalController::class,"updatestatus"])->name('update.status');
     Route::post('/updatestatusgagal', [PortalController::class,"updatestatusgagal"])->name('update.status.gagal');
+    Route::post('/updatestatusmaster', [PortalController::class,"updateStatusMaster"])->name('update.status.master');
+Route::post('/updatestatusmastergagal', [PortalController::class,"updateStatusMasterGagal"])->name('update.status.master.gagal');
     Route::get("/detailproduk",[PortalController::class,"detailproduk"]);
     Route::get("/toko", [PortalController::class, "toko"]);
     Route::get("/ratingdanulasan",[PortalController::class,"ratingdanulasan"]);
@@ -40,9 +42,12 @@ Route::prefix('/p')->group(function () {
     Route::get("/cekongkir",[PortalController::class,"cekongkir"]);
     Route::post("/cekongkir",[PortalController::class,"cekHasil"]);
     Route::get("/pesanparcel",[PortalController::class,"pesanparcel"]);
+    Route::get("/pesanparcelapi",[PortalController::class,"pesanparcelapi"]);
     Route::post("/pesanparcel",[PortalController::class,"kirimpesanparcel"])->name('parcel.store');
+    Route::post("/pesanparcelapi",[PortalController::class,"kirimpesanparcelapi"])->name('parcel.store');
     Route::get('/bayarparcel', [PortalController::class, 'paymentparcel'])->name('paymentparcel');
     Route::post('/save-to-cart', [PortalController::class, 'saveToCart'])->name('save.to.cart');
+    Route::post('/save-to-cart-api', [PortalController::class, 'saveToCartApi'])->name('save.to.cart.api');
     Route::get('/keranjang', [PortalController::class, 'keranjang'])->name('keranjang');
     Route::get('/api/barang', [PortalController::class, 'apibarang']);
 
@@ -131,6 +136,7 @@ Route::prefix('/p')->group(function () {
         Route::get("/",[PortalController::class,"keranjang"]);
         Route::post("/",[PortalController::class,"postKeranjangToCheckout"]);
         Route::delete("/{id}",[PortalController::class,"deleteKeranjang"]);
+        Route::patch('/{id}', [PortalController::class, 'updateKeranjang']);
         Route::post("/data",[PortalController::class,"getKeranjangData"]);
     });
 

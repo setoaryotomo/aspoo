@@ -24,7 +24,7 @@ class MasterUMKMRepository
 
     public static function barang_datatable($per_page = 15)
     {
-        $data = DataBarang::with(['user', 'satuan'])->paginate($per_page);
+        $data = DataBarang::with(['user', 'satuan'])->orderByDesc('created_at')->paginate($per_page);
         return $data;
     }
 

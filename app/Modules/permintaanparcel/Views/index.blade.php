@@ -35,13 +35,17 @@
                         value: 'tanggal',
                     },    
                     {
-                        text: 'Review Komposisi',
-                        value: 'review_komposisi',
+                        text: 'Status',
+                        value: 'transaksi.status_readable',
                     },    
-                    {
-                        text: 'Review Pelayanan',
-                        value: 'review_pelayanan',
-                    },    
+                    // {
+                    //     text: 'Review Komposisi',
+                    //     value: 'review_komposisi',
+                    // },    
+                    // {
+                    //     text: 'Review Pelayanan',
+                    //     value: 'review_pelayanan',
+                    // },    
 					],
             }
         },

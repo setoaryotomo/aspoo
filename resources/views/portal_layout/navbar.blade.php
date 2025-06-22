@@ -69,6 +69,138 @@
         color: #dc3545 !important;
     }
     
+    .user-profile {
+    position: relative;
+    margin-left: 15px;
+}
+
+.user-dropdown-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+}
+
+.user-profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* Tambahan untuk memastikan lingkaran sempurna */
+    flex-shrink: 0; /* Mencegah gambar menyusut */
+    display: block; /* Menghilangkan whitespace */
+}
+
+.box-user {
+    margin-left: 10px;
+    line-height: 1.3;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.user-role {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.dropdown-menu {
+    min-width: 220px;
+    padding: 0;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.dropdown-user {
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f1f1;
+    background-color: #f8f9fa;
+}
+
+.dropdown-item {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.logout-item {
+    color: #dc3545 !important;
+}
+
+/* Media Query yang diperbaiki untuk tampilan mobile */
+@media (max-width: 767px) {
+    .user-name, .user-role {
+        display: none;
+    }
+    
+    .user-profile-img {
+        width: 32px;
+        height: 32px;
+        border: 1.5px solid #fff; /* Border disesuaikan dengan ukuran */
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Shadow disesuaikan */
+    }
+    
+    .user-profile {
+        margin-left: 10px; /* Margin disesuaikan */
+    }
+    
+    .box-user {
+        margin-left: 8px; /* Margin disesuaikan */
+    }
+    
+    /* Dropdown menu untuk mobile */
+    .dropdown-menu {
+        min-width: 180px; /* Lebar disesuaikan untuk mobile */
+        right: 0 !important;
+        left: auto !important;
+    }
+}
+
+/* Media query tambahan untuk layar sangat kecil */
+@media (max-width: 480px) {
+    .user-profile-img {
+        width: 28px;
+        height: 28px;
+        border: 1px solid #fff;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+    
+    .user-profile {
+        margin-left: 8px;
+    }
+    
+    .dropdown-menu {
+        min-width: 160px;
+    }
+}
+
+/* Fix untuk memastikan aspect ratio tetap 1:1 */
+.user-profile-img {
+    aspect-ratio: 1 / 1; /* Memastikan selalu berbentuk kotak sempurna */
+}
+
+/* Alternative fix jika aspect-ratio tidak didukung browser lama */
+@supports not (aspect-ratio: 1 / 1) {
+    .user-profile-img::before {
+        content: "";
+        display: block;
+        padding-top: 100%; /* Membuat kotak dengan rasio 1:1 */
+    }
+}
+
     /* Untuk tampilan mobile */
     @media (max-width: 767px) {
         .user-name, .user-role {
@@ -76,8 +208,8 @@
         }
         
         .user-profile-img {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
         }
     }
     </style>
@@ -114,9 +246,10 @@
                         </div>
                         <div class="col-md-4 col-6 tf-md-hidden">
                             {{-- <div class="tf-form-search">
-                                <form action="home-search.html" class="search-box">
-                                    <input type="text" placeholder="Search product">
-                                    <button class="tf-btn"><i class="icon icon-search"></i></button>
+                                <form action="{{ url('/p/cari') }}" role="search" method="GET" class="search-box">
+                                    <input type="search" name="q" aria-label="Search" placeholder="Search product">
+                                    <input type="hidden" name="tipe" value="barang">
+                                    <button type="submit" class="tf-btn" name="cari"><i class="icon icon-search"></i></button>
                                 </form>
                             </div> --}}
                         </div>
@@ -166,8 +299,8 @@
                                             <div class="user-info">
                                                 <img :src="userData.fotodata || 'https://via.placeholder.com/40'" class="user-profile-img" alt="Profile">
                                                 <div class="box-user">
-                                                    {{-- <div class="user-name">@{{ userData.name }}</div> --}}
-                                                    {{-- <div class="user-role">@{{ userData.roleName }}</div> --}}
+                                                    <div class="user-name">@{{ userData.name }}</div>
+                                                    <div class="user-role">@{{ userData.roleName }}</div>
                                                 </div>
                                                 <i class="icon icon-chevron-down ms-2" style="font-size:12px"></i>
                                             </div>
@@ -181,6 +314,7 @@
                                             </a>
                                             <a class="dropdown-item" 
                                                href="{{ url('/user/login') }}" 
+                                               v-if="userData.roleName !== 'USER'"
                                                target="_blank" 
                                                rel="noopener noreferrer" 
                                                @click.stop>
@@ -237,7 +371,7 @@
                                 
                             </li>
                             <li class="nav-mb-item">
-                                <a href="{{ url('/p/daftartransaksi') }}" class="collapsed mb-menu-link current">
+                                <a v-if="this.isLoggedin == true" href="{{ url('/p/daftartransaksi') }}" class="collapsed mb-menu-link current">
                                     <span>Daftar Transaksi</span>
                                 </a>
                                

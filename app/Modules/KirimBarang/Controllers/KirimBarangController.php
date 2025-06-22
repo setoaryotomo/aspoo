@@ -84,8 +84,8 @@ class KirimBarangController extends Controller
                 $barang->save();
             }
     
-            // Kirim notifikasi WhatsApp jika ada biaya pengiriman atau kurir
-            if($data->biaya_pengiriman || $data->kurir_pengiriman) {
+            // Kirim notifikasi WhatsApp jika ada biaya pengiriman kurir
+            if($data->biaya_pengiriman && $data->kurir_pengiriman) {
                 // Format pesan WhatsApp
                 $whatsappMessage = "Halo " . $data->pembeli->name . ",\n";
                 $whatsappMessage .= "📦 *Informasi Pengiriman* #" . $data->kode_transaksi_master . "\n\n";

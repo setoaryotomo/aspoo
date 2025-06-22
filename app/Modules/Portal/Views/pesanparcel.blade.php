@@ -571,7 +571,7 @@
                                                             data-type="kategori_umum">
                                                         <label class="form-check-label"
                                                             for="desired-{{ Str::slug($kategori) }}">
-                                                            {{ $kategori }} ({{ $counts['categories'][$kategori] ?? 0 }})
+                                                            {{ $kategori }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -596,7 +596,7 @@
                                                             data-type="bahan_dasar">
                                                         <label class="form-check-label"
                                                             for="desired-bahan-{{ Str::slug($bahan) }}">
-                                                            {{ $bahan }} ({{ $counts['bahan'][$bahan] ?? 0 }})
+                                                            {{ $bahan }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -609,7 +609,7 @@
                                 <div class="col-12 mb-3">
                                     <div class="card">
                                         <div class="card-header bg-success text-white">
-                                            <h6 class="mb-0 text-white text-center">Basah/Kering yang Diinginkan ({{ count($uniqueData['basah_kering']) }})</h6> 
+                                            <h6 class="mb-0 text-white text-center">Basah/Kering yang Diinginkan</h6> 
                                         </div>
                                         <div class="card-body" style="max-height: 150px; overflow-y: auto;">
                                             <div id="desired-basah-kering" class="category-container">
@@ -622,7 +622,7 @@
                                                             data-type="basah_kering">
                                                         <label class="form-check-label"
                                                             for="desired-basah-kering-{{ Str::slug($basahKering) }}">
-                                                            {{ $basahKering }} ({{ $counts['basah_kering'][$basahKering] ?? 0 }})
+                                                            {{ $basahKering }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -646,7 +646,7 @@
                                                             id="desired-rasa-{{ Str::slug($rasa) }}" data-type="rasa">
                                                         <label class="form-check-label"
                                                             for="desired-rasa-{{ Str::slug($rasa) }}">
-                                                            {{ $rasa }} ({{ $counts['rasa'][$rasa] ?? 0 }})
+                                                            {{ $rasa }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -672,7 +672,7 @@
                                                             data-type="produsen">
                                                         <label class="form-check-label"
                                                             for="desired-produsen-{{ Str::slug($produsen) }}">
-                                                            {{ $produsen }} ({{ $counts['produsen'][$produsen] ?? 0 }})
+                                                            {{ $produsen }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -726,7 +726,7 @@
                                                             data-type="kategori_umum">
                                                         <label class="form-check-label"
                                                             for="unwanted-category-{{ Str::slug($kategori) }}">
-                                                            {{ $kategori }} ({{ $counts['categories'][$kategori] ?? 0 }})
+                                                            {{ $kategori }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -751,7 +751,7 @@
                                                             data-type="bahan_dasar">
                                                         <label class="form-check-label"
                                                             for="unwanted-bahan-{{ Str::slug($bahan) }}">
-                                                            {{ $bahan }} ({{ $counts['bahan'][$bahan] ?? 0 }})
+                                                            {{ $bahan }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -776,7 +776,7 @@
                                                             data-type="basah_kering">
                                                         <label class="form-check-label"
                                                             for="unwanted-basah-kering-{{ Str::slug($basahKering) }}">
-                                                            {{ $basahKering }} ({{ $counts['basah_kering'][$basahKering] ?? 0 }})
+                                                            {{ $basahKering }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -800,7 +800,7 @@
                                                             id="unwanted-rasa-{{ Str::slug($rasa) }}" data-type="rasa">
                                                         <label class="form-check-label"
                                                             for="unwanted-rasa-{{ Str::slug($rasa) }}">
-                                                            {{ $rasa }} ({{ $counts['rasa'][$rasa] ?? 0 }})
+                                                            {{ $rasa }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -825,7 +825,7 @@
                                                             data-type="produsen">
                                                         <label class="form-check-label"
                                                             for="unwanted-produsen-{{ Str::slug($produsen) }}">
-                                                            {{ $produsen }} ({{ $counts['produsen'][$produsen] ?? 0 }})
+                                                            {{ $produsen }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -2312,6 +2312,7 @@ function displayRecommendations(recommendations, id) {
                                 `<span class="text-success font-weight-bold">Produsen: ${item.produsen} &#x2713;</span><br>` : ''}
                                 
                             </div>
+                            <hr>
                         `;
                     }).join('')}
                 </div>

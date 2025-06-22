@@ -40,8 +40,9 @@
                                 <p><b>Pembeli : </b> {{ @$data->pembeli->name }}</p>
                             </div>
                         </section>
+                        <hr>
                     </section>
-                    <hr>
+                    
                     <section class="col-md-12">
                         <table class="table">
                             <thead>
@@ -107,7 +108,7 @@
             <div class="card-footer">
                 <div class="float-right">
                     <button class="btn btn-primary btn-sm" style="margin-right: 5px;" @click="approve('{{ $data->kode_transaksi }}')">Simpan</button> 
-                    <button class="btn btn-danger btn-sm" @click="tolak('{{ $data->kode_transaksi }}')">Tolak</button>
+                    {{-- <button class="btn btn-danger btn-sm" @click="tolak('{{ $data->kode_transaksi }}')">Tolak</button> --}}
                 </div>
             </div>
         </section>

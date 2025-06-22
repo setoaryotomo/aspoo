@@ -96,7 +96,7 @@
             <div class="card-footer">
                 <div class="float-right">
                     <button class="btn btn-primary btn-sm" style="margin-right: 5px;" @click="approve('{{ $data->kode_transaksi }}')">Simpan</button>
-                    <button class="btn btn-danger btn-sm" @click="tolak('{{ $data->kode_transaksi }}')">Tolak</button>
+                    <button style="display: none" class="btn btn-danger btn-sm" @click="tolak('{{ $data->kode_transaksi }}')">Tolak</button>
                 </div>
             </div>
         </section>

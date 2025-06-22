@@ -62,6 +62,14 @@ class PortalController extends Controller
         }
         return JsonResponseHandler::setResult($delete)->send();
     }
+    public function updateKeranjang(Request $request, $id)
+    {
+        // Your update logic here
+        $keranjang = Keranjang::findOrFail($id);
+        $keranjang->update($request->only(['jumlah']));
+
+        return response()->json(['message' => 'Cart updated successfully']);
+    }
     public function postKeranjangToCheckout(Request $request)
 {
     $datas = json_decode($request->data);
@@ -139,16 +147,19 @@ class PortalController extends Controller
     {
         $q = $request->input('q');
         $tipe = $request->input('tipe');
+        $category = DataBarang::select('kategori_umum')->distinct()->get();
 
         // Hanya jalankan pencarian jika nilai 'q' tidak kosong
         if (!empty($q)) {
             if ($tipe == 'barang') {
                 $results = DataBarang::where("nama_barang", "LIKE", "%" . $q . "%")->get();
-                return view('Portal::cari.cari', compact('results', 'q', 'tipe'));
-            } elseif ($tipe == 'toko') {
-                $results = TokoUser::where("nama", "LIKE", "%" . $q . "%")->with(['user', 'user.kotaModel'])->get();
-                return view('Portal::cari.caritoko', compact('results', 'q', 'tipe'));
-            } else {
+                return view('Portal::cari.cari', compact('results', 'q', 'tipe','category'));
+            } 
+            // elseif ($tipe == 'toko') {
+            // $results = TokoUser::where("nama", "LIKE", "%" . $q . "%")->with(['user', 'user.kotaModel'])->get();
+            // return view('Portal::cari.caritoko', compact('results', 'q', 'tipe'));
+            // } 
+            else {
                 // Handle jenis pencarian yang tidak valid
                 return redirect()->back()->with('error', 'Jenis pencarian tidak valid.');
             }
@@ -459,6 +470,99 @@ private function getMasterStatusReadable($transactions)
     
     $status = $this->getMasterStatus($transactions);
     return $statuses[$status] ?? 'Diproses';
+}
+
+public function updateStatusMaster(Request $request)
+{
+    try {
+        $masterKode = $request->input('masterKode');
+        $newStatus = $request->input('newStatus');
+
+        // Cari semua transaksi dengan kode master tersebut
+        $transaksis = TransaksiBarang::where('kode_transaksi_master', $masterKode)->get();
+
+        if ($transaksis->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan.']);
+        }
+
+        DB::beginTransaction();
+        
+        foreach ($transaksis as $transaksi) {
+            // Update status transaksi
+            $transaksi->status = $newStatus;
+            $transaksi->save();
+
+            // Kirim notifikasi untuk setiap transaksi
+            $pesan = WatZapRepository::formatMessage($transaksi);
+            $pesan .= "Barang Berhasil diterima\n\n Terima Kasih telah berbelanja di WarungAspoo";
+            // WatZapRepository::sendTextMessage($transaksi->pembeli->nomor_telepon, $pesan);
+
+            // Update terjual untuk setiap barang
+            foreach ($transaksi->dataChildren as $tr_child) {
+                $b = DataBarang::find($tr_child->barang_id);
+                if ($b) {
+                    $jumlah = $b->terjual;
+                    $jumlah = intval($jumlah) + intval($tr_child->jumlah);
+                    $b->terjual = $jumlah;
+                    $b->save();
+                }
+            }
+
+            // Buat record pengiriman
+            Pengiriman::create([
+                'transaksi_id' => $transaksi->id,
+                'status' => $newStatus,
+                'keterangan' => "Barang berhasil diterima",
+            ]);
+        }
+
+        DB::commit();
+
+        return response()->json(['success' => true]);
+    } catch (Exception $e) {
+        DB::rollBack();
+        Log::error('Error updating master status: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+}
+
+public function updateStatusMasterGagal(Request $request)
+{
+    try {
+        $masterKode = $request->input('masterKode');
+        $newStatus = $request->input('newStatus');
+        $barangtidakditerima = $request->input('barangtidakditerima');
+
+        // Cari semua transaksi dengan kode master tersebut
+        $transaksis = TransaksiBarang::where('kode_transaksi_master', $masterKode)->get();
+
+        if ($transaksis->isEmpty()) {
+            return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan.']);
+        }
+
+        DB::beginTransaction();
+        
+        foreach ($transaksis as $transaksi) {
+            // Update status transaksi
+            $transaksi->status = $newStatus;
+            $transaksi->save();
+
+            // Buat record pengiriman
+            Pengiriman::create([
+                'transaksi_id' => $transaksi->id,
+                'status' => $newStatus,
+                'keterangan' => $barangtidakditerima,
+            ]);
+        }
+
+        DB::commit();
+
+        return response()->json(['success' => true]);
+    } catch (Exception $e) {
+        DB::rollBack();
+        Log::error('Error updating master status: ' . $e->getMessage());
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
 }
 
     public function updateStatus(Request $request)
@@ -884,13 +988,14 @@ public function postCheckout(Request $request)
     //     return view('Portal::listbarang', compact('produk','category', 'placeholder'));
     // }
 
-public function listBarang(Request $request)
-{
-    $produk = DataBarang::paginate(16);
-    $category = DataBarang::select('kategori_umum')->distinct()->get();
+    public function listBarang(Request $request)
+    {
+        $produk = DataBarang::orderBy('created_at', 'desc')->paginate(16);
+        $category = DataBarang::select('kategori_umum')->distinct()->get();
+        
+        return view('Portal::listbarang', compact('produk','category'));
+    }
     
-    return view('Portal::listbarang', compact('produk','category'));
-}
 
 public function listBarangByKategori($kategori)
 {
@@ -1108,7 +1213,7 @@ public function listBarangByKategori($kategori)
     }
 }
 
-    public function pesanparcel(Request $request)
+    public function pesanparcelapi(Request $request)
     {
         $auth = Auth::user();
         // $data = permintaanparcel::where('id',$id)->with(['user'])->first();
@@ -1190,20 +1295,108 @@ public function listBarangByKategori($kategori)
         ];
         // dd($card);
         //return view('Portal::auth.profile', ['data' => $data, 'user' => $userMaster, 'asal' => $asal_daerah]);
-        return view('Portal::pesanparcel', compact('auth', 'card', 'data', 'asal','parcel','barangUnique','uniqueData','counts','stokProduk'));
+        return view('Portal::pesanparcelapi', compact('auth', 'card', 'data', 'asal','parcel','barangUnique','uniqueData','counts','stokProduk'));
     }
 
-    public function apibarang(Request $request){
-        $barang = DataBarang::with(['user', 'user.detail', 'user.detail.kotaModel'])
-            ->where('berat', '>', 0)
-            ->where('stock_global', '>', 0)
+    public function pesanparcel(Request $request)
+    {
+        $auth = Auth::user();
+        // $data = permintaanparcel::where('id',$id)->with(['user'])->first();
+        
+        // $barang = DataBarang::select('*')->with(['user'])->get();
+        $barang = DataBarang::select('*')->with(['user'])->get();
+
+        $parcel = permintaanparcel::with(['parcel_children.barang'])->where('review_komposisi', '!=', '')
+                          ->get();
+
+
+        $data = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
+        // dd($data);
+        $userMaster = UserModel::where('id', Auth::id())->first();
+        $provinsi = Provinsi::all();
+        $kota = Kota::all();
+        $asal = [
+            'provinsi' => $provinsi,
+            'kota' => $kota,
+        ];
+
+        // Query dasar dengan eager loading
+        $barangUnique = DataBarang::with(['user'])
+        ->where('berat', '>', 0)
+        ->where('stock_global', '>', 0)
+            ->where('kategori_umum', '!=', 'Null')
+            ->where('produsen', '!=', 'null')
+            ->where('produsen', '!=', '-')
             // ->where('kategori_umum', '!=', '')
             // ->where('bahan_dasar', '!=', '')
             // ->where('basah_kering', '!=', '')
             // ->where('rasa', '!=', '')
             // ->where('produsen', '!=', '')
-            ->groupBy('nama_barang')
-            ->get();
+        ->get();
+
+        $namaBarangUnique = DataBarang::with(['user'])
+        ->where('berat', '>', 0)
+        ->where('stock_global', '>', 0)
+        ->where(function($query) {
+            $query->where('available', '<>', 'No')
+                  ->orWhereNull('available'); // Jika ingin termasuk NULL
+        })
+            // ->where('kategori_umum', '!=', '')
+            // ->where('bahan_dasar', '!=', '')
+            // ->where('basah_kering', '!=', '')
+            // ->where('rasa', '!=', '')
+            // ->where('produsen', '!=', '')
+        ->get();
+
+        $stokProduk = $barangUnique->groupBy('nama_barang')->map(function ($items) {
+            return $items->sum(function ($item) {
+                return isset($item->stock_global) ? $item->stock_global : 0;
+            });
+        });
+
+        // Hitung semua kategori unik sekaligus
+        $uniqueData = [
+            // 'categories' => $barangUnique->pluck('kategori_umum')->unique()->sort()->values(),
+            'categories' => $barangUnique->pluck('kategori_umum')->filter()->unique()->sort()->values(),
+            'bahan' => $barangUnique->pluck('bahan_dasar')->filter()->unique()->sort()->values(),
+            'basah_kering' => $barangUnique->pluck('basah_kering')->filter()->unique()->sort()->values(),
+            'rasa' => $barangUnique->pluck('rasa')->filter()->unique()->sort()->values(),
+            'produsen' => $barangUnique->pluck('produsen')->filter()->unique()->sort()->values(),
+            // 'nama_produk' => $barangUnique->pluck('nama_barang')->filter()->unique()->sort()->values(),
+            'nama_produk' => $namaBarangUnique->pluck('nama_barang')->filter()->unique()->sort()->values(),
+        ];
+
+        // Hitung jumlah per kategori (sekali saja)
+        $counts = [
+            'categories' => $barangUnique->countBy('kategori_umum'),
+            'bahan' => $barangUnique->countBy('bahan_dasar'),
+            'basah_kering' => $barangUnique->countBy('basah_kering'),
+            'rasa' => $barangUnique->countBy('rasa'),
+            'produsen' => $barangUnique->countBy('produsen'),
+        ];
+
+        // $selectedItems = ParcelChildren::where('parcel_id', $id)->with(['parcel','barang'])->get();
+        // dd($selectedItems);
+
+        $card = [
+            'barang' => $barang,
+            // 'selectedItems' => $selectedItems
+        ];
+        // dd($card);
+        //return view('Portal::auth.profile', ['data' => $data, 'user' => $userMaster, 'asal' => $asal_daerah]);
+        return view('Portal::pesanparcel', compact('auth', 'card', 'data', 'asal','parcel','barangUnique','uniqueData','counts','stokProduk'));
+    }
+
+    public function apibarang(Request $request){
+        $barang = DataBarang::with(['user', 'user.detail', 'user.detail.kotaModel'])
+        ->where('berat', '>', 0)
+        ->where('stock_global', '>', 0)
+        ->where(function($query) {
+            $query->where('available', '<>', 'No')
+                  ->orWhereNull('available'); // Jika ingin termasuk NULL
+        })
+        ->groupBy('nama_barang')
+        ->get();
             
         return response()->json([
             'success' => true,
@@ -1219,6 +1412,7 @@ public function listBarangByKategori($kategori)
                     'rasa' => $item->rasa,
                     'produsen' => $item->produsen,
                     'stock_global' => $item->stock_global,
+                    'available' => $item->available,
                     'thumbnail_readable' => $item->thumbnail_readable ? URL::asset($item->thumbnail_readable) : null,
                     'user' => [
                         'nama' => $item->user->nama,
@@ -1294,6 +1488,148 @@ public function listBarangByKategori($kategori)
     }
 }
 
+public function saveToCartApi(Request $request)
+{
+    $user = Auth::user();
+    $datauser = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
+    
+    // Validate the input
+    $request->validate([
+        'items' => 'required|string', // Expecting a JSON string
+        'parcel_id' => 'required|integer',
+        'parcel_quantity' => 'nullable|integer|min:1',
+    ]);
+    
+    // Decode the JSON string to an array
+    try {
+        $items = json_decode($request->input('items'), true);
+        
+        // Check if decoding was successful and items is an array
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($items)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid JSON format for items'
+            ], 400);
+        }
+        
+        // Validate that items array is not empty
+        if (empty($items)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Items array cannot be empty'
+            ], 400);
+        }
+        
+        // Validate each item has required fields
+        foreach ($items as $item) {
+            if (!isset($item['id']) || !is_numeric($item['id'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Each item must have a valid numeric ID'
+                ], 400);
+            }
+        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error decoding items: ' . $e->getMessage()
+        ], 400);
+    }
+    
+    $parcelId = $request->input('parcel_id');
+    $parcelQuantity = max(1, intval($request->input('parcel_quantity', 1))); // Default to 1 if not provided
+    
+    DB::beginTransaction();
+    try {
+        // Get parcel information
+        $parcel = permintaanparcel::with(['parcel_children.barang'])
+                        ->where('id', $parcelId)
+                        ->first();
+        
+        if (!$parcel) {
+            throw new \Exception('Parcel not found');
+        }
+        
+        // Prepare items list for WhatsApp message
+        $itemsList = "";
+        foreach ($items as $index => $item) {
+            $barang = DataBarang::find($item['id']);
+            if (!$barang) {
+                throw new \Exception('Item with ID ' . $item['id'] . ' not found');
+            }
+            $itemsList .= ($index + 1) . ". " . $barang->nama_barang . "\n";
+        }
+        
+        // Save items to cart
+        foreach ($items as $item) {
+            Keranjang::create([
+                'user_id' => $user->id,
+                'barang_id' => $item['id'],
+                'jumlah' => $parcelQuantity,
+                'parcel_id' => $parcelId,
+            ]);
+        }
+        
+        DB::commit();
+        
+        // Send WhatsApp notification
+        $whatsappMessage = "Halo " . $user->username . ", Pesanan Parcel ASPOO #" . $parcelId . "\n";
+        $whatsappMessage .= "Jumlah: " . $parcelQuantity . "\n";
+        $whatsappMessage .= "Items:\n" . $itemsList;
+        
+        $response = Http::withHeaders([
+            'Authorization' => 'RNnk34zGgGPPxF7KLn8L',
+        ])->post('https://api.fonnte.com/send', [
+            'target' => $datauser->telepon,
+            'message' => $whatsappMessage,
+        ]);
+        
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'success' => false,
+            'message' => 'Error saving to cart: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+public function kirimpesanparcelapi(Request $request)
+{
+    $request->validate([
+        'user_id' => 'required|string',
+        'harga' => 'required|numeric',
+        'berat' => 'required|numeric',
+        'alamat' => 'required|string',
+        'barang' => 'required|string',
+        'tanggal' => 'required|date',
+    ]);
+
+    // Decode alamat JSON untuk menambahkan data RajaOngkir
+    $alamat = json_decode($request->alamat, true);
+    
+    // Ambil data kota dari database
+    $kota = Kota::find($alamat['kota']['id']);
+    
+    // Tambahkan data RajaOngkir ke alamat
+    $alamat['kota']['kota_rajaongkir'] = $kota->rajaongkir_city;
+    $alamat['kota']['postal_rajaongkir'] = $kota->rajaongkir_postal;
+
+    $parcel = permintaanparcel::create([
+        'user_id' => $request->user_id,
+        'harga' => $request->harga,
+        'berat' => $request->berat,
+        'alamat' => json_encode($alamat), // Simpan kembali sebagai JSON
+        'barang' => $request->barang,
+        'tanggal' => $request->tanggal,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'parcel_id' => $parcel->id,
+        'harga' => $parcel->harga
+    ]);
+}
 public function kirimpesanparcel(Request $request)
 {
     $request->validate([

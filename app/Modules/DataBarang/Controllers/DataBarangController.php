@@ -134,7 +134,7 @@ class DataBarangController extends Controller
             //   ->orWhere('kategori_umum', 'LIKE', "%{$keyword}%");
     }
 
-    $data = $query->paginate($per_page);
+    $data = $query->orderByDesc('created_at')->paginate($per_page);
 
     return JsonResponseHandler::setResult($data)->send();
 }

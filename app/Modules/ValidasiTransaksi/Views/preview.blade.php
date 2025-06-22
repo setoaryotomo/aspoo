@@ -59,7 +59,7 @@
                     <button class="btn btn-primary" style="margin-right: 5px;" @click="klikApprove('{{ $data->kode_transaksi }}')">
                         Approve
                     </button>
-                    <button class="btn btn-danger" @click="klikTolak('{{ $data->kode_transaksi }}')">
+                    <button style="display: none" class="btn btn-danger" @click="klikTolak('{{ $data->kode_transaksi }}')">
                         Tolak
                     </button>
                 </div>

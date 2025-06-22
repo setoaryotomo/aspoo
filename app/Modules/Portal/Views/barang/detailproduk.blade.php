@@ -278,6 +278,21 @@
                 width: 100%;
             }
         }
+        .product-image {
+            flex: 1;
+            max-width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto;
+        }
     </style>
     </head>
     @php
@@ -288,9 +303,14 @@
         }
     @endphp
 
-    <body>
+    <body class="preload-wrapper">
+        <div class="preload preload-container">
+            <div class="preload-logo">
+                <div class="spinner"></div>
+            </div>
+        </div>
         <div id="container" class="container mt-5">
-
+          
             <div class="row">
                 <div class="col-md-9">
                     <div class="card">
@@ -324,10 +344,10 @@
                                                 <hr>
 
                                                 <div class="store-card">
-                                                    <div class="store-image">
+                                                    {{-- <div class="store-image">
                                                         <img style="max-width: 75px" src="{{ asset('storage/' . $data->user->detail->foto) }}" alt="Toko Image">
                                                         
-                                                    </div>
+                                                    </div> --}}
                                                     <div class="store-details">
                                                         <div class="store-name">{{@$data->user->nama}}</div>
                                                         <div class="store-location">{{@$data->user->detail->alamat}}</div>
@@ -353,10 +373,10 @@
                                         <div class="col-md-12 mt-3">
                                             <h6><strong>{{ rupiah($data->harga_user) }}</strong></h6>
                                         </div>
-                                        <div class="col-md-12">
+                                        {{-- <div class="col-md-12">
                                             <span class="badge badge-danger">{{ $data->diskon }}%</span> <span
                                                 class="text-muted"><del>{{ rupiah($data->harga_user_asli) }}</del></span>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <div class="product-description">
                                         <div class="description-sections">
@@ -415,7 +435,19 @@
                 </div>
             </div>
         </div>
-
+        <script src="{!! asset('js/bootstrap.min.js') !!}"></script>
+        <script src="{!! asset('js/jquery.min.js') !!}"></script>
+        <script src="{!! asset('js/swiper-bundle.min.js') !!}"></script>
+        <script src="{!! asset('js/carousel.js') !!}"></script>
+        <script src="{!! asset('js/bootstrap-select.min.js') !!}"></script>
+        <script src="{!! asset('js/lazysize.min.js') !!}"></script>
+        <script src="{!! asset('js/bootstrap-select.min.js') !!}"></script>
+        <script src="{!! asset('js/count-down.js') !!}"></script>
+        <script src="{!! asset('js/wow.min.js') !!}"></script>
+        <script src="{!! asset('js/multiple-modal.js') !!}"></script>
+        <script src="{!! asset('js/shop.js') !!}"></script>
+        <script src="{!! asset('js/nouislider.min.js') !!}"></script>
+        <script src="{!! asset('js/main.js') !!}"></script>
         <script>
             Vue.createApp({
                 data() {
@@ -435,7 +467,7 @@
                     async tambahKeranjang() {
                         try {
                             showLoading()
-                            const response = await httpClient.post("{!! url('p/barang/keranjang') !!}/", {
+                            const response = await httpClient.post("{!! url('p/barang/keranjang') !!}", {
                                 barang_id: this.barang.id,
                                 jumlah: this.barang.jumlah
                             })
@@ -446,7 +478,7 @@
                         } catch (err) {
                             hideLoading()
                             showToast({
-                                message: err.message,
+                                message: "Login terlebih dahulu",
                                 type: 'error'
                             })
                         }

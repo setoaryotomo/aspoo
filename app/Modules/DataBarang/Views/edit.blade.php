@@ -55,7 +55,7 @@
                                 </vue-multiselect>
                             </div>
 
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label class="form-control-label">Rasa *</label>
                                 <vue-multiselect 
                                     v-model="barang.rasa" 
@@ -65,7 +65,7 @@
                                     :allow-empty="false"
                                     required>
                                 </vue-multiselect>
-                            </div>
+                            </div> --}}
                             <div class="form-group" style="margin-top: 34px">
                                 <label class="form-control-label">Jenis Kemasan *</label>
                                 <vue-multiselect 
@@ -94,7 +94,7 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-6" style="display: none">
                                     <div class="form-group">
                                         <label class="form-control-label">Harga Supplier *</label>
                                         <div class="input-group">
@@ -116,10 +116,21 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Berat *</label>
+                                        <div class="input-group">
+                                            <input v-model="barang.berat" class="form-control" type="number" required>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">gram</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4" style="display: none">
                                     <div class="form-group">
                                         <label class="form-control-label">Diskon</label>
                                         <div class="input-group">
@@ -130,11 +141,26 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="form-control-label">Stok *</label>
                                         <input v-model="barang.stock_global" class="form-control" type="number" required>
                                     </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Available</label>
+                                        <vue-multiselect 
+                                            v-model="barang.available" 
+                                            :options="availableOptions"
+                                            :allow-empty="false"
+                                            required>
+                                        </vue-multiselect>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-control-label">Expired</label>
+                                    <input v-model="barang.expired" class="form-control" type="date">
                                 </div>
                             </div>
                         </div>
@@ -180,9 +206,20 @@
                                 </vue-multiselect>
                             </div>
                             <div class="form-group">
+                                <label class="form-control-label">Rasa *</label>
+                                <vue-multiselect 
+                                    v-model="barang.rasa" 
+                                    :options="rasaOptions"
+                                    :searchable="true"
+                                    placeholder="Pilih Rasa"
+                                    :allow-empty="false"
+                                    required>
+                                </vue-multiselect>
+                            </div>
+                            {{-- <div class="form-group">
                                 <label class="form-control-label">Expired</label>
                                 <input v-model="barang.expired" class="form-control" type="date">
-                            </div>
+                            </div> --}}
                             {{-- <div class="form-group">
                                 <label class="form-control-label">Bahan Kemasan *</label>
                                 <input v-model="barang.bahan_kemasan" class="form-control" type="text" required>
@@ -198,28 +235,17 @@
                                     required>
                                 </vue-multiselect>
                             </div>
-                            <div class="form-group">
+                            {{-- <div class="form-group" style="margin-bottom: 8px">
                                 <label class="form-control-label">Expired</label>
                                 <input v-model="barang.expired" class="form-control" type="date">
-                            </div>
+                            </div> --}}
                             <div class="form-group">
                                 <label class="form-control-label">Info Penting</label>
                                 <textarea class="form-control" v-model="barang.info_penting" rows="3" placeholder="Informasi penting tentang produk"></textarea>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label">Berat *</label>
-                                        <div class="input-group">
-                                            <input v-model="barang.berat" class="form-control" type="number" required>
-                                            <div class="input-group-append">
-                                                <span class="input-group-text">gram</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
+                            <div class="row">  
+                                <div class="col-md-6" style="display: none">
                                     <div class="form-group">
                                         <label class="form-control-label">Satuan *</label>
                                         <vue-multiselect 
@@ -231,9 +257,6 @@
                                         </vue-multiselect>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label class="form-control-label">Panjang</label>
@@ -259,6 +282,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 
@@ -290,6 +314,7 @@
                         bahan_dasar: null,
                         kekhasan: null,
                         basah_kering: null,
+                        available: null,
                         bahan_kemasan: null,
                     },
                     satuan_list: [],
@@ -297,7 +322,7 @@
                     
                     // Options for dropdowns
                     // kategoriUmumOptions: ['Makanan', 'Minuman', 'Snack', 'Kue', 'Rempah', 'Buah', 'Sayur', 'Daging'],
-                    kategoriUmumOptions: ['Abon', 'biskuit', 'Bubuk', 'Bubuk wedang', 'Cookies', 'jenang', 'kacang', 'kentang', 'keripik', 'kerupuk', 'kue', 'Kwaci', 'Minuman', 'Minuman Serbuk', 'Olahan Ikan', 'sambal', 'sari buah', 'Serundeng', 'sirup', 'snack', 'Tahu Bakso', 'talam', 'tape ketan', 'teh', 'telor asin', 'test'],
+                    kategoriUmumOptions: ['Abon', 'biskuit', 'Bubuk', 'Bubuk wedang', 'Cookies', 'jenang', 'kacang', 'kentang', 'keripik', 'kerupuk', 'Kue', 'Kwaci', 'Minuman', 'Minuman Serbuk', 'Olahan Ikan', 'sambal', 'sari buah', 'Serundeng', 'sirup', 'snack', 'Tahu Bakso', 'talam', 'tape ketan', 'teh', 'telor asin', 'test'],
 
                     // kategoriNamaOptions: ['Tradisional', 'Modern', 'Impor', 'Lokal', 'Organik', 'Khusus'],
                     // kategoriUmumOptions: ['Abon', 'Abon Ayam', 'Abon Bandeng', 'Abon Ikan', 'Abon Sapi', 'Amplang', 'Ampyang', 'Apple Pie', 'Aromanis', 'Ayam', 'Bajigur', 'Bakpia', 'Bakpia Kukus', 'Bakpia Ubi', 'Bakso', 'Bakso Goreng (Basreng)', 'Balung Kethek', 'Banana Cookies', 'Banana Roll', 'Bandeng', 'Bandeng Kropok', 'Bandeng Presto', 'Bandrek', 'Bangket', 'Banquet', 'Bawang Goreng', 'Begelan', 'Belinjo', 'Belut', 'Bolen', 'Bolu', 'Brambang', 'Brem', 'Brownies', 'Bumbu', 'Butter Cookies', 'Carica', 'Ceker Ayam', 'Cendol', 'Cheese Stick', 'Chiffon Cake', 'Cimol', 'Cincau', 'Coklat', 'Combro', 'Cookies', 'Cuangki', 'Dendeng', 'Dodol', 'Dollar', 'Dollar Wijen', 'Donat', 'Eggrolls', 'Empal Gepuk', 'Emping', 'Enting Enting Kacang', 'Enting Enting Mlinjo', 'Enting Enting Wijen', 'Enting-Enting', 'Fish Skin', 'Gam', 'Ganep', 'Gapit', 'Gemblong', 'Gembus', 'Gendar', 'Geplak', 'Gethuk', 'Gudeg', 'Gula Aren', 'Iga Sapi', 'Ikan Layur', 'Jahe', 'Jamu', 'Jamur', 'Jenang', 'Jipang', 'Kacang', 'Kacang Atom', 'Kacang Bali', 'Kacang Bangkok', 'Kacang Bawang', 'Kacang Kapri', 'Kacang Kedelai', 'Kacang Koro', 'Kacang Mete', 'Kacang Telur', 'Karak', 'Kastengel', 'Kecap', 'Kecipir', 'Keciput', 'Kembang Goyang', 'Kering Kentang', 'Keripik', 'Keripik Bekicot', 'Keripik Beling', 'Keripik Jamur', 'Keripik Singkong', 'Keripik Wader', 'Kerupuk', 'Kerupuk Bakso', 'Kerupuk Bandeng', 'Kerupuk Bawang', 'Kerupuk Belitung', 'Kerupuk Beras', 'Kerupuk Buah Naga', 'Kerupuk Cakar', 'Kerupuk Cipir', 'Kerupuk Cumi', 'Kerupuk Dele', 'Kerupuk Gendar', 'Kerupuk Gethuk', 'Kerupuk Ikan', 'Kerupuk Jamur', 'Kerupuk Jengkol', 'Kerupuk Kaca', 'Kerupuk Keju', 'Kerupuk Kemplang', 'Kerupuk Kentang', 'Kerupuk Kuku Macan', 'Kerupuk Kulit', 'Kerupuk Lombok', 'Kerupuk Mangga', 'Kerupuk Paru', 'Kerupuk Pedas', 'Kerupuk Puli', 'Kerupuk Rambak', 'Kerupuk Seblak', 'Kerupuk Singkong', 'Kerupuk Stik', 'Kerupuk Tahu', 'Kerupuk Tengiri', 'Kerupuk Tongkol', 'Kerupuk Udang', 'Kerupuk Urat', 'Kletikan', 'Kopi', 'Krasikan', 'Kremesan', 'Kripik', 'Kripik Anggur', 'Kripik Apel', 'Kripik Bakso', 'Kripik Bawang', 'Kripik Bayam', 'Kripik Belut', 'Kripik Brownies', 'Kripik Buah Naga', 'Kripik Cakar', 'Kripik Carica', 'Kripik Ceker', 'Kripik Cimol', 'Kripik Cireng', 'Kripik Cumi', 'Kripik Daun Kangkung', 'Kripik Daun Kenikir', 'Kripik Durian', 'Kripik Gadung', 'Kripik Gembus', 'Kripik Gethuk', 'Kripik Iga', 'Kripik Ikan', 'Kripik Jagung', 'Kripik Jamur', 'Kripik Kaca', 'Kripik Kacang', 'Kripik Kentang', 'Kripik Kulit Ayam', 'Kripik Kulit Ikan', 'Kripik Labu', 'Kripik Layur', 'Kripik Lele', 'Kripik Maicih', 'Kripik Mangga', 'Kripik Melon', 'Kripik Nanas', 'Kripik Nangka', 'Kripik Nuget', 'Kripik Pangsit', 'Kripik Pare', 'Kripik Paru', 'Kripik Pegagan', 'Kripik Pete', 'Kripik Pisang', 'Kripik Salak', 'Kripik Sawi', 'Kripik Singkong', 'Kripik Sukun', 'Kripik Tahu', 'Kripik Talas', 'Kripik Tela', 'Kripik Tembolok', 'Kripik Tempe', 'Kripik Tulang', 'Kripik Ubi', 'Kripik Udang', 'Kripik Usus', 'Kripik Daun Singkong', 'Kripik Singkong', 'Krupuk Intip', 'Kue', 'Kue Blinjo', 'Kue Jahe', 'Kue Kacang', 'Kue Kapit', 'Kue Kelapa', 'Kue Keranjang', 'Kue Kering', 'Kue Pia', 'Kue Pie', 'Kunyit Asem', 'Kuping Gajah', 'Kwaci', 'Lanting', 'Lapis Legit', 'Ledre', 'Lidah Kucing', 'Lontong', 'Lumpia', 'Madu', 'Madu Mongso', 'Makaroni', 'Manisan', 'Marning', 'Mete', 'Mie Keju', 'Mie Lidi', 'Mie Ongklok', 'Minuman', 'Moaci', 'Moci', 'Nastar', 'Nopia', 'Onde Onde', 'Opak', 'Otak Otak', 'Pangsit', 'Pare', 'Paru', 'Pastel', 'Permen', 'Petis', 'Peyek', 'Pia', 'Pie', 'Pilus', 'Popcorn', 'Proll', 'Putri Salju', 'Rambak', 'Rambut Nenek', 'Rempelo', 'Rempeyek', 'Rendang', 'Rengginang', 'Resoles', 'Rolade', 'Roll Cake', 'Rollcake', 'Roti', 'Rumput Laut', 'Sagon', 'Sagu Keju', 'Sale Pisang', 'Sambal', 'Sambal Petis', 'Sarang Madu', 'Satru', 'Sawala', 'Seblak', 'Sekoteng', 'Selondok', 'Sempe', 'Semprit', 'Semprong', 'Serbat', 'Serbuk Jahe', 'Serundeng', 'Singkong', 'Sirup Jahe', 'Sirup Kawista', 'Sirup Temu Lawak', 'Sirup Tjampolay', 'Slondok', 'Snack', 'Soes', 'Soes Ayam', 'Soes Coklat', 'Soes Keju', 'Soes Kering', 'Soft Cookies', 'Spikoe', 'Stik', 'Sumpia', 'Sus Kering', 'Tahu', 'Tahu Bakso', 'Tahu Bulat', 'Talam', 'Tape Ketan', 'Tau Sa Ko', 'Teh', 'Telor Asin', 'Tempe Keripik', 'Tempe Sagu', 'Temulawak', 'Tengiri', 'Terasi', 'Test', 'Timus', 'Tiwul', 'Tradisional', 'Tumpi', 'Untir Untir', 'Wajik', 'Wajit', 'Walangan', 'Wedang Bajigur', 'Wedang Bandrek', 'Wedang Canting', 'Wedang Jahe', 'Wedang Jambos', 'Wedang Jogja', 'Wedang Plethok', 'Wedang Ronde', 'Wedang Secang', 'Wedang Serai', 'Wedang Sinom', 'Wedang Telang', 'Wedang Uwuh', 'Widaran', 'Wingko', 'Yangko'],
@@ -322,6 +347,8 @@
                     basahKeringOptions: ['Basah', 'Kering', 'Semi Basah', 'Cair','Serbuk'],
 
                     bahanKemasanOptions: ['kardus','Karton','kertas','Metalized','Plastik'],
+
+                    availableOptions: ['Yes','No'],
                     
                     path: null,
                     name: null,
@@ -426,6 +453,9 @@
     }
     if (response.data.result.bahan_kemasan) {
         this.barang.bahan_kemasan = response.data.result.bahan_kemasan
+    }
+    if (response.data.result.available) {
+        this.barang.available = response.data.result.available
     }
     
     console.log(this.barang)
