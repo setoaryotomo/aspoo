@@ -33,6 +33,7 @@ use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -1385,6 +1386,179 @@ public function listBarangByKategori($kategori)
         // dd($card);
         //return view('Portal::auth.profile', ['data' => $data, 'user' => $userMaster, 'asal' => $asal_daerah]);
         return view('Portal::pesanparcel', compact('auth', 'card', 'data', 'asal','parcel','barangUnique','uniqueData','counts','stokProduk'));
+    }
+
+    public function getFilterStats(Request $request)
+    {
+        try {
+            $cacheKey = 'filter_stats_optimal';
+            
+            return Cache::remember($cacheKey, 600, function () { // Cache 10 menit
+                // Single query untuk semua statistik
+                $rawData = DB::select("
+                    SELECT 
+                        'categories' as type, kategori_umum as name,
+                        MIN(harga_umum) as min_price, MAX(harga_umum) as max_price,
+                        MIN(berat) as min_weight, MAX(berat) as max_weight,
+                        COUNT(*) as count
+                    FROM barang 
+                    WHERE berat > 0 AND stock_global > 0 
+                        AND kategori_umum != 'Null' AND kategori_umum IS NOT NULL
+                        AND produsen != 'null' AND produsen != '-' AND produsen IS NOT NULL
+                        AND kategori_umum != '' AND kategori_umum != 'null' AND kategori_umum != '-'
+                    GROUP BY kategori_umum
+                    
+                    UNION ALL
+                    
+                    SELECT 
+                        'bahan' as type, bahan_dasar as name,
+                        MIN(harga_umum) as min_price, MAX(harga_umum) as max_price,
+                        MIN(berat) as min_weight, MAX(berat) as max_weight,
+                        COUNT(*) as count
+                    FROM barang 
+                    WHERE berat > 0 AND stock_global > 0 
+                        AND kategori_umum != 'Null' AND kategori_umum IS NOT NULL
+                        AND produsen != 'null' AND produsen != '-' AND produsen IS NOT NULL
+                        AND bahan_dasar IS NOT NULL AND bahan_dasar != '' AND bahan_dasar != 'null' AND bahan_dasar != '-'
+                    GROUP BY bahan_dasar
+                    
+                    UNION ALL
+                    
+                    SELECT 
+                        'basah_kering' as type, basah_kering as name,
+                        MIN(harga_umum) as min_price, MAX(harga_umum) as max_price,
+                        MIN(berat) as min_weight, MAX(berat) as max_weight,
+                        COUNT(*) as count
+                    FROM barang 
+                    WHERE berat > 0 AND stock_global > 0 
+                        AND kategori_umum != 'Null' AND kategori_umum IS NOT NULL
+                        AND produsen != 'null' AND produsen != '-' AND produsen IS NOT NULL
+                        AND basah_kering IS NOT NULL AND basah_kering != '' AND basah_kering != 'null' AND basah_kering != '-'
+                    GROUP BY basah_kering
+                    
+                    UNION ALL
+                    
+                    SELECT 
+                        'rasa' as type, rasa as name,
+                        MIN(harga_umum) as min_price, MAX(harga_umum) as max_price,
+                        MIN(berat) as min_weight, MAX(berat) as max_weight,
+                        COUNT(*) as count
+                    FROM barang 
+                    WHERE berat > 0 AND stock_global > 0 
+                        AND kategori_umum != 'Null' AND kategori_umum IS NOT NULL
+                        AND produsen != 'null' AND produsen != '-' AND produsen IS NOT NULL
+                        AND rasa IS NOT NULL AND rasa != '' AND rasa != 'null' AND rasa != '-'
+                    GROUP BY rasa
+                    
+                    UNION ALL
+                    
+                    SELECT 
+                        'produsen' as type, produsen as name,
+                        MIN(harga_umum) as min_price, MAX(harga_umum) as max_price,
+                        MIN(berat) as min_weight, MAX(berat) as max_weight,
+                        COUNT(*) as count
+                    FROM barang 
+                    WHERE berat > 0 AND stock_global > 0 
+                        AND kategori_umum != 'Null' AND kategori_umum IS NOT NULL
+                        AND produsen != 'null' AND produsen != '-' AND produsen IS NOT NULL
+                        AND produsen != '' AND produsen != 'null'
+                    GROUP BY produsen
+                    
+                    UNION ALL
+                    
+                    SELECT 
+                        'nama_produk' as type, nama_barang as name,
+                        MIN(harga_umum) as min_price, MAX(harga_umum) as max_price,
+                        MIN(berat) as min_weight, MAX(berat) as max_weight,
+                        COUNT(*) as count
+                    FROM barang 
+                    WHERE berat > 0 AND stock_global > 0 
+                        AND kategori_umum != 'Null' AND kategori_umum IS NOT NULL
+                        AND produsen != 'null' AND produsen != '-' AND produsen IS NOT NULL
+                        AND nama_barang IS NOT NULL AND nama_barang != '' AND nama_barang != 'null' AND nama_barang != '-'
+                    GROUP BY nama_barang
+                    
+                    ORDER BY type, name
+                ");
+                
+                // Group hasil berdasarkan type
+                $grouped = collect($rawData)->groupBy('type');
+                
+                $response = [
+                    'success' => true,
+                    'data' => [
+                        'categories' => $grouped->get('categories', collect())->map(function($item) {
+                            return [
+                                'name' => $item->name,
+                                'min_price' => (float) $item->min_price,
+                                'max_price' => (float) $item->max_price,
+                                'min_weight' => (float) $item->min_weight,
+                                'max_weight' => (float) $item->max_weight,
+                                'count' => (int) $item->count
+                            ];
+                        })->values()->toArray(),
+                        'bahan' => $grouped->get('bahan', collect())->map(function($item) {
+                            return [
+                                'name' => $item->name,
+                                'min_price' => (float) $item->min_price,
+                                'max_price' => (float) $item->max_price,
+                                'min_weight' => (float) $item->min_weight,
+                                'max_weight' => (float) $item->max_weight,
+                                'count' => (int) $item->count
+                            ];
+                        })->values()->toArray(),
+                        'basah_kering' => $grouped->get('basah_kering', collect())->map(function($item) {
+                            return [
+                                'name' => $item->name,
+                                'min_price' => (float) $item->min_price,
+                                'max_price' => (float) $item->max_price,
+                                'min_weight' => (float) $item->min_weight,
+                                'max_weight' => (float) $item->max_weight,
+                                'count' => (int) $item->count
+                            ];
+                        })->values()->toArray(),
+                        'rasa' => $grouped->get('rasa', collect())->map(function($item) {
+                            return [
+                                'name' => $item->name,
+                                'min_price' => (float) $item->min_price,
+                                'max_price' => (float) $item->max_price,
+                                'min_weight' => (float) $item->min_weight,
+                                'max_weight' => (float) $item->max_weight,
+                                'count' => (int) $item->count
+                            ];
+                        })->values()->toArray(),
+                        'produsen' => $grouped->get('produsen', collect())->map(function($item) {
+                            return [
+                                'name' => $item->name,
+                                'min_price' => (float) $item->min_price,
+                                'max_price' => (float) $item->max_price,
+                                'min_weight' => (float) $item->min_weight,
+                                'max_weight' => (float) $item->max_weight,
+                                'count' => (int) $item->count
+                            ];
+                        })->values()->toArray(),
+                        'nama_produk' => $grouped->get('nama_produk', collect())->map(function($item) {
+                            return [
+                                'name' => $item->name,
+                                'min_price' => (float) $item->min_price,
+                                'max_price' => (float) $item->max_price,
+                                'min_weight' => (float) $item->min_weight,
+                                'max_weight' => (float) $item->max_weight,
+                                'count' => (int) $item->count
+                            ];
+                        })->values()->toArray()
+                    ]
+                ];
+                
+                return response()->json($response);
+            });
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load filter stats: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function apibarang(Request $request){

@@ -50,6 +50,7 @@ Route::post('/updatestatusmastergagal', [PortalController::class,"updateStatusMa
     Route::post('/save-to-cart-api', [PortalController::class, 'saveToCartApi'])->name('save.to.cart.api');
     Route::get('/keranjang', [PortalController::class, 'keranjang'])->name('keranjang');
     Route::get('/api/barang', [PortalController::class, 'apibarang']);
+    Route::get('/api/filter-stats', [PortalController::class, 'getFilterStats']);
 
     // Route::get('/send-wa', [PortalController::class, 'send-wa']);
     // Route::get('send-wa', function(){
@@ -169,3 +170,4 @@ Route::post('/updatestatusmastergagal', [PortalController::class,"updateStatusMa
 });
 
 Route::get('/api/barang', [PortalController::class, 'apibarang']);
+Route::get('/api/filter-stats', [PortalController::class, 'getFilterStats']);

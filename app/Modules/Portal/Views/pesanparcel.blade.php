@@ -189,6 +189,56 @@
             box-shadow: var(--shadow);
         }
 
+/* Tambahkan ini di bagian CSS */
+.category-option .stats-tooltip {
+    display: none;
+    position: absolute;
+    background-color: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 100;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.category-option .stats-tooltip:after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.category-option {
+    position: relative;
+    display: inline-block;
+}
+
+.category-option:hover .stats-tooltip {
+    display: block;
+}
+
+.category-name {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    padding: 2px 0;
+}
+
+.badge-count {
+    margin-left: 5px;
+    font-size: 0.7em;
+    vertical-align: middle;
+}
+
         .category-option {
             margin: 0.5rem 0;
             display: flex;
@@ -460,14 +510,15 @@
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="desired-price" class="form-label">Harga yang Diinginkan (Rp)</label>
-                            <input type="number" id="desired-price" name="harga" class="form-control"
-                                placeholder="Masukkan harga" required>
+                            <input type="text" id="desired-price" name="harga_formatted" class="form-control" placeholder="Masukkan harga" required>
+                            <input type="hidden" id="desired-price-raw" name="harga">
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
                             <label for="desired-weight" class="form-label">Berat yang Diinginkan (Kilogram)</label>
-                            <input type="number" id="desired-weight" name="berat" class="form-control"
-                                placeholder="Masukkan berat" required step="0.01" min="0">
+                            <input type="text" id="desired-weight" name="berat_formatted" class="form-control"
+                                placeholder="Masukkan berat (Max:10)" required>
+                            <input type="hidden" id="desired-weight-raw" name="berat">
                         </div>
 
                         <div class="col-md-6 col-lg-3 mb-3">
@@ -569,9 +620,13 @@
                                                             value="{{ $kategori }}"
                                                             id="desired-{{ Str::slug($kategori) }}"
                                                             data-type="kategori_umum">
-                                                        <label class="form-check-label"
-                                                            for="desired-{{ Str::slug($kategori) }}">
-                                                            {{ $kategori }}
+                                                        <label class="form-check-label" for="desired-{{ Str::slug($kategori) }}">
+                                                            <span class="category-name">
+                                                                {{ $kategori }}
+                                                                <span class="stats-tooltip" data-category="{{ $kategori }}">
+                                                                    Loading...
+                                                                </span>
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -597,6 +652,9 @@
                                                         <label class="form-check-label"
                                                             for="desired-bahan-{{ Str::slug($bahan) }}">
                                                             {{ $bahan }}
+                                                            <span class="stats-tooltip" data-category="{{ $bahan }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -623,6 +681,9 @@
                                                         <label class="form-check-label"
                                                             for="desired-basah-kering-{{ Str::slug($basahKering) }}">
                                                             {{ $basahKering }}
+                                                            <span class="stats-tooltip" data-category="{{ $basahKering }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -647,6 +708,9 @@
                                                         <label class="form-check-label"
                                                             for="desired-rasa-{{ Str::slug($rasa) }}">
                                                             {{ $rasa }}
+                                                            <span class="stats-tooltip" data-category="{{ $rasa }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -673,6 +737,9 @@
                                                         <label class="form-check-label"
                                                             for="desired-produsen-{{ Str::slug($produsen) }}">
                                                             {{ $produsen }}
+                                                            <span class="stats-tooltip" data-category="{{ $produsen }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -699,6 +766,9 @@
                                                         <label class="form-check-label"
                                                             for="desired-nama-produk-{{ Str::slug($namaProduk) }}">
                                                             {{ $namaProduk }}
+                                                            <span class="stats-tooltip" data-category="{{ $namaProduk }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -727,6 +797,9 @@
                                                         <label class="form-check-label"
                                                             for="unwanted-category-{{ Str::slug($kategori) }}">
                                                             {{ $kategori }}
+                                                            <span class="stats-tooltip" data-category="{{ $kategori }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -752,6 +825,9 @@
                                                         <label class="form-check-label"
                                                             for="unwanted-bahan-{{ Str::slug($bahan) }}">
                                                             {{ $bahan }}
+                                                            <span class="stats-tooltip" data-category="{{ $bahan }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -777,6 +853,9 @@
                                                         <label class="form-check-label"
                                                             for="unwanted-basah-kering-{{ Str::slug($basahKering) }}">
                                                             {{ $basahKering }}
+                                                            <span class="stats-tooltip" data-category="{{ $basahKering }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -801,6 +880,9 @@
                                                         <label class="form-check-label"
                                                             for="unwanted-rasa-{{ Str::slug($rasa) }}">
                                                             {{ $rasa }}
+                                                            <span class="stats-tooltip" data-category="{{ $rasa }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -826,6 +908,9 @@
                                                         <label class="form-check-label"
                                                             for="unwanted-produsen-{{ Str::slug($produsen) }}">
                                                             {{ $produsen }}
+                                                            <span class="stats-tooltip" data-category="{{ $produsen }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -851,6 +936,9 @@
                                                         <label class="form-check-label"
                                                             for="unwanted-nama-produk-{{ Str::slug($namaProduk) }}">
                                                             {{ $namaProduk }}
+                                                            <span class="stats-tooltip" data-category="{{ $namaProduk }}">
+                                                                Loading...
+                                                            </span>
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -932,6 +1020,7 @@
 
     <!-- Scripts -->
     <script src="{!! asset('js/bootstrap.min.js') !!}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
     <script src="{!! asset('js/jquery.min.js') !!}"></script>
     <script src="{!! asset('js/swiper-bundle.min.js') !!}"></script>
     <script src="{!! asset('js/carousel.js') !!}"></script>
@@ -946,6 +1035,75 @@
     <script src="{!! asset('js/main.js') !!}"></script>
     <!-- Font Awesome for icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi input mask untuk harga
+            const priceInput = new Cleave('#desired-price', {
+                numeral: true,
+                numeralThousandsGroupStyle: 'thousand',
+                prefix: 'Rp ',
+                noImmediatePrefix: true,
+                rawValueTrimPrefix: true,
+                onValueChanged: function(e) {
+                    // Update hidden field dengan nilai numerik
+                    document.getElementById('desired-price-raw').value = e.target.rawValue;
+                }
+            });
+    
+            // Inisialisasi input mask untuk berat
+            const weightInput = new Cleave('#desired-weight', {
+                numeral: true,
+                numeralDecimalMark: '.',
+                delimiter: '',
+                numeralDecimalScale: 2, // Allow up to 2 decimal places
+                suffix: ' kg',
+                noImmediateSuffix: true,
+                rawValueTrimSuffix: true,
+                onValueChanged: function(e) {
+                    // Update hidden field with numeric value
+                    const rawValue = parseFloat(e.target.rawValue);
+                    // if (rawValue > 10) {
+                    //     alert("Maksimal berat adalah 10 kg");
+                    //     e.target.value = '10.00 kg';
+                    //     document.getElementById('desired-weight-raw').value = 10;
+                    // } else {
+                        document.getElementById('desired-weight-raw').value = rawValue;
+                    // }
+                }
+            });
+    
+            // Validasi form submit
+            document.getElementById('parcel-form').addEventListener('submit', function(e) {
+                const rawPrice = document.getElementById('desired-price-raw').value;
+                const rawWeight = document.getElementById('desired-weight-raw').value;
+    
+                if (!rawPrice || isNaN(rawPrice)) {
+                    e.preventDefault();
+                    alert('Masukkan harga yang valid');
+                    return;
+                }
+    
+                if (!rawWeight || isNaN(rawWeight) || parseFloat(rawWeight) <= 0) {
+                    e.preventDefault();
+                    alert('Masukkan berat yang valid (harus lebih dari 0)');
+                    return;
+                }
+            });
+        });
+    
+        // Fungsi untuk mendapatkan nilai numerik harga
+        function getDesiredPriceValue() {
+            const rawValue = document.getElementById('desired-price-raw').value;
+            return parseFloat(rawValue) || 0;
+        }
+    
+        // Fungsi untuk mendapatkan nilai numerik berat
+        function getDesiredWeightValue() {
+            const rawValue = document.getElementById('desired-weight-raw').value;
+            return parseFloat(rawValue) || 0;
+        }
+    </script>
 
     <script>
         // document.addEventListener('DOMContentLoaded', function() {
@@ -2183,8 +2341,8 @@ function displayRecommendations(recommendations, id) {
     const container = document.getElementById('barang-list');
     container.innerHTML = '';
 
-    const desiredPrice = parseFloat(document.getElementById('desired-price').value);
-    const desiredWeightKg = parseFloat(document.getElementById('desired-weight').value);
+    const desiredPrice = getDesiredPriceValue();
+    const desiredWeightKg = getDesiredWeightValue();
     const desiredWeight = desiredWeightKg * 1000; // Convert to grams for internal use
     const desiredTotalItems = document.getElementById('total-items').value ? 
         parseInt(document.getElementById('total-items').value) : null;
@@ -2402,14 +2560,28 @@ function displayRecommendations(recommendations, id) {
 document.getElementById("process-button").addEventListener("click", async function() {
     console.log("Process button clicked");
 
-    const desiredPrice = parseFloat(document.getElementById('desired-price').value);
-    const desiredWeightKg = parseFloat(document.getElementById('desired-weight').value);
+    const desiredPrice = getDesiredPriceValue();
+    const desiredWeightKg = getDesiredWeightValue();
     const desiredWeight = desiredWeightKg * 1000; // Convert kilograms to grams
 
     if (!desiredPrice || !desiredWeight) {
         alert("Masukkan harga dan berat yang diinginkan");
         return;
     }
+
+    // Add weight limit validation
+    if (desiredWeightKg > 10) {
+            alert("Melebihi berat maksimal 10 kg");
+            return;
+        }
+
+    // Add confirmation for 10 kg parcels
+    if (desiredWeightKg === 10) {
+            const isConfirmed = confirm("Anda memilih berat maksimal 10 kg. Apakah Anda yakin?");
+            if (!isConfirmed) {
+                return;
+            }
+        }
 
     // Show loading state
     this.disabled = true;
@@ -2984,6 +3156,95 @@ document.getElementById("process-button").addEventListener("click", async functi
     document.addEventListener('DOMContentLoaded', updateSelectedFiltersDisplay);
     </script>
 
+<script>
+    $(document).ready(function() {
+        // Load filter stats via AJAX
+        function loadFilterStats() {
+            $.ajax({
+                url: '/p/api/filter-stats',
+                type: 'GET',
+                beforeSend: function() {
+                    // Show loading indicator if needed
+                },
+                success: function(response) {
+                    if (response.success) {
+                        updateFilterStats(response.data);
+                    } else {
+                        console.error('Failed to load filter stats:', response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('AJAX Error:', xhr.responseText);
+                }
+            });
+        }
+    
+        // Function to update the stats in the existing DOM structure
+        function updateFilterStats(data) {
+            // Update categories
+            updateCategoryStats('#desired-categories', data.categories);
+            updateCategoryStats('#unwanted-categories', data.categories);
+            
+            // Update other filter types as needed
+            updateCategoryStats('#desired-bahan', data.bahan);
+            updateCategoryStats('#unwanted-bahan', data.bahan);
+            
+            updateCategoryStats('#desired-basah-kering', data.basah_kering);
+            updateCategoryStats('#unwanted-basah-kering', data.basah_kering);
+            
+            updateCategoryStats('#desired-rasa', data.rasa);
+            updateCategoryStats('#unwanted-rasa', data.rasa);
+            
+            updateCategoryStats('#desired-produsen', data.produsen);
+            updateCategoryStats('#unwanted-produsen', data.produsen);
+            
+            updateCategoryStats('#desired-nama-produk', data.nama_produk);
+            updateCategoryStats('#unwanted-nama-produk', data.nama_produk);
+        }
+    
+        function updateCategoryStats(containerId, items) {
+            $(containerId).find('.category-option').each(function() {
+                const $option = $(this);
+                const categoryName = $option.find('input').val();
+                const categoryData = items.find(item => item.name === categoryName);
+                
+                if (categoryData) {
+                // Update badge count
+                $option.find('.badge-count').text(categoryData.count);
+                
+                // Format price display
+                let priceDisplay;
+                if (categoryData.min_price === categoryData.max_price) {
+                    priceDisplay = formatCurrency(categoryData.min_price);
+                } else {
+                    priceDisplay = `${formatCurrency(categoryData.min_price)}-${formatCurrency(categoryData.max_price)}`;
+                }
+                
+                // Format weight display
+                let weightDisplay;
+                if (categoryData.min_weight === categoryData.max_weight) {
+                    weightDisplay = `${categoryData.min_weight}g`;
+                } else {
+                    weightDisplay = `${categoryData.min_weight}g-${categoryData.max_weight}g`;
+                }
+                
+                // Update tooltip content
+                $option.find('.stats-tooltip').html(`
+                    Harga: ${priceDisplay}<br>
+                    Berat: ${weightDisplay}
+                `);
+            }
+            });
+        }
+    
+        function formatCurrency(amount) {
+            return (amount / 1000).toFixed(0) + 'rb';
+        }
+    
+        // Call the function when page loads
+        loadFilterStats();
+    });
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
