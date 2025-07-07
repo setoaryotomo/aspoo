@@ -4,429 +4,678 @@ $title = 'Penjualan';
 ?>
 <?php $active[5] = 'active' ?>
 <?php include('../templates/sidebar.php') ?>
-<div class="main-panel bgMain ">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-        <div class="container-fluid">
-            <div class="navbar-wrapper">
-                <span class="navbar-brand title-layout">Penjualan</span>
+<div class="main-panel bgMain">
+    <div class="container-fluid" style="padding-top: 10px;">
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: #333;
+            }
+
+            .pos-container {
+                display: grid;
+                grid-template-columns: 1fr 400px;
+                gap: 20px;
+                min-height: calc(100vh - 150px);
+            }
+
+            .left-panel {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 20px;
+                padding: 25px;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            }
+
+            .right-panel {
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 20px;
+                padding: 25px;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .logo {
+                font-size: 24px;
+                font-weight: bold;
+                color: #667eea;
+            }
+
+            .date {
+                color: #666;
+                font-size: 14px;
+            }
+
+            .search-bar {
+                position: relative;
+                margin-bottom: 30px;
+            }
+
+            .search-bar input {
+                width: 100%;
+                padding: 15px 50px 15px 20px;
+                border: 2px solid #e0e0e0;
+                border-radius: 50px;
+                font-size: 16px;
+                outline: none;
+                transition: all 0.3s ease;
+            }
+
+            .search-bar input:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .products-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 20px;
+            }
+
+            .product-card {
+                background: white;
+                border-radius: 15px;
+                padding: 20px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+                position: relative;
+                border: 1px solid #eee;
+            }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            }
+
+            .product-image {
+                width: 100%;
+                height: 120px;
+                object-fit: contain;
+                margin-bottom: 10px;
+                border-radius: 10px;
+                background-color: #f8f9fa;
+            }
+
+            .product-name {
+                font-weight: 600;
+                margin-bottom: 8px;
+                color: #333;
+            }
+
+            .product-category {
+                color: #999;
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+
+            .product-price {
+                font-weight: bold;
+                color: #667eea;
+                font-size: 14px;
+            }
+
+            .add-btn {
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                width: 30px;
+                height: 30px;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                font-size: 18px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+
+            .add-btn:hover {
+                transform: scale(1.1);
+            }
+
+            .quantity-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: #FF6B6B;
+                color: white;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+            }
+
+            .order-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+
+            .order-title {
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .order-number {
+                color: #667eea;
+                font-weight: 600;
+            }
+
+            .order-items {
+                max-height: 300px;
+                overflow-y: auto;
+                margin-bottom: 20px;
+            }
+
+            .order-item {
+                display: flex;
+                align-items: center;
+                padding: 15px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .order-item:last-child {
+                border-bottom: none;
+            }
+
+            .item-details {
+                flex: 1;
+            }
+
+            .item-name {
+                font-weight: 600;
+                margin-bottom: 5px;
+            }
+
+            .item-price {
+                color: #999;
+                font-size: 14px;
+            }
+
+            .quantity-controls {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-right: 15px;
+            }
+
+            .qty-btn {
+                width: 30px;
+                height: 30px;
+                border: 1px solid #e0e0e0;
+                background: white;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                transition: all 0.3s ease;
+            }
+
+            .qty-btn:hover {
+                background: #f0f0f0;
+            }
+
+            .qty-display {
+                min-width: 30px;
+                text-align: center;
+                font-weight: 600;
+            }
+
+            .item-total {
+                font-weight: bold;
+                color: #333;
+                min-width: 80px;
+                text-align: right;
+            }
+
+            .order-summary {
+                border-top: 2px solid #f0f0f0;
+                padding-top: 20px;
+            }
+
+            .summary-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 10px;
+            }
+
+            .summary-row.total {
+                font-weight: bold;
+                font-size: 18px;
+                color: #333;
+                border-top: 1px solid #e0e0e0;
+                padding-top: 10px;
+                margin-top: 10px;
+            }
+
+            .checkout-btn {
+                width: 100%;
+                padding: 18px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 15px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin-top: 20px;
+            }
+
+            .checkout-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            }
+
+            .payment-section {
+                margin-top: 20px;
+                padding-top: 20px;
+                border-top: 1px solid #eee;
+            }
+
+            .payment-input {
+                margin-bottom: 15px;
+            }
+
+            .payment-input label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: 600;
+                color: #555;
+            }
+
+            .payment-input input {
+                width: 100%;
+                padding: 12px 15px;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                font-size: 16px;
+                outline: none;
+                transition: all 0.3s ease;
+            }
+
+            .payment-input input:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .change-display {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 8px;
+                margin-top: 15px;
+                font-weight: bold;
+                text-align: center;
+                font-size: 18px;
+                color: #333;
+            }
+
+            @media (max-width: 1024px) {
+                .pos-container {
+                    grid-template-columns: 1fr;
+                    gap: 15px;
+                }
+
+                .right-panel {
+                    order: -1;
+                }
+
+                .products-grid {
+                    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                    gap: 15px;
+                }
+            }
+
+            .summary-row.total {
+                border-top: none !important;
+            }
+        </style>
+
+        <div class="pos-container">
+            <div class="left-panel">
+                <div class="header">
+                    <div class="logo">Menu</div>
+                    <div class="date" id="current-date"><?= date('l, j F Y') ?></div>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" placeholder="Search..." id="searchInput">
+                </div>
+
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be populated by JavaScript -->
+                </div>
             </div>
 
-            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="navbar-toggler-icon icon-bar"></span>
-                <span class="navbar-toggler-icon icon-bar"></span>
-                <span class="navbar-toggler-icon icon-bar"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end">
-                <ul class="navbar-nav">
-                    <!-- your navbar here -->
-                    <li class="ml-auto nav-item">
-                        <div class="alert alert-info ">
-                            <h4 class="" style=" position: relative;" id="days"></h4>
-                        </div>
-                    </li>
-                </ul>
+            <div class="right-panel">
+                <div class="order-header">
+                    <div class="order-title">Orders</div>
+                </div>
+
+                <div class="order-items" id="orderItems">
+                    <!-- Order items will be populated by JavaScript -->
+                </div>
+
+                <div class="order-summary">
+                    <div class="summary-row" style="display: none;">
+                        <span>Subtotal</span>
+                        <span id="subTotal">Rp. 0</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="grandTotal">Rp. 0</span>
+                    </div>
+                </div>
+
+                <div class="payment-section">
+                    <div class="payment-input">
+                        <label for="paymentAmount">Jumlah Pembayaran</label>
+                        <input type="number" id="paymentAmount" placeholder="Masukkan jumlah pembayaran">
+                    </div>
+                    <div class="change-display" id="changeDisplay">
+                        Kembalian: Rp. 0
+                    </div>
+                    <button class="checkout-btn" id="completePayment">Simpan Transaksi</button>
+                </div>
             </div>
         </div>
-    </nav>
-    <!-- End Navbar -->
-    <div class="content">
-        <div class="container">
-            <!-- your content here -->
 
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="alert alert-danger pt-4" role="alert">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <h3>Total Harga :</h3>
-                            </div>
-                            <div class="col-md-9">
-                                <h3 class="mb-0" id="totalAtas">Rp. 0</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- <div class="col-md-3">
-                    <div class="alert alert-primary " role="alert">
-                        <h4>Jumlah</h4>
-                        <p class="mb-0" id="jumlahAtas">0</p>
-                    </div>
-                </div> -->
-                <!-- <div class="col-md-4">
-                    <div class="alert alert-info " role="alert">
-                        <h2 class="mb-0 text-center"><span style=" position: relative;" id="days"></span></h2>
-                    </div>
-                </div> -->
-            </div>
-
-            <div class="card mt-5">
-                <div class="card-header card-header-primary card-header-bg">
-                    <h4 class="card-title">Data Penjualan</h4>
-                </div>
-                <div class="card-body">
-
-                    <form id="kirim" action="./penjualan/api.php" method="POST">
-                        <input type="hidden" name="allData" id="allData">
-                        <div class="form-group pt-3">
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <input type="hidden" name="obat" id="obat">
-                                    <a class="btn btn-primary ml-4" data-toggle="modal" data-target="#pilihObat">Pilih Barang</a>
-
-                                    <!-- modal -->
-                                    <div class="modal fade" id="pilihObat" tabindex="-1" role="dialog">
-                                        <div class="modal-dialog modal-lg" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Pilih Barang</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="table-responsive pt-3">
-                                                        <table id="table_id" class="table">
-                                                            <thead class="text-primary">
-                                                                <th>No</th>
-                                                                <th>Kode Barang</th>
-                                                                <th>Nama Barang</th>
-                                                                <th>Satuan Barang</th>
-                                                                <th>Harga</th>
-                                                                <th>Stok</th>
-                                                                <th>Option</th>
-                                                            </thead>
-                                                            <tbody>
-                                                                <?php $i = 1;
-                                                                $userId = $_SESSION['data']['id']; // Ambil ID user yang login
-                                                                $s = $conn->query("SELECT * FROM barang WHERE created_by_user_id = '$userId'"); // Filter barang berdasarkan user_id
-                                                                while ($row = $s->fetch_assoc()) : ?>
-                                                                    <tr>
-                                                                        <td><?= $i++ ?></td>
-                                                                        <td><?= $row['id'] ?></td>
-                                                                        <td><?= $row['nama_barang'] ?></td>
-                                                                        <td><?= $conn->query("SELECT satuan.satuan_nama FROM satuan WHERE id ='" . $row['satuan_id'] . "'")->fetch_assoc()['satuan_nama'] ?></td>
-                                                                        </td>
-                                                                        <td><?= $row['harga_umum'] ?></td>
-                                                                        <td><?= $row['stock_global'] ?></td>
-                                                                        <td>
-                                                                            <button data-dismiss="modal" <?= (intval($row['stock_global']) <= 0 ? "disabled" : "") ?> aria-label="Close" onclick="editObatPenjualan('<?= $row['id'] ?>')" class="btn btn-primary" type="button">Pilih</button>
-                                                                        </td>
-                                                                    </tr>
-                                                                <?php endwhile; ?>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="form-group text-center mt-3">
-                                        <span class="pilih-obat" id="obat-selected">Nama Barang</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-3 mt-3">
-                                                <label for="jumlah" class="bmd-label-floating">Jumlah</label>
-                                            </div>
-                                            <div class="col-md-9 mt-2">
-                                                <input type="number" class="form-control" name="jumlah" id="jumlah" value="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <div class="pull-right">
-                                            <button type="button" class="btn btn-primary" id="buat_data">Simpann</button>
-                                        </div>
-                                    </div>
-
-                                    <input type="hidden" name="request" value="kirimData">
-                                </div>
-                             
-                            </div>
-                        </div>
-                    </form>
-
-                    <div class="table-responsive">
-                        <table class="table mt-3">
-                            <thead class="text-primary">
-                                <th>No</th>
-                                <th>Nama Barang</th>
-                                <th>Satuan</th>
-                                <th>Jumlah</th>
-                                <th>Harga</th>
-                                <th>Subtotal</th>
-                                <th>Action</th>
-                            </thead>
-                            <tbody id="bodyTable">
-
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <form class="pt-3">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group" style="display: none;">
-                                    <select class="form-control selectpicker" data-style="btn btn-link" name="pelanggan" id="pelanggan">
-                                        <option selected value="0">Pelanggan Biasa</option>
-                                        <?php $sl = $conn->query("SELECT * FROM pos_pelanggan");
-                                        while ($row = $sl->fetch_assoc()) : ?>
-                                            <option value="<?= $row['pelanggan_id'] ?>"><?= $row['pelanggan_nama'] ?></option>
-                                        <?php endwhile; ?>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="bmd-label-floating">Total</label>
-                                    <input type="text" class="form-control" name="total" id="total" value="0">
-                                </div>
-                                <div class="form-group">
-                                    <label class="bmd-label-floating">Bayar</label>
-                                    <input type="text" class="form-control" name="bayar" id="bayar" value="0">
-                                </div>
-                                <div class="form-group">
-                                    <label class="bmd-label-floating">Kembali</label>
-                                    <input type="text" class="form-control" name="kembali" disabled id="kembali" value="0">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group pull-right">
-                            <button class="btn btn-primary" id="simpan_data" type="button">Simpan Data</button>
-                        </div>
-                    </form>
-
-                </div>
-            </div>
-
-        </div>
+        <!-- Hidden form for submitting data -->
+        <form id="kirim" action="./penjualan/api.php" method="POST" style="display: none;">
+            <input type="hidden" name="allData" id="allData">
+            <input type="hidden" name="request" value="kirimData">
+        </form>
     </div>
+
     <?php include('../templates/footer.php') ?>
     <script>
-        var url = "./penjualan/api.php",
-            dataPenjualan,
-            arrData = [],
-            deletedData = [],
-            i = 0,
-            dataObat,
-            dataConvertSatuan = [],
-            mSwitch = false,
-            isClicked = false
-
-
-        function editObatPenjualan(arr) {
-            $.post(
-                url, {
-                    id: arr,
-                    request: "dataObat",
-                },
-                (data, status, xhr) => {
-                     console.log("Received data:", data);
-                    dataObat = data;
-                    $("#obat-selected").html(
-                        data.id +
-                        " | " +
-                        data.nama_barang +
-                        " | Rp. " +
-                        data.harga_umum
-                    );
-                }
-            );
-            isClicked = true
-        }
-
-        function hapusTr(it) {
-            if (parseInt(it) != 0) it--;
-            if (typeof arrData[it].penjualan_child_id != "undefined")
-                deletedData.push(arrData[it]);
-            delete arrData[it];
-            $("#bodyTable").empty();
-            i = 0
-            iterateUlang()
-            arrData = $.grep(arrData, (n) => {
-                return n == 0 || n;
-            });
-            countTotal();
-        }
-
-        function countTotal() {
-            var total = 0;
-            var jumlah = 0;
-            for (x in arrData) {
-                total += parseInt(arrData[x].subtotal);
-                jumlah += parseInt(arrData[x].jumlah_data)
+        // Function to process thumbnail URL
+        function processThumbnail(thumbnail) {
+            // If thumbnail is already a full URL
+            if (thumbnail.startsWith('http') && !thumbnail.includes('drive.google.com')) {
+                return thumbnail;
             }
-            $("#total").val(total);
-            $('#jumlahAtas').html(jumlah);
-            rubahTotalAtas()
-            kembali();
+            
+            // If thumbnail is a Google Drive link
+            if (thumbnail.includes('drive.google.com')) {
+                // Extract file ID from Google Drive URL
+                const pattern = /\/d\/([^\/]+)/;
+                const matches = thumbnail.match(pattern);
+                
+                if (matches && matches[1]) {
+                    const fileId = matches[1];
+                    return `https://drive.google.com/thumbnail?id=${fileId}&sz=w500&v=1`;
+                }
+                
+                return thumbnail;
+            }
+            
+            // Default: assume it's a local storage path
+            return `storage/${thumbnail}`;
         }
 
-        function kembali() {
-            $("#kembali").val(parseInt($("#bayar").val()) - parseInt($("#total").val()));
-        }
+        // Sample product data - this will be replaced with your PHP data
+        const products = [
+            <?php 
+            $userId = $_SESSION['data']['id'];
+            $query = $conn->query("SELECT * FROM barang WHERE created_by_user_id = '$userId'");
+            while ($row = $query->fetch_assoc()): 
+                // Simple category mapping based on product name for demo
+                $category = 'makanan';
+                if (strpos(strtolower($row['nama_barang']), 'minum') !== false) $category = 'minuman';
+                if (strpos(strtolower($row['nama_barang']), 'snack') !== false || strpos(strtolower($row['nama_barang']), 'goreng') !== false) $category = 'snack';
+            ?>
+            { 
+                id: <?= $row['id'] ?>, 
+                name: '<?= $row['nama_barang'] ?>', 
+                category: '<?= $category ?>', 
+                price: <?= $row['harga_umum'] ?>, 
+                image: '<?= $row['thumbnail'] ?>', 
+                stock: <?= $row['stock_global'] ?>,
+                satuan: '<?= $conn->query("SELECT satuan.satuan_nama FROM satuan WHERE id ='" . $row['satuan_id'] . "'")->fetch_assoc()['satuan_nama'] ?>'
+            },
+            <?php endwhile; ?>
+        ];
 
-        function iterateUlang() {
-            arrData.forEach(dataIterate => {
-                if (dataIterate.convertSatuan) {
-                    $("#bodyTable").append(`
-                        <tr id="tr_${i++}">
-                            <td>${i}</td>
-                            <td>${dataIterate.nama_barang}</td>
-                            <td>${dataIterate.dc_satuan_nama} | (${dataIterate.satuan_nama})</td>
-                            <td>${dataIterate.dc_jumlah} | (${dataIterate.dc_jumlah_asli})</td>
-                            <td>${dataIterate.harga_umum}</td>
-                            <td>${dataIterate.subtotal}</td>
-                            <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
-                        </tr>
-                    `);
-                } else {
-                    $("#bodyTable").append(`
-                        <tr id="tr_${i++}">
-                            <td>${i}</td>
-                            <td>${dataIterate.nama_barang}</td>
-                            <td>${dataIterate.satuan_nama}</td>
-                            <td>${dataIterate.jumlah_data}</td>
-                            <td>${dataIterate.harga_umum}</td>
-                            <td>${dataIterate.subtotal}</td>
-                            <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
-                        </tr>
-                    `);
-                }
-            })
-        }
+        let cart = [];
+        let currentCategory = 'all';
 
-        function rubahTotalAtas() {
-            $('#totalAtas').html("Rp. " + $('#total').val())
-            $('#totalAtas').change()
-        }
-
-        $(document).ready(() => {
-            $("#buat_data").click(() => {
-                if (parseInt(dataObat.stock_global) < parseInt($('#jumlah').val())) {
-                    alert("Jumlah tidak boleh melebihi dari stok barang! \n" + "Stok Barang : " + dataObat.stock_global);
-                    return;
-                }
-                dataObat["jumlah_data"] = parseInt($("#jumlah").val());
-                dataObat["subtotal"] = parseInt(dataObat.jumlah_data) * parseInt(dataObat.harga_umum);
-                // tambah ke table
-                if (mSwitch) {
-                    mSwitch = false;
-                    isClicked = false;
-                    dataObat['dc_jumlah_asli'] = dataObat.jumlah_data;
-                    dataObat['convertSatuan'] = true;
-                    $("#bodyTable").append(`
-                        <tr id="tr_${i++}">
-                            <td>${i}</td>
-                            <td>${dataObat.nama_barang}</td>
-                            <td>${dataObat.dc_satuan_nama} | (${dataObat.satuan_nama})</td>
-                            <td>${dataObat.dc_jumlah} | (${dataObat.dc_jumlah_asli})</td>
-                            <td>${dataObat.harga_umum}</td>
-                            <td>${dataObat.subtotal}</td>
-                            <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
-                        </tr>
-                    `);
-                } else {
-                    $("#bodyTable").append(`
-                        <tr id="tr_${i++}">
-                            <td>${i}</td>
-                            <td>${dataObat.nama_barang}</td>
-                            <td>${dataObat.satuan_nama}</td>
-                            <td>${dataObat.jumlah_data}</td>
-                            <td>${dataObat.harga_umum}</td>
-                            <td>${dataObat.subtotal}</td>
-                            <td><button type="button" class="btn btn-danger" onclick="hapusTr('${i}')">Hapus</button></td>
-                        </tr>
-                    `);
-                    dataObat['convertSatuan'] = false;
-                }
-                arrData.push(dataObat);
-                $("#obat-selected").html("Pilih Barang");
-                $("#jumlah").val("");
-                $("#m_total_obat").val("0");
-                $("#m_jumlah_convert").val("0");
-                countTotal();
-            });
-
-            $('#m_total_obat').keyup(() => {
-                console.log(parseInt($('#jumlah').val()), parseInt($('#m_total_obat').val()))
-                $('#m_jumlah_convert').val(parseInt($('#jumlah').val()) / parseInt($('#m_total_obat').val()))
-
-            });
-
-            $('#m_convert_satuan').click(() => {
-                if (!isClicked) {
-                    alert("Silahkan pilih obat terlebih dahulu")
-                    $('#convert').modal('hide');
-                    return;
-                }
-                if (parseInt($('#jumlah').val()) <= 0) {
-                    alert("Silahkan diisi dulu jumlahnya")
-                    $('#convert').modal('hide')
-                    return;
-                }
-                $('#convert').modal('show');
-                mSwitch = true;
-                $('#penjelasan').html(`
-                    Jumlah Awal : ${$("#jumlah").val()} <br>
-                    Satuan Awal : ${dataObat.satuan_nama}
-                `)
-                // $('#jumlah_awal').html(" Jumlah : " + $('#jumlah').val())
-                // $('#m_satuan_awal').html("Satuan : " + dataObat.satuan_nama)
-                $.post(url, {
-                    id: dataObat.satuan_id,
-                    request: "getSatuan"
-                }, (data) => {
-                    $("#m_satuan_dirubah").empty()
-                    data.forEach((yw) => {
-                        $('#m_satuan_dirubah').append(`<option value="${yw.satuan_id}">${yw.satuan_nama}</option>`).selectpicker("refresh")
-                    })
-
-                })
-
-
-            })
-            $('#m_simpan').click(() => {
-                dataObat['dc_satuan_id'] = $('#m_satuan_dirubah').find(":selected").val()
-                dataObat['dc_satuan_nama'] = $('#m_satuan_dirubah').find(":selected").text()
-                dataObat['dc_jumlah'] = parseInt($('#m_jumlah_convert').val())
-            })
-
-            $("#bayar").keyup(() => {
-                kembali();
-            });
-            var retr;
-            $("#simpan_data").click(() => {
-                if (parseInt($("#kembali").val()) < 0) {
-                    alert("Kembalian tidak boleh minus")
-                    return;
-                }
-                dataPenjualan = {
-                    id_pelanggan: $("#pelanggan option:selected").val(),
-                    total: $("#total").val(),
-                    bayar: $("#bayar").val(),
-                    kembali: $("#kembali").val(),
-                };
-                retr = {
-                    request: "kirimData",
-                    penjualan: dataPenjualan,
-                    obat: arrData,
-                };
-                console.log(retr)
-
-                console.log(JSON.stringify(retr))
-                $("#allData").val(JSON.stringify(retr));
-                $("#kirim").submit();
-            });
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            displayProducts();
+            setupEventListeners();
+            updateCurrentDate();
         });
+
+        function updateCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            document.getElementById('current-date').textContent = today.toLocaleDateString('id-ID', options);
+        }
+
+        function displayProducts() {
+            const productsGrid = document.getElementById('productsGrid');
+            const filteredProducts = currentCategory === 'all' 
+                ? products 
+                : products.filter(product => product.category === currentCategory);
+
+            productsGrid.innerHTML = '';
+
+            filteredProducts.forEach(product => {
+                const cartItem = cart.find(item => item.id === product.id);
+                const quantity = cartItem ? cartItem.quantity : 0;
+                const imageUrl = processThumbnail(product.image);
+                
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-category">Stok: ${product.stock} ${product.satuan}</div>
+                    <div class="product-price">Rp. ${product.price.toLocaleString('id-ID')}</div>
+                    <button class="add-btn" style="background: #667eea;" onclick="addToCart(${product.id})" ${product.stock <= 0 ? 'disabled' : ''}>
+                        ${product.stock <= 0 ? '⛔' : '+'}
+                    </button>
+                    ${quantity > 0 ? `<div class="quantity-badge">${quantity}</div>` : ''}
+                `;
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredProducts = products.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm)
+                );
+                displayFilteredProducts(filteredProducts);
+            });
+            
+            // Complete payment button
+            document.getElementById('completePayment').addEventListener('click', completePayment);
+            
+            // Payment amount input
+            document.getElementById('paymentAmount').addEventListener('input', updateChange);
+        }
+
+        function displayFilteredProducts(filteredProducts) {
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = '';
+
+            filteredProducts.forEach(product => {
+                const cartItem = cart.find(item => item.id === product.id);
+                const quantity = cartItem ? cartItem.quantity : 0;
+                const imageUrl = processThumbnail(product.image);
+                
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-category">Stok: ${product.stock} ${product.satuan}</div>
+                    <div class="product-price">Rp. ${product.price.toLocaleString('id-ID')}</div>
+                    <button class="add-btn" style="background: #667eea;" onclick="addToCart(${product.id})" ${product.stock <= 0 ? 'disabled' : ''}>
+                        ${product.stock <= 0 ? '⛔' : '+'}
+                    </button>
+                    ${quantity > 0 ? `<div class="quantity-badge">${quantity}</div>` : ''}
+                `;
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                if (existingItem.quantity >= product.stock) {
+                    alert('Stok tidak mencukupi!');
+                    return;
+                }
+                existingItem.quantity += 1;
+            } else {
+                if (product.stock <= 0) {
+                    alert('Stok habis!');
+                    return;
+                }
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1,
+                    satuan: product.satuan
+                });
+            }
+
+            displayProducts();
+            updateOrderDisplay();
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(cartItem => cartItem.id !== productId);
+                }
+            }
+            displayProducts();
+            updateOrderDisplay();
+        }
+
+        function updateOrderDisplay() {
+            const orderItems = document.getElementById('orderItems');
+            orderItems.innerHTML = '';
+
+            cart.forEach(item => {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+                orderItem.innerHTML = `
+                    <div class="item-details">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">Rp. ${item.price.toLocaleString('id-ID')}</div>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                        <div class="qty-display">${item.quantity}</div>
+                        <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </div>
+                    <div class="item-total">Rp. ${(item.price * item.quantity).toLocaleString('id-ID')}</div>
+                `;
+                orderItems.appendChild(orderItem);
+            });
+
+            updateTotals();
+        }
+
+        function updateTotals() {
+            const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            document.getElementById('subTotal').textContent = `Rp. ${total.toLocaleString('id-ID')}`;
+            document.getElementById('grandTotal').textContent = `Rp. ${total.toLocaleString('id-ID')}`;
+            
+            // Auto-focus payment input when items are added
+            if (cart.length > 0) {
+                document.getElementById('paymentAmount').focus();
+            }
+        }
+
+        function updateChange() {
+            const paymentAmount = parseInt(document.getElementById('paymentAmount').value) || 0;
+            const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            const change = paymentAmount - total;
+            
+            document.getElementById('changeDisplay').textContent = `Kembalian: Rp. ${change.toLocaleString('id-ID')}`;
+            
+            // Change color based on change amount
+            const changeDisplay = document.getElementById('changeDisplay');
+            if (change < 0) {
+                changeDisplay.style.color = '#e74c3c';
+            } else {
+                changeDisplay.style.color = '#27ae60';
+            }
+        }
+
+        function completePayment() {
+            if (cart.length === 0) {
+                alert('Keranjang kosong! Silakan tambahkan produk terlebih dahulu.');
+                return;
+            }
+            
+            const paymentAmount = parseInt(document.getElementById('paymentAmount').value) || 0;
+            const total = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            
+            if (paymentAmount < total) {
+                alert('Pembayaran kurang dari total!');
+                return;
+            }
+            
+            // Prepare data for submission
+            const dataPenjualan = {
+                id_pelanggan: 0, // Default to regular customer
+                total: total,
+                bayar: paymentAmount,
+                kembali: paymentAmount - total
+            };
+
+            const arrData = cart.map(item => ({
+                id: item.id,
+                nama_barang: item.name,
+                harga_umum: item.price,
+                jumlah_data: item.quantity,
+                subtotal: item.price * item.quantity,
+                satuan_nama: item.satuan
+            }));
+
+            const retr = {
+                request: "kirimData",
+                penjualan: dataPenjualan,
+                obat: arrData,
+            };
+
+            // Submit the form
+            document.getElementById('allData').value = JSON.stringify(retr);
+            document.getElementById('kirim').submit();
+        }
     </script>
+</div>

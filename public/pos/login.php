@@ -85,7 +85,7 @@ if (isset($_POST['username'])) {
                                 <!-- <span toggle="#password-field" class="fa fa-fw fa-eye fa-lg field-icon toggle-password"></span> -->
                             </div>
                         </div>
-                        <div class="form-check ml-4 mt-2">
+                        <div class="form-check ml-4 mt-2" style="display: none;">
                             <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" value="yes" name="ingat">
                                 Ingat Saya
@@ -94,16 +94,14 @@ if (isset($_POST['username'])) {
                                 </span>
                             </label>
                         </div>
-                        <div class="form-group pt-2 ">
-                            <div class="row">
-                                <div class="col-md-5">
+                        <div class="form-group pt-2">
+                            <div class="row justify-content-center">
+                                <div class="col-md-5 text-center">
                                     <button type="submit" class="btn btn-lg btn-round btn-primary btn-login">Login</button>
-                                </div>
-                                <div class="col-md-7">
-                                    <a href="register.php" class="btn btn-akun btn-lg btn-round">Buat Akun</a>
                                 </div>
                             </div>
                         </div>
+
                     </form>
                     
                 </div>

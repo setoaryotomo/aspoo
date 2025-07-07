@@ -93,6 +93,8 @@
                             <div class="col-md-3 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary w-100">Filter</button>
                             </div>
+                                
+                            
                         </div>
                     </form>
                 </div>
@@ -108,6 +110,21 @@
                             <p>Periode: {{ date('d M Y', strtotime($startDate)) }} - {{ date('d M Y', strtotime($endDate)) }}</p>
                             <p>Total Transaksi: {{ $totalTransaksi }}</p>
                             <p>Total Toko: {{ $tokos->count() }}</p>
+                            
+                            <!-- Updated Export PDF link dengan parameter filter -->
+                            {{-- <a href="{{ route('laporan.penjualan.export.pdf', [
+                                'tanggal_mulai' => $startDate,
+                                'tanggal_selesai' => $endDate,
+                                'status' => $status,
+                                'toko_id' => $tokoId
+                            ]) }}" 
+                            class="btn btn-success btn-sm" 
+                            target="_blank">
+                                <i class="fas fa-file-pdf"></i> EXPORT PDF
+                            </a> --}}
+                            <button onclick="exportPDF()" class="btn btn-success btn-sm">
+                                <i class="fas fa-file-pdf"></i> CETAK LAPORAN
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -155,4 +172,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    function exportPDF() {
+        const startDate = document.getElementById('tanggal_mulai').value;
+        const endDate = document.getElementById('tanggal_selesai').value;
+        const status = document.getElementById('status').value;
+        const tokoId = document.getElementById('toko_id').value;
+        
+        const exportUrl = `/dashboard/export-pdf?tanggal_mulai=${startDate}&tanggal_selesai=${endDate}&status=${status}&toko_id=${tokoId}`;
+        window.open(exportUrl, '_blank');
+    }
+    </script>
 @endsection

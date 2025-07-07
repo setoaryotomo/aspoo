@@ -10,4 +10,7 @@ Route::prefix('/dashboard')->group(function() {
     Route::get('/transaction-data', [DashboardController::class, 'getTransactionData']);
     Route::get('/laporan-penjualan', [DashboardController::class, 'laporanPenjualan'])->name('laporan.penjualan');
     Route::get('/laporan-penjualan-admin', [DashboardController::class, 'laporanPenjualanAdmin'])->name('laporan.penjualan.admin');
+    Route::get('/export-pdf', [DashboardController::class, 'exportPdf'])
+    ->name('laporan.penjualan.export.pdf')
+    ->middleware('auth');
 });

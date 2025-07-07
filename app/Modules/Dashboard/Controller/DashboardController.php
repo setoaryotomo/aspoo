@@ -15,6 +15,7 @@ use App\Modules\PortalUser\Models\TokoUser;
 use App\Modules\TransaksiBarang\Models\TransaksiBarang;
 use App\Modules\TransaksiBarang\Models\TransaksiBarangChildren;
 use App\Modules\User\Model\UserRoleModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -262,6 +263,62 @@ class DashboardController extends Controller
         'tokos' => $tokos,
         'totalTransaksi' => $transaksi->count() // Menambahkan total transaksi
     ]);
+}
+
+public function exportPdf(Request $request) 
+{
+    // Ambil parameter filter yang sama dengan laporan admin
+    $startDate = $request->input('tanggal_mulai', date('Y-m-01'));
+    $endDate = $request->input('tanggal_selesai', date('Y-m-d'));
+    $status = $request->input('status', 'semua');
+    $tokoId = $request->input('toko_id', 'semua');
+    
+    // Query transaksi dengan filter yang sama
+    $transaksi = TransaksiBarang::with(['pembeli', 'penjual'])
+        ->whereBetween('created_at', [$startDate, $endDate]);
+        
+    // Filter status
+    if ($status != 'semua') {
+        $transaksi->where('status', $status);
+    }
+    
+    // Filter toko
+    if ($tokoId != 'semua') {
+        $transaksi->where('toko_id', $tokoId);
+    }
+    
+    $transaksi = $transaksi->orderBy('created_at', 'desc')->get();
+    $totalPenjualan = $transaksi->sum('total_biaya');
+    
+    // Daftar toko untuk informasi
+    $tokos = TokoUser::all();
+    
+    // Set timezone ke WIB (Asia/Jakarta)
+    date_default_timezone_set('Asia/Jakarta');
+    
+    // Data untuk PDF
+    $data = [
+        'transaksi' => $transaksi,
+        'totalPenjualan' => $totalPenjualan,
+        'startDate' => $startDate,
+        'endDate' => $endDate,
+        'status' => $status,
+        'tokoId' => $tokoId,
+        'tokos' => $tokos,
+        'totalTransaksi' => $transaksi->count(),
+        'tanggalCetak' => date('d M Y H:i:s') . ' WIB'
+    ];
+    
+    // Generate PDF
+    $pdf = Pdf::loadView('pdf.laporan_penjualan_pdf', $data);
+    
+    // Set paper size dan orientation
+    $pdf->setPaper('A4', 'landscape');
+    
+    // Generate filename dengan timestamp
+    $filename = 'laporan_penjualan_' . date('Y-m-d_H-i-s') . '.pdf';
+    
+    return $pdf->download($filename);   
 }
 
 }

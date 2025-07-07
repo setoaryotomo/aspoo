@@ -30,7 +30,7 @@ class PortalUserController extends Controller
 
     public function datatable(Request $request)
     {
-        $per_page = $request->input('per_page') != null ? $request->input('per_page') : 15;
+        $per_page = $request->input('per_page') ?? 15;
         $data = PortalUserRepository::datatable($per_page);
         return JsonResponseHandler::setResult($data)->send();
     }
@@ -42,91 +42,103 @@ class PortalUserController extends Controller
 
     public function store(PortalUserCreateRequest $request)
     {
-        $payload = $request->all();
-        
-        if (!empty($payload['kota_id'])) {
-            $get_rajaongkircity = $payload['kota_id'];
-            $rajaongkir_city = Kota::find($get_rajaongkircity);
-    
+        $kota_id = $request->input('kota_id');
+        $kota_rajaongkir = null;
+        $postal_rajaongkir = null;
+
+        if (!empty($kota_id)) {
+            $rajaongkir_city = Kota::find($kota_id);
             if ($rajaongkir_city) {
                 $kota_rajaongkir = $rajaongkir_city->rajaongkir_city;
                 $postal_rajaongkir = $rajaongkir_city->rajaongkir_postal;
-            } else {
-                $kota_rajaongkir = null;
-                $postal_rajaongkir = null;
             }
-        } else {
-            $kota_rajaongkir = null;
-            $postal_rajaongkir = null;
         }
-    
-        $role = $payload['role_id'];
+
+        $role_id = $request->input('role_id');
         $formDataUser = new Request([
-            'name' => $payload['nama'],
-            'email' => $payload['email'],
-            'username' => $payload['email'],
-            'password' => $payload['password'],
+            'name' => $request->input('nama'),
+            'email' => $request->input('email'),
+            'username' => $request->input('email'),
+            'password' => $request->input('password'),
         ]);
-        $payload['password'] = Hash::make($request->password);
-    
+
         $userController = new UserController();
         try {
             DB::beginTransaction();
             $dataUser = $userController->store($formDataUser)->original['result'];
-            $payload['user_id'] = $dataUser['id'];
-            $portaluser = PortalUserRepository::create($payload);
-            $roleRequest = new Request(['role_id' => $role]);
+            $user_id = $dataUser['id'];
+
+            $portalUserData = [
+                'user_id' => $user_id,
+                'nama' => $request->input('nama'),
+                'email' => $request->input('email'),
+                'password' => Hash::make($request->input('password')),
+                'role_id' => $role_id,
+                'alamat' => $request->input('alamat'),
+                'tanggal_lahir' => $request->input('tanggal_lahir'),
+                'telepon' => $request->input('telepon'),
+                'provinsi_id' => $request->input('provinsi_id'),
+                'kota_id' => $kota_id,
+                'kecamatan_id' => $request->input('kecamatan_id'),
+                'kelurahan_id' => $request->input('kelurahan_id'),
+            ];
+            $portaluser = PortalUserRepository::create($portalUserData);
+
+            $roleRequest = new Request(['role_id' => $role_id]);
             $userController->addRole($roleRequest, $dataUser->id);
-    
+
             // Create user details based on role
-            if ($role == "3" || $role == "4") {
+            if ($role_id == 3 || $role_id == 4) {
                 TokoUser::create([
-                    'user_id' => $dataUser['id'],
-                    'nama' => $payload['nama'],
+                    'user_id' => $user_id,
+                    'nama' => $request->input('nama_toko'),
+                    'ijin_usaha' => $request->input('ijin_usaha'),
+                    'npwp' => $request->input('npwp'),
+                    'omset' => $request->input('omset'),
                 ]);
                 UserDetail::create([
-                    'user_id' => $dataUser->id,
-                    'alamat' => $payload['alamat'],
-                    'tanggal_lahir' => $payload['tanggal_lahir'],
-                    'telepon' => $payload['telepon'],
-                    'provinsi' => $payload['provinsi_id'],
-                    'kota' => $payload['kota_id'] ?? null,
+                    'user_id' => $user_id,
+                    'alamat' => $request->input('alamat'),
+                    'tanggal_lahir' => $request->input('tanggal_lahir'),
+                    'telepon' => $request->input('telepon'),
+                    'provinsi' => $request->input('provinsi_id'),
+                    'kota' => $kota_id,
                     'kota_rajaongkir' => $kota_rajaongkir,
                     'postal_rajaongkir' => $postal_rajaongkir,
-                    'kecamatan' => $payload['kecamatan_id'] ?? null,
-                    'kelurahan' => $payload['kelurahan_id'] ?? null,
+                    'kecamatan' => $request->input('kecamatan_id'),
+                    'kelurahan' => $request->input('kelurahan_id'),
                 ]);
             } else {
                 UserDetail::create([
-                    'user_id' => $dataUser->id,
-                    'alamat' => $payload['alamat'],
-                    'tanggal_lahir' => $payload['tanggal_lahir'],
-                    'telepon' => $payload['telepon'],
-                    'provinsi' => $payload['provinsi_id'],
-                    'kota' => $payload['kota_id'] ?? null,
+                    'user_id' => $user_id,
+                    'alamat' => $request->input('alamat'),
+                    'tanggal_lahir' => $request->input('tanggal_lahir'),
+                    'telepon' => $request->input('telepon'),
+                    'provinsi' => $request->input('provinsi_id'),
+                    'kota' => $kota_id,
                     'kota_rajaongkir' => $kota_rajaongkir,
                     'postal_rajaongkir' => $postal_rajaongkir,
-                    'kecamatan' => $payload['kecamatan_id'] ?? null,
-                    'kelurahan' => $payload['kelurahan_id'] ?? null,
+                    'kecamatan' => $request->input('kecamatan_id'),
+                    'kelurahan' => $request->input('kelurahan_id'),
                 ]);
             }
-    
+
             DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             return JsonResponseHandler::setResult($e)->send();
         }
-    
+
         return JsonResponseHandler::setResult($portaluser)->send();
     }
-    
-    
-    public function login(Request $request){
+
+    public function login(Request $request)
+    {
         $email = $request->input('email');
         $password = $request->input('password');
         $remember_me = $request->input('remember_me');
-        
-        $user = UserModel::where('email', $email)->orWhere('email', $email)->first();
+
+        $user = UserModel::where('email', $email)->first();
         if ($user == null) {
             return JsonResponseHandler::setCode(JsonResponseType::ERROR)
                 ->setStatus(400)
@@ -141,10 +153,9 @@ class PortalUserController extends Controller
                 ->send();
         }
         if (Auth::attempt($request->only('email', 'password'))) {
-            // Authentication was successful
             $user = Auth::user();
             $token = $user->createToken('authToken')->plainTextToken;
-    
+
             return response()->json([
                 'user' => $user,
                 'token' => $token,
@@ -155,14 +166,16 @@ class PortalUserController extends Controller
             ->setResult($user)
             ->send();
     }
+
     public function logout(Request $request)
     {
         $user = $request->user();
         $user->tokens()->delete();
         return JsonResponseHandler::setCode(JsonResponseType::SUCCESS)
-        ->setMessage("Berhasil Logout")
-        ->send();
+            ->setMessage("Berhasil Logout")
+            ->send();
     }
+
     public function show(Request $request, $id)
     {
         $portaluser = PortalUserRepository::get($id);
@@ -176,10 +189,10 @@ class PortalUserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $payload = $request->all();
-        unset($payload['created_at']);
-        unset($payload['updated_at']);
-        $portaluser = PortalUserRepository::update($id, $payload);
+        $data = $request->all();
+        unset($data['created_at']);
+        unset($data['updated_at']);
+        $portaluser = PortalUserRepository::update($id, $data);
         return JsonResponseHandler::setResult($portaluser)->send();
     }
 

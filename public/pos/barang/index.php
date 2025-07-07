@@ -17,7 +17,7 @@ $title = "Barang";
 <?php include('../templates/sidebar.php') ?>
 <div class="main-panel bgMain ">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+    <!-- <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
             <div class="navbar-wrapper">
                 <span class="navbar-brand title-layout">Barang</span>
@@ -32,7 +32,6 @@ $title = "Barang";
             </button>
             <div class="collapse navbar-collapse justify-content-end">
                 <ul class="navbar-nav">
-                    <!-- your navbar here -->
                     <li class="ml-auto nav-item">
                         <div class="profil">
 
@@ -41,9 +40,9 @@ $title = "Barang";
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav> -->
     <!-- End Navbar -->
-    <div class="content">
+    <!-- <div class="content"> -->
         <div class="container">
             <!-- your content here -->
 
@@ -58,10 +57,8 @@ $title = "Barang";
                                 <th>No</th>
                                 <th>Kode Barang</th>
                                 <th>Nama Barang</th>
-                                <th>Satuan</th>
-                                <th>Harga Supplier</th>
                                 <th>Harga Umum</th>
-                                <th>Jumlah</th>
+                                <th>Stok</th>
                             </thead>
                             <tbody>
                                 <?php $totalsupplier = 0;
@@ -71,18 +68,6 @@ $title = "Barang";
                                     <td><?= $i++ ?></td>
                                     <td><?= $row['id'] ?></td>
                                     <td><?= $row['nama_barang'] ?></td>
-                                    <?php
-                                    $namasatuan = $row['satuan_id'];
-
-                                    $query = "SELECT barang.*, satuan.satuan_nama
-                                            FROM barang
-                                            INNER JOIN satuan ON barang.satuan_id = satuan.id
-                                            WHERE barang.satuan_id = '$namasatuan'";
-                                    $result = $conn->query($query);
-                                    $row_result = $result->fetch_assoc();
-                                    echo "<td>" . $row_result['satuan_nama'] . "</td>";
-                                    ?>
-                                    <td><?= $row['harga_supplier'] ?></td>
                                     <td><?= $row['harga_umum'] ?></td>
                                     <td><?= $row['stock_global'] ?></td>
                                 </tr>
@@ -94,8 +79,6 @@ $title = "Barang";
                             <tfoot>
                                 <td></td>
                                 <td></td>
-                                <td class="text-primary center-align">Jumlah Harga Supplier</td>
-                                <td>Rp. <?= number_format($totalsupplier, 2, ',', '.') ?></td>
                                 <td class="text-primary center-align">Jumlah Harga Umum</td>
                                 <td>Rp. <?= number_format($totalumum, 2, ',', '.') ?></td>
                             </tfoot>
@@ -105,6 +88,6 @@ $title = "Barang";
             </div>
 
         </div>
-    </div>
+    <!-- </div> -->
 
     <?php include('../templates/footer.php') ?>

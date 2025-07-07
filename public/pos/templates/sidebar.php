@@ -52,7 +52,7 @@
           <?php if ($_SESSION['user_name'] !== ' ') : ?>
 
             <li class="nav-item <?php if (isset($active[1])) echo $active[1] ?>">
-              <a href="obat" class="nav-link">
+              <a href="barang" class="nav-link">
                 <i class="material-icons">business</i>
                 <p>Barang</p>
               </a>

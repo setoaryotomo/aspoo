@@ -21,7 +21,7 @@ $title = 'Laporan';
 
 <div class="main-panel bgMain fadeIn animated">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+    <!-- <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
             <div class="navbar-wrapper">
                 <span class="navbar-brand title-layout">Laporan</span>
@@ -35,7 +35,6 @@ $title = 'Laporan';
             </button>
             <div class="collapse navbar-collapse justify-content-end">
                 <ul class="navbar-nav">
-                    <!-- your navbar here -->
                     <li class="ml-auto nav-item">
                         <div class="profil">
 
@@ -44,14 +43,14 @@ $title = 'Laporan';
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav> -->
     <!-- End Navbar -->
-    <div class="content">
-        <div class="container">
+    <!-- <div class="content"> -->
+        <div class="container" style="padding-top: 10px;">
             <!-- your content here -->
 
             <!-- card laporan uang -->
-            <div class="laporan-uang mb-2">
+            <div class="laporan-uang mb-2" style="display: none;">
                 <div class="row justify-content-center align-items-center">
                     <div class="col-md-4 mb-3">
                         <div class="custom-card uang-masuk">
@@ -132,7 +131,7 @@ $title = 'Laporan';
             </div>
 
         </div>
-    </div>
+    <!-- </div> -->
 
 
 

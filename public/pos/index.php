@@ -74,9 +74,9 @@ $title = "Dashboard " ?>
                         <div class="text-banner">
                             <p><i class="material-icons fa-2x">today</i> &nbsp<span id="days"></span></span></p>
                         </div>
-                        <div class="button-banner">
+                        <!-- <div class="button-banner">
                             <a href="laporan" class="btn btn-round btn-outline-primary cek-obat">Lihat Laporan <i class="material-icons fa-2x">arrow_forward</i></a>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
