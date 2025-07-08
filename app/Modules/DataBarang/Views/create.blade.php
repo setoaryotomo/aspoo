@@ -18,7 +18,7 @@
                     <div class="row">
                         <!-- Left Column -->
                         <div class="col-md-6">
-                            <div class="form-group">
+                            <div class="form-group" style="display: none">
                                 <label class="form-control-label">Pilih Barang</label>
                                 <vue-multiselect 
                                     v-model="barang.scm_barang_id" 
@@ -155,16 +155,12 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label">Available</label>
-                                        <vue-multiselect 
-                                            v-model="barang.available" 
-                                            :options="availableOptions"
-                                            :allow-empty="false"
-                                            required>
-                                        </vue-multiselect>
+                                    <div class="form-group" style="margin-bottom: 13px">
+                                        <label class="form-control-label">Expired</label>
+                                        <input v-model="barang.expired" class="form-control" type="date">
                                     </div>
                                 </div>
+                                
                             </div>
 
                             
@@ -237,10 +233,6 @@
                                     required>
                                 </vue-multiselect>
                             </div>
-                            <div class="form-group" style="margin-bottom: 13px">
-                                <label class="form-control-label">Expired</label>
-                                <input v-model="barang.expired" class="form-control" type="date">
-                            </div>
                             <div class="form-group">
                                 <label class="form-control-label">Info Penting</label>
                                 <textarea class="form-control" v-model="barang.info_penting" rows="3" placeholder="Informasi penting tentang produk"></textarea>
@@ -285,6 +277,17 @@
                                             
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">Available</label>
+                                    <vue-multiselect 
+                                        v-model="barang.available" 
+                                        :options="availableOptions"
+                                        :allow-empty="false"
+                                        required>
+                                    </vue-multiselect>
                                 </div>
                             </div>
 

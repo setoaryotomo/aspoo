@@ -4,7 +4,7 @@
         <div id="add-user" class="card">
             <div class="card-header pb-0">
                 <div class="d-flex align-items-center">
-                    <h4 class="card-title">Tambah User</h4>
+                    <h4 class="card-title">Tambah Toko</h4>
                 </div>
             </div>
             <div class="card-body">
@@ -14,6 +14,12 @@
                             <div class="form-group">
                                 <label class="form-label">Nama</label>
                                 <input type="text" class="form-control" v-model="user.nama">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Nama Toko</label>
+                                <input type="text" class="form-control" v-model="user.nama_toko">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -34,12 +40,39 @@
                                 <input type="date" class="form-control" v-model="user.tanggal_lahir">
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Nomor Telepon</label>
+                                <input type="number" class="form-control" v-model="user.telepon">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Ijin Usaha</label>
+                                {{-- <label class="control-label">Jenis Ijin Usaha</label> --}}
+                                <vue-multiselect v-model="user.ijin_usaha" :searchable="true" :options="ijin_usaha_list" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Omset</label>
+                                <vue-multiselect v-model="user.omset" :searchable="true" :options="omset_list" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">NPWP</label>
+                                <input type="text" class="form-control" v-model="user.npwp">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-label">Alamat</label>
                                 <input type="text" class="form-control" v-model="user.alamat">
                             </div>
                         </div>
+                        
                         <div class="col-md-6" style="display: none">
                             <div class="form-group">
                                 <label class="form-label"> Role</label>
@@ -78,6 +111,12 @@
                                 </div>
                             </div>
                         </div>
+                        {{-- <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="form-label">Alamat</label>
+                                <input type="text" class="form-control" v-model="user.alamat">
+                            </div>
+                        </div> --}}
 
                         <div class="d-flex justify-content-end">
                             <button type="button" @click="back" class="btn btn-sm bg-warning me-1 text-white">
@@ -114,6 +153,48 @@
                         {
                             value: 4,
                             label: "Mitra"
+                        },
+                    ],
+                    ijin_usaha_list: [{
+                            value: "BELUM_BERIJIN",
+                            label: "Belum Berijin"
+                        },
+                        {
+                            value: "CV",
+                            label: "CV"
+                        },
+                        {
+                            value: "PERSEORANGAN",
+                            label: "Perseorangan"
+                        },
+                        {
+                            value: "PT",
+                            label: "PT"
+                        },
+                        {
+                            value: "UD",
+                            label: "UD"
+                        },
+                        {
+                            value: "-",
+                            label: "-"
+                        },
+                    ],
+                    omset_list: [{
+                            value: "<10jt",
+                            label: "Kurang dari 10 juta"
+                        },
+                        {
+                            value: "10-50jt",
+                            label: "10 sampai 50 juta"
+                        },
+                        {
+                            value: "50-150jt",
+                            label: "50 sampai 150 juta"
+                        },
+                        {
+                            value: ">150jt",
+                            label: "Lebih dari 150 juta"
                         },
                     ],
                     user: {

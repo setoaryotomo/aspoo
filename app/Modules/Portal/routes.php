@@ -42,6 +42,7 @@ Route::post('/updatestatusmastergagal', [PortalController::class,"updateStatusMa
     Route::get("/cekongkir",[PortalController::class,"cekongkir"]);
     Route::post("/cekongkir",[PortalController::class,"cekHasil"]);
     Route::get("/pesanparcel",[PortalController::class,"pesanparcel"]);
+    Route::get("/tutorialparcel",[PortalController::class,"tutorialparcel"]);
     Route::get("/pesanparcelapi",[PortalController::class,"pesanparcelapi"]);
     Route::post("/pesanparcel",[PortalController::class,"kirimpesanparcel"])->name('parcel.store');
     Route::post("/pesanparcelapi",[PortalController::class,"kirimpesanparcelapi"])->name('parcel.store');

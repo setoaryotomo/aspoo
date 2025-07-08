@@ -419,7 +419,13 @@
 
         <div class="container py-5">
             <h1 class="page-title text-center">Pesan Parcel Sesuai Keinginanmu</h1>
+            {{-- <a href="/p/tutorialparcel" style="display: block; text-align: center; margin: 1rem 0;">Berikut Tutorial Parcel Custom Aspoo</a> --}}
 
+            <div style="text-align: center;">
+                <a href="/p/tutorialparcel" class="btn btn-outline-primary mt-0 mb-3 d-inline-block" style="width: auto; max-width: 300px;">
+                    <i class="fas fa-book me-2"></i>Lihat Tutorial Lengkap
+                </a>
+            </div>
             <div class="section-card">
                 <form id="parcel-form" action="{{ route('parcel.store') }}" method="POST">
                     @csrf

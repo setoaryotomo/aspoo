@@ -16,6 +16,7 @@ use App\Modules\InputSCM\Models\Alamat\Provinsi;
 use App\Modules\KategoriProduk\Models\KategoriProduk;
 use App\Modules\KategoriProduk\Models\PivotKategoriProduk;
 use App\Modules\Keranjang\Models\Keranjang;
+use App\Modules\MasterUMKM\Models\MasterUMKM;
 use App\Modules\Pembelian\Repositories\WatZapRepository;
 use App\Modules\Penjualan\Models\Pengikut;
 use App\Modules\permintaanparcel\Models\permintaanparcel;
@@ -654,6 +655,7 @@ public function updateStatusMasterGagal(Request $request)
         $data = UserDetail::where('user_id', Auth::id())->with('userMaster')->first();
         // dd($data);
         $userMaster = UserModel::where('id', Auth::id())->first();
+        $toko = MasterUMKM::where('user_id', Auth::id())->first();
         $provinsi = Provinsi::all();
         $kota = Kota::all();
         $asal_daerah = [
@@ -661,7 +663,7 @@ public function updateStatusMasterGagal(Request $request)
             'kota' => $kota,
         ];
 
-        return view('Portal::auth.profile', ['data' => $data, 'user' => $userMaster, 'asal' => $asal_daerah]);
+        return view('Portal::auth.profile', ['data' => $data, 'user' => $userMaster, 'asal' => $asal_daerah, 'toko' => $toko]);
     }
     public function updateProfile(Request $request)
 {
@@ -1847,6 +1849,11 @@ public function kirimpesanparcel(Request $request)
         $rekening = Rekening::select('*')->get();
 
         return view('Portal::parcelkonfirmasi', compact('rekening', 'harga'));
+    }
+    public function tutorialparcel(Request $request)
+    {
+
+        return view('Portal::tutorialparcel');
     }
     public function daftarparcel(Request $request)
     {

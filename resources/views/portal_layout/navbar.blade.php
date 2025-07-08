@@ -241,7 +241,7 @@
                         </div>
                         <div class="col-md-4 col-6">
                             <a href="{{ url('/p') }}" class="logo-header">
-                                <img src="https://warungaspoo.com/img/portal/logo.png" alt="logo" class="logo">
+                                <img src="{{ asset('img/portal/android-chrome-512x512.png') }}" alt="ASPOO Logo" class="logo">
                             </a>
                         </div>
                         <div class="col-md-4 col-6 tf-md-hidden">
@@ -274,7 +274,7 @@
                                         <a href="#" role="button" id="userNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true"
                                             aria-expanded="false" class="user-dropdown-link">
                                             <div class="user-info">
-                                                <img :src="userData.fotodata || 'https://warungaspoo.com/img/portal/user-icon.png'" class="user-profile-img" alt="Profile">
+                                                <img :src="userData.fotodata || '{{ asset('img/portal/user-icon.png') }}'" class="user-profile-img" alt="Profile">
                                                 <div class="box-user">
                                                     {{-- <div class="user-name">@{{ userData.name }}</div> --}}
                                                     {{-- <div class="user-role">@{{ userData.roleName }}</div> --}}
@@ -297,7 +297,7 @@
                                         <a href="#" role="button" id="userNavbarDropdown" data-bs-toggle="dropdown" aria-haspopup="true"
                                             aria-expanded="false" class="user-dropdown-link">
                                             <div class="user-info">
-                                                <img :src="userData.fotodata || 'https://via.placeholder.com/40'" class="user-profile-img" alt="Profile">
+                                                <img :src="userData.fotodata || '{{ asset('img/portal/user-icon.png') }}'" class="user-profile-img" alt="Profile">
                                                 <div class="box-user">
                                                     <div class="user-name">@{{ userData.name }}</div>
                                                     <div class="user-role">@{{ userData.roleName }}</div>

@@ -13,6 +13,12 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="form-control-label">Nama</label>
+                                <input v-model="userData.user.name" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">Nama Toko</label>
                                 <input v-model="userData.nama" class="form-control" type="text">
                             </div>
                         </div>
@@ -26,6 +32,32 @@
                             <div class="form-group">
                                 <label class="form-control-label">Email</label>
                                 <input v-model="userData.user.email" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">Nomor Telepon</label>
+                                <input v-model="userData.detail.telepon" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">NPWP</label>
+                                <input v-model="userData.npwp" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">Ijin Usaha</label>
+                                <input v-model="userData.ijin_usaha" class="form-control" type="text">
+                                {{-- <vue-multiselect v-model="userData.ijin_usaha" :searchable="true" :options="ijin_usaha_list" /> --}}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-control-label">Omset</label>
+                                <input v-model="userData.omset" class="form-control" type="text">
+                                {{-- <vue-multiselect v-model="userData.omset" :searchable="true" :options="omset_list" /> --}}
                             </div>
                         </div>
                         {{-- <div class="col-md-6" style="display: none">
@@ -106,6 +138,48 @@
                             kelurahan: null
                         }
                     },
+                    ijin_usaha_list: [{
+                            value: "BELUM_BERIJIN",
+                            label: "Belum Berijin"
+                        },
+                        {
+                            value: "CV",
+                            label: "CV"
+                        },
+                        {
+                            value: "PERSEORANGAN",
+                            label: "Perseorangan"
+                        },
+                        {
+                            value: "PT",
+                            label: "PT"
+                        },
+                        {
+                            value: "UD",
+                            label: "UD"
+                        },
+                        {
+                            value: "-",
+                            label: "-"
+                        },
+                    ],
+                    omset_list: [{
+                            value: "<10jt",
+                            label: "Kurang dari 10 juta"
+                        },
+                        {
+                            value: "10-50jt",
+                            label: "10 sampai 50 juta"
+                        },
+                        {
+                            value: "50-150jt",
+                            label: "50 sampai 150 juta"
+                        },
+                        {
+                            value: ">150jt",
+                            label: "Lebih dari 150 juta"
+                        },
+                    ],
                     provinsi_list: [],
                     kota_list: [],
                     kecamatan_list: [],
@@ -315,6 +389,9 @@
                         // Prepare the data structure properly
                         const updateData = {
                             nama: this.userData.nama,
+                            ijin_usaha: this.userData.ijin_usaha,
+                            omset: this.userData.omset,
+                            npwp: this.userData.npwp,
                             user: {
                                 username: this.userData.user.username,
                                 email: this.userData.user.email

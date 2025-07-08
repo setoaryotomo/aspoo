@@ -120,9 +120,9 @@
 <main id="login-page" class="main-content">
     <div class="container">
         <div class="login-card row g-0">
-            <div class="logo-container col-12">
+            {{-- <div class="logo-container col-12">
                 <img src="../img/portal/logo.png" alt="Logo" style="width: 200px" class="img-fluid"/>
-            </div>
+            </div> --}}
             
             <div class="col-md-6 login-image">
                 <img src="{{URL::asset('/img/portal/login_logo.png')}}" alt="Login Illustration" class="img-fluid"/>
