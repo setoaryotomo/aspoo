@@ -1018,13 +1018,15 @@
                                 
                                 <div class="product-details">
                                     <div class="product-name">{{ $item['namaBarang'] }}</div>
+                                    ({{ $item['toko'] }})
                                     {{-- <div class="product-meta">
                                         <span><i class="bi bi-upc"></i> {{ $item['kodeTransaksi'] }}</span>
                                     </div> --}}
                                 </div>
                                 
                                 <div class="product-price">
-                                    <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }} x {{ $item['jumlah'] }}</span> 
+                                    {{-- <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</span>  --}}
+                                    <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }} ({{ $item['jumlah'] }})</span> 
                                     {{-- <span class="qty">{{ $item['jumlah'] }} x Rp {{ number_format($item['harga'], 0, ',', '.') }}</span> --}}
                                 </div>
                                 
@@ -1051,13 +1053,15 @@
                                     
                                     <div class="product-details">
                                         <div class="product-name">{{ $item['namaBarang'] }}</div>
+                                        ({{ $item['toko'] }})
                                         {{-- <div class="product-meta">
                                             <span><i class="bi bi-upc"></i> {{ $item['kodeTransaksi'] }}</span>
                                         </div> --}}
                                     </div>
                                     
                                     <div class="product-price">
-                                        <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }} x {{ $item['jumlah'] }}</span> 
+                                        {{-- <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}</span>  --}}
+                                        <span class="amount">Rp {{ number_format($item['subtotal'], 0, ',', '.') }} ({{ $item['jumlah'] }})</span> 
                                         {{-- <span class="qty">{{ $item['jumlah'] }} x Rp {{ number_format($item['harga'], 0, ',', '.') }}</span> --}}
                                     </div>
                                     

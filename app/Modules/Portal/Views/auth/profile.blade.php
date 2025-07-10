@@ -162,7 +162,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="nama" class="form-label">Nama Lengkap</label>
-                        <input type="text" class="form-control" value="{{ $data->nama }}" id="nama" name="nama" placeholder="Nama Lengkap">
+                        <input type="text" class="form-control" value="{{ $user->name }}" id="name" name="name" placeholder="Nama Lengkap">
                     </div>
                     @if(!empty($toko->nama))
                     <div class="form-group">

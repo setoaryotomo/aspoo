@@ -1,9 +1,7 @@
 @extends('portal_layout.templates')
 @section('content')
 
-@php
-    $hideHeaderFooter = true;
-@endphp
+
 <style>
     /* Add the Poppins font */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');

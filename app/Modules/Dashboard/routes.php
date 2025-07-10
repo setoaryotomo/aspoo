@@ -13,4 +13,5 @@ Route::prefix('/dashboard')->group(function() {
     Route::get('/export-pdf', [DashboardController::class, 'exportPdf'])
     ->name('laporan.penjualan.export.pdf')
     ->middleware('auth');
+    Route::get('/get-transaction-details', [DashboardController::class, 'getTransactionDetails'])->name('dashboard.transaction-details');
 });

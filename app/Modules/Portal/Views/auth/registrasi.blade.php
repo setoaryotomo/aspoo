@@ -1,9 +1,9 @@
-<?php $hideHeaderFooter = true; ?>
+
 @extends('portal_layout.templates')
 @section('content')
-    @php
+    {{-- @php
         $hideHeaderFooter = true;
-    @endphp
+    @endphp --}}
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
         body { font-family: 'Poppins'; }

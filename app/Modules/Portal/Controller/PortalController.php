@@ -415,6 +415,7 @@ class PortalController extends Controller
                     'transaksiId' => $transaksi->id,
                     'kodeTransaksi' => $transaksi->kode_transaksi,
                     'namaBarang' => $barang->nama_barang,
+                    'toko' => $barang->user->nama,
                     'thumbnail' => $barang->thumbnail,
                     'thumbnail_readable' => $barang->thumbnail_readable,
                     'jumlah' => $child->jumlah,

@@ -223,7 +223,55 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function laporanPenjualanAdmin(Request $request)
+    // public function laporanPenjualanAdmin1(Request $request)
+    // {
+    //     // Filter tanggal
+    //     $startDate = $request->input('tanggal_mulai', date('Y-m-01'));
+    //     $endDate = $request->input('tanggal_selesai', date('Y-m-d'));
+    //     $status = $request->input('status', 'semua');
+    //     $tokoId = $request->input('toko_id', 'semua');
+        
+    //     // Query transaksi master
+    //     $transaksiMaster = TransaksiBarang::with(['pembeli', 'penjual', 'dataChildren'])
+    //         ->whereBetween('created_at', [$startDate, $endDate])
+    //         ->whereNotNull('kode_transaksi_master');
+            
+    //     // Filter status
+    //     if ($status != 'semua') {
+    //         $transaksiMaster->where('status', $status);
+    //     }
+        
+    //     // Filter toko
+    //     if ($tokoId != 'semua') {
+    //         $transaksiMaster->where('toko_id', $tokoId);
+    //     }
+        
+    //     $transaksiMaster = $transaksiMaster->orderBy('created_at', 'desc')
+    //         ->get()
+    //         ->groupBy('kode_transaksi_master');
+            
+    //     // Hitung total penjualan
+    //     $totalPenjualan = 0;
+    //     foreach ($transaksiMaster as $group) {
+    //         $totalPenjualan += $group->sum('total_biaya');
+    //     }
+        
+    //     // Daftar toko untuk dropdown filter
+    //     $tokos = TokoUser::all();
+        
+    //     return view('Dashboard::laporan_penjualan_admin', [
+    //         'transaksiMaster' => $transaksiMaster,
+    //         'totalPenjualan' => $totalPenjualan,
+    //         'startDate' => $startDate,
+    //         'endDate' => $endDate,
+    //         'status' => $status,
+    //         'tokoId' => $tokoId,
+    //         'tokos' => $tokos,
+    //         'totalTransaksi' => count($transaksiMaster) // Menghitung group master transaksi
+    //     ]);
+    // }
+
+public function laporanPenjualanAdmin(Request $request)
 {
     // Filter tanggal
     $startDate = $request->input('tanggal_mulai', date('Y-m-01'));
@@ -231,94 +279,183 @@ class DashboardController extends Controller
     $status = $request->input('status', 'semua');
     $tokoId = $request->input('toko_id', 'semua');
     
-    // Query transaksi
-    $transaksi = TransaksiBarang::with(['pembeli', 'penjual'])
-        ->whereBetween('created_at', [$startDate, $endDate]);
+    // Query transaksi master
+    $transaksiMaster = TransaksiBarang::with([
+        'pembeli', 
+        'penjual', 
+        'dataChildren', 
+        'dataChildren.barang' // Tambahkan eager loading untuk barang
+    ])
+    ->whereBetween('created_at', [$startDate, $endDate])
+    ->whereNotNull('kode_transaksi_master');
         
     // Filter status
     if ($status != 'semua') {
-        $transaksi->where('status', $status);
+        $transaksiMaster->where('status', $status);
     }
     
     // Filter toko
     if ($tokoId != 'semua') {
-        $transaksi->where('toko_id', $tokoId);
+        $transaksiMaster->where('toko_id', $tokoId);
     }
     
-    $transaksi = $transaksi->orderBy('created_at', 'desc')
-        ->get(); // Menggunakan get() bukan paginate()
+    $transaksiMaster = $transaksiMaster->orderBy('created_at', 'desc')
+        ->get()
+        ->groupBy('kode_transaksi_master');
         
-    $totalPenjualan = $transaksi->sum('total_biaya');
+    // Hitung total penjualan
+    $totalPenjualan = 0;
+    foreach ($transaksiMaster as $group) {
+        $totalPenjualan += $group->sum('total_biaya');
+    }
     
     // Daftar toko untuk dropdown filter
     $tokos = TokoUser::all();
     
     return view('Dashboard::laporan_penjualan_admin', [
-        'transaksi' => $transaksi,
+        'transaksiMaster' => $transaksiMaster,
         'totalPenjualan' => $totalPenjualan,
         'startDate' => $startDate,
         'endDate' => $endDate,
         'status' => $status,
         'tokoId' => $tokoId,
         'tokos' => $tokos,
-        'totalTransaksi' => $transaksi->count() // Menambahkan total transaksi
+        'totalTransaksi' => count($transaksiMaster)
     ]);
 }
 
+// public function exportPdf(Request $request) 
+// {
+//     // Ambil parameter filter yang sama dengan laporan admin
+//     $startDate = $request->input('tanggal_mulai', date('Y-m-01'));
+//     $endDate = $request->input('tanggal_selesai', date('Y-m-d'));
+//     $status = $request->input('status', 'semua');
+//     $tokoId = $request->input('toko_id', 'semua');
+    
+//     // Query transaksi dengan filter yang sama
+//     $transaksi = TransaksiBarang::with(['pembeli', 'penjual'])
+//         ->whereBetween('created_at', [$startDate, $endDate]);
+        
+//     // Filter status
+//     if ($status != 'semua') {
+//         $transaksi->where('status', $status);
+//     }
+    
+//     // Filter toko
+//     if ($tokoId != 'semua') {
+//         $transaksi->where('toko_id', $tokoId);
+//     }
+    
+//     $transaksi = $transaksi->orderBy('created_at', 'desc')->get();
+//     $totalPenjualan = $transaksi->sum('total_biaya');
+    
+//     // Daftar toko untuk informasi
+//     $tokos = TokoUser::all();
+    
+//     // Set timezone ke WIB (Asia/Jakarta)
+//     date_default_timezone_set('Asia/Jakarta');
+    
+//     // Data untuk PDF
+//     $data = [
+//         'transaksi' => $transaksi,
+//         'totalPenjualan' => $totalPenjualan,
+//         'startDate' => $startDate,
+//         'endDate' => $endDate,
+//         'status' => $status,
+//         'tokoId' => $tokoId,
+//         'tokos' => $tokos,
+//         'totalTransaksi' => $transaksi->count(),
+//         'tanggalCetak' => date('d M Y H:i:s') . ' WIB'
+//     ];
+    
+//     // Generate PDF
+//     $pdf = Pdf::loadView('pdf.laporan_penjualan_pdf', $data);
+    
+//     // Set paper size dan orientation
+//     $pdf->setPaper('A4', 'landscape');
+    
+//     // Generate filename dengan timestamp
+//     $filename = 'laporan_penjualan_' . date('Y-m-d_H-i-s') . '.pdf';
+    
+//     return $pdf->download($filename);   
+// }
+
 public function exportPdf(Request $request) 
 {
-    // Ambil parameter filter yang sama dengan laporan admin
     $startDate = $request->input('tanggal_mulai', date('Y-m-01'));
     $endDate = $request->input('tanggal_selesai', date('Y-m-d'));
     $status = $request->input('status', 'semua');
     $tokoId = $request->input('toko_id', 'semua');
     
-    // Query transaksi dengan filter yang sama
-    $transaksi = TransaksiBarang::with(['pembeli', 'penjual'])
-        ->whereBetween('created_at', [$startDate, $endDate]);
+    $transaksiMaster = TransaksiBarang::with([
+        'pembeli', 
+        'penjual', 
+        'dataChildren',
+        'dataChildren.barang'
+    ])
+    ->whereBetween('created_at', [$startDate, $endDate])
+    ->whereNotNull('kode_transaksi_master');
         
-    // Filter status
     if ($status != 'semua') {
-        $transaksi->where('status', $status);
+        $transaksiMaster->where('status', $status);
     }
     
-    // Filter toko
     if ($tokoId != 'semua') {
-        $transaksi->where('toko_id', $tokoId);
+        $transaksiMaster->where('toko_id', $tokoId);
     }
     
-    $transaksi = $transaksi->orderBy('created_at', 'desc')->get();
-    $totalPenjualan = $transaksi->sum('total_biaya');
+    $transaksiMaster = $transaksiMaster->orderBy('created_at', 'desc')
+        ->get()
+        ->groupBy('kode_transaksi_master');
+        
+    $totalPenjualan = 0;
+    foreach ($transaksiMaster as $group) {
+        $totalPenjualan += $group->sum('total_biaya');
+    }
     
-    // Daftar toko untuk informasi
     $tokos = TokoUser::all();
-    
-    // Set timezone ke WIB (Asia/Jakarta)
     date_default_timezone_set('Asia/Jakarta');
     
-    // Data untuk PDF
     $data = [
-        'transaksi' => $transaksi,
+        'transaksiMaster' => $transaksiMaster,
         'totalPenjualan' => $totalPenjualan,
         'startDate' => $startDate,
         'endDate' => $endDate,
         'status' => $status,
         'tokoId' => $tokoId,
         'tokos' => $tokos,
-        'totalTransaksi' => $transaksi->count(),
+        'totalTransaksi' => count($transaksiMaster),
         'tanggalCetak' => date('d M Y H:i:s') . ' WIB'
     ];
     
-    // Generate PDF
     $pdf = Pdf::loadView('pdf.laporan_penjualan_pdf', $data);
-    
-    // Set paper size dan orientation
     $pdf->setPaper('A4', 'landscape');
-    
-    // Generate filename dengan timestamp
     $filename = 'laporan_penjualan_' . date('Y-m-d_H-i-s') . '.pdf';
     
     return $pdf->download($filename);   
+}
+
+public function getTransactionDetails(Request $request)
+{
+    $masterCode = $request->input('master_code');
+    
+    $transactions = TransaksiBarang::with([
+        'pembeli', 
+        'penjual', 
+        'dataChildren',
+        'dataChildren.barang'
+    ])
+    ->where('kode_transaksi_master', $masterCode)
+    ->orderBy('created_at', 'desc')
+    ->get();
+    
+    $totalAmount = $transactions->sum('total_biaya');
+    
+    return view('Dashboard::transaction_details', [
+        'transactions' => $transactions,
+        'masterCode' => $masterCode,
+        'totalAmount' => $totalAmount
+    ]);
 }
 
 }
