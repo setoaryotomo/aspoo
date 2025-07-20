@@ -61,7 +61,8 @@
                         showToast({
                             message: "Data berhasil di Approve!"
                         })
-                        history.back()
+                        // history.back()
+                        window.location.reload() // Hanya sebagai fallback
 
                     } catch (err) {
                         hideLoading()

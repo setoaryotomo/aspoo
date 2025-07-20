@@ -15,6 +15,13 @@
                             @blur="isSearchFocused = false"
                         />
                     </div>
+                    <button 
+                        v-if="canExport" 
+                        @click="$emit('export-pdf')"
+                        class="btn btn-info btn-round mr-2"
+                    >
+                        <i class="fas fa-file-pdf mr-1"></i> Cetak Laporan
+                    </button>
                     <div>
                         <a
                             v-if="canAdd"
@@ -100,7 +107,7 @@
                                             type="button"
                                             class="btn btn-xs bg-primary mr-1 text-white"
                                         >
-                                            Edit
+                                            <!-- Edit --><i class="fas fa-edit"></i>
                                         </a>
                                         <button
                                             v-if="canDelete"
@@ -108,7 +115,7 @@
                                             type="button"
                                             class="btn btn-xs btn-danger"
                                         >
-                                            Delete
+                                            <!-- Delete --><i class="fas fa-trash"></i>
                                         </button>
                                         <slot
                                             name="right-action"
@@ -160,10 +167,18 @@ export default {
             type: Boolean,
             default: true,
         },
+        canExport: {
+            type: Boolean,
+            default: false
+        },
         canDelete: {
             type: Boolean,
             default: true,
         },
+        filters: {
+            type: Object,
+            default: () => ({})
+        }
     },
     data() {
         return {
@@ -184,6 +199,14 @@ export default {
         page(newPage, oldPage) {
             this.fetchData();
         },
+        // Tambahkan watcher untuk filters
+        filters: {
+            handler(newVal, oldVal) {
+                this.page = 1; // Reset ke halaman pertama saat filter berubah
+                this.fetchData();
+            },
+            deep: true
+        }
     },
     created() {
         this.fetchData();
@@ -209,9 +232,25 @@ export default {
             this.isContentLoading = true;
             const { page, per_page, keyword } = this;
             fetchController = new AbortController();
+            
+            // Siapkan params termasuk filters
+            const params = { 
+                page, 
+                per_page, 
+                keyword,
+                ...this.filters // Gabungkan filters ke params
+            };
+            
+            // Bersihkan params dari nilai kosong
+            Object.keys(params).forEach(key => {
+                if (params[key] === null || params[key] === undefined || params[key] === '') {
+                    delete params[key];
+                }
+            });
+
             const response = await httpClient.get(`${this.url}/datatable`, {
                 signal: fetchController.signal,
-                params: { page, per_page, keyword },
+                params
             });
             const result = response.data.result;
             this.contents = result.data;
@@ -219,11 +258,11 @@ export default {
             this.isContentLoading = false;
         },
         async deleteWithPost(url, data = {}) {
-    return await httpClient.post(url, {
-        ...data,
-        _method: 'DELETE'
-    });
-},
+            return await httpClient.post(url, {
+                ...data,
+                _method: 'DELETE'
+            });
+        },
         async deleteData(id) {
             Swal.fire({
                 title: "Apakah anda yakin ingin menghapus data ini?",
@@ -241,6 +280,10 @@ export default {
                 }
             });
         },
+        // Tambahkan method refresh untuk dipanggil dari parent
+        refresh() {
+            this.fetchData();
+        }
     },
 };
 </script>

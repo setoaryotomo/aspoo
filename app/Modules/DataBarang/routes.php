@@ -2,6 +2,7 @@
 namespace App\Modules\DataBarang;
 
 use App\Modules\DataBarang\Controllers\DataBarangController;
+use App\Modules\DataBarang\Models\DataBarang;
 use App\Modules\Komposisi\Controllers\KomposisiSupplierController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,7 +12,16 @@ Route::prefix('/data-barang')->group(function() {
 
     Route::get('/all', [DataBarangController::class, 'all']);
     Route::get('/produsenall', [DataBarangController::class, 'produsenAll']);
-    Route::get('/kategoriumumall', [DataBarangController::class, 'kategoriUmumAll']);
+    Route::get('/kategoriumumall', [DataBarangController::class, 'kategoriumumAll']);
+    Route::get('/kategorinamaall', [DataBarangController::class, 'kategorinamaAll']);
+    Route::get('/kategoriprodukall', [DataBarangController::class, 'kategoriprodukAll']);
+    Route::get('/rasaall', [DataBarangController::class, 'rasaAll']);
+    Route::get('/jeniskemasanall', [DataBarangController::class, 'jeniskemasanAll']);
+    Route::get('/bahandasarall', [DataBarangController::class, 'bahandasarAll']);
+    Route::get('/kekhasanall', [DataBarangController::class, 'kekhasanAll']);
+    Route::get('/basahkeringall', [DataBarangController::class, 'basahkeringAll']);
+    Route::get('/bahankemasanall', [DataBarangController::class, 'bahankemasanAll']);
+    Route::get('/export-pdf', [DataBarangController::class, 'exportPdf']);
     // SUB MENU MARKER (DONT DELETE THIS LINE)
     Route::prefix("/komposisi/{kode_barang}")->group(function(){
         Route::prefix("/supplier/{kode_komposisi}")->group(function(){
@@ -51,6 +61,9 @@ Route::prefix('/data-barang')->group(function() {
     Route::get('/{data_barang_id}/edit', [DataBarangController::class, 'edit'])->middleware('authorize:update-data_barang');
     Route::post('/{data_barang_id}', [DataBarangController::class, 'update'])->middleware('authorize:update-data_barang');
     Route::delete('/{data_barang_id}', [DataBarangController::class, 'destroy'])->middleware('authorize:delete-data_barang');
-
+    Route::get('/debug/barang-user', function() {
+        $data = DataBarang::with(['user'])->limit(5)->get();
+        return response()->json($data, 200, [], JSON_PRETTY_PRINT);
+    });
     
 });
