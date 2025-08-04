@@ -349,9 +349,10 @@
                                                         
                                                     </div> --}}
                                                     <div class="store-details">
-                                                        <div class="store-name">{{@$data->user->nama}}</div>
-                                                        <div class="store-location">{{@$data->user->detail->alamat}}</div>
-                                                        <div style="font-size: 8px;">{{@$data->user->user->username}}</div>
+                                                        <div class="store-name"><a href="{{ url('/p/toko/' . $data->user->id) }}">{{@$data->user->nama}}</a></div>
+                                                        {{-- <div class="store-location">{{@$data->user->detail->alamat}}</div> --}}
+                                                        {{-- <div style="font-size: 8px;">{{@$data->user->user->username}}</div> --}}
+                                                        <div style="store-location">{{@$data->user->user->username}}</div>
 
                                                     </div>
 
@@ -381,9 +382,9 @@
                                     <div class="product-description">
                                         <div class="description-sections">
                                             <div class="description-section">Detail</div>
-                                            <div class="description-section">Info Penting</div>
+                                            <div class="description-section" style="display: none">Info Penting</div>
                                         </div>
-                                        <div class="description-content" id="detailContent">
+                                        <div class="description-content" id="detailContent" style="display: block">
                                             {{-- <img src="https://chart.googleapis.com/chart?cht=qr&chl={{$data->id}}&chs=180x180&choe=UTF-8&chld=L|2" ><br> --}}
                                                 {!! $data->keterangan !!}<br>
                                                 @if($data->panjang && $data->lebar && $data->tinggi)
@@ -487,7 +488,7 @@
 
             }).mount("#container")
         </script>
-        <script>
+        {{-- <script>
             const detailSection = document.querySelector('.description-section:nth-child(1)');
             const infoPentingSection = document.querySelector('.description-section:nth-child(2)');
             const detailContent = document.getElementById('detailContent');
@@ -510,5 +511,5 @@
                 detailContent.style.display = 'none';
                 infoPentingContent.style.display = 'block';
             });
-        </script>
+        </script> --}}
     @endsection

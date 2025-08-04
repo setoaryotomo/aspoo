@@ -258,6 +258,7 @@
                                 {{-- <li class="nav-search"><a href="#canvasSearch" data-bs-toggle="offcanvas" aria-controls="offcanvasLeft" class="nav-icon-item"><i class="icon icon-search"></i></a></li> --}}
                                 
                                 <li class="nav-compare"><a href="{{ url('/p/listbarang') }}" class="nav-icon-item align-items-center gap-10"><i class="icon icon-shopping"></i><span class="text">Product</span></a></li>
+                                <li class="nav-compare"><a href="{{ url('/p/listtoko') }}" class="nav-icon-item align-items-center gap-10"><i class="fa-solid fa-shop"></i><span class="text">Toko</span></a></li>
                                 
                                 <li class="nav-wishlist">
                                     <a v-if="this.isLoggedin == true" href="{{ url('/p/pesanparcel') }}" class="nav-icon-item align-items-center gap-10">
@@ -287,6 +288,11 @@
                                             <a class="dropdown-item" 
                                                href="{{ url('/p/login') }}">
                                                 Login
+                                            </a>
+                                            <hr>
+                                            <a class="dropdown-item" 
+                                               href="{{ url('/p/registrasi') }}">
+                                                Register / Daftar
                                             </a>
                                             <br>
                                         </div>
@@ -358,7 +364,11 @@
                                 <a href="{{ url('/p/listbarang') }}" class="collapsed mb-menu-link current">
                                     <span>Produk</span>
                                 </a>
-                                
+                            </li>
+                            <li class="nav-mb-item">
+                                <a href="{{ url('/p/listtoko') }}" class="collapsed mb-menu-link current">
+                                    <span>Toko</span>
+                                </a>
                             </li>
                             <li class="nav-mb-item">
                                 <a v-if="this.isLoggedin == true" href="{{ url('/p/pesanparcel') }}" class="collapsed mb-menu-link current">

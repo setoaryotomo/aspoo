@@ -190,7 +190,7 @@
                                     </td>
                                     <td>
                                         <button class="btn btn-sm btn-info" onclick="showTransactionDetails('{{ $masterCode }}')">
-                                            <i class="fas fa-eye"></i> Detail
+                                            <i class="fas fa-eye" style="color: white"></i>
                                         </button>
                                     </td>
                                 </tr>

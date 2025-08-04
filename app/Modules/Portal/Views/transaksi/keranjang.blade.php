@@ -206,6 +206,7 @@
                                                     <td>
                                                         <input type="checkbox" 
                                                                v-model="keranjang.selected" 
+                                                               style="display: none" 
                                                                @change="updateParcelGroupSelection(parcelId)">
                                                     </td>
                                                     <td>

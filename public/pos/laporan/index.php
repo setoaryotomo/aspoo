@@ -235,7 +235,7 @@ $title = 'Laporan';
         
         // Total transaksi
         pdf.setFont(undefined, 'bold');
-        pdf.text(`Total: ${total}`, margin, yPos);
+        // pdf.text(`Total: ${total}`, margin, yPos);
         yPos += 40;
         
         // Garis pemisah

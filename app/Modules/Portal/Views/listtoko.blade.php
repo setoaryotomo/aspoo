@@ -101,7 +101,7 @@
 
 <body>
     <div class="container custom-margin">
-        <ul class="nav">
+        {{-- <ul class="nav">
             <li class="nav-item">
                 <a href="{{ url('/p/listbarang')}}" class="nav-link active" aria-disabled="true"
                     style="font-size: 21px; color:#000"><i class="bi bi-archive"></i><span
@@ -111,15 +111,16 @@
                 <a href="{{ url('/p/listtoko')}}" class="nav-link active" aria-current="page"
                     style="font-size: 21px; color:#000; text-decoration: underline; text-decoration-color: red;"><i
                         class="bi bi-shop-window"></i><span style="margin-left: 8px;">TOKO</span></a>
-            {{-- <li class="nav-item">
+            <li class="nav-item">
                 <a href="{{ url('/p/listparcel') }}" class="nav-link active" aria-current="page"
                     style="font-size: 21px; color:#000; text-decoration:"><i class="bi bi-gift"></i><span
                         style="margin-left: 8px;">PAKET PARCEL</span></a>
-            </li> --}}
             </li>
-        </ul>
+            </li>
+        </ul> --}}
     </div>
-    <div class="section-divider"></div>
+    {{-- <div class="section-divider"></div> --}}
+    <div class=""></div>
     <br>
     <div class="container">
         <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -129,6 +130,9 @@
                     <img src="{{ $users_toko->detail->foto ? Storage::url($users_toko->detail->foto) : 'https://www.canbind.ca/wp-content/uploads/2025/01/placeholder-image-person-jpg.jpg' }}" 
      alt="{{ $users_toko->nama }}" 
      class="card-img">
+                    {{-- <img src="{{ $users_toko->detail->foto ? Storage::url($users_toko->detail->foto) : 'https://www.canbind.ca/wp-content/uploads/2025/01/placeholder-image-person-jpg.jpg' }}" 
+     alt="{{ $users_toko->nama }}" 
+     class="card-img"> --}}
                     <div class="card-body">
                         <h5 class="card-title">{{ $users_toko->nama }}</h5>
                         {{-- <p class="card-text">Tautan: {{ $users_toko->tautan }}</p> --}}
@@ -152,3 +156,16 @@
     </div>
 
     @endsection
+    <script src="{!! asset('js/bootstrap.min.js') !!}"></script>
+    <script src="{!! asset('js/jquery.min.js') !!}"></script>
+    <script src="{!! asset('js/swiper-bundle.min.js') !!}"></script>
+    <script src="{!! asset('js/carousel.js') !!}"></script>
+    <script src="{!! asset('js/bootstrap-select.min.js') !!}"></script>
+    <script src="{!! asset('js/lazysize.min.js') !!}"></script>
+    <script src="{!! asset('js/bootstrap-select.min.js') !!}"></script>
+    <script src="{!! asset('js/count-down.js') !!}"></script>
+    <script src="{!! asset('js/wow.min.js') !!}"></script>
+    <script src="{!! asset('js/multiple-modal.js') !!}"></script>
+    <script src="{!! asset('js/shop.js') !!}"></script>
+    <script src="{!! asset('js/nouislider.min.js') !!}"></script>
+    <script src="{!! asset('js/main.js') !!}"></script>
